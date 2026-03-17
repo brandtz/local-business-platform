@@ -2,17 +2,26 @@ import { Injectable } from "@nestjs/common";
 
 import type { TenantResolutionTenantRecord } from "@platform/types";
 
+import { canTenantAccessLifecycleMode } from "@platform/types";
+
 import {
 	normalizeRequestHost,
 	resolveManagedSubdomain
 } from "./tenant-request-host";
 
-export type PreviewSurface = "storefront" | "admin";
+export const previewSurfaces = ["storefront", "admin"] as const;
 
-export type PreviewRouteResolutionOptions = {
-	managedPreviewAdminDomains?: readonly string[];
-	managedPreviewStorefrontDomains?: readonly string[];
-};
+export type PreviewSurface = (typeof previewSurfaces)[number];
+
+export const previewRouteUnresolvedReasons = [
+	"no-host",
+	"no-matching-domain",
+	"tenant-not-found",
+	"tenant-not-accessible"
+] as const;
+
+export type PreviewRouteUnresolvedReason =
+	(typeof previewRouteUnresolvedReasons)[number];
 
 export type PreviewRouteResolutionRequest = {
 	host: string | null | undefined;
@@ -23,7 +32,7 @@ export type PreviewRouteResolutionResult =
 	| {
 		kind: "resolved";
 		normalizedHost: string;
-		previewSubdomain: string;
+		subdomain: string;
 		surface: PreviewSurface;
 		tenant: TenantResolutionTenantRecord;
 	  }
@@ -33,87 +42,112 @@ export type PreviewRouteResolutionResult =
 		reason: PreviewRouteUnresolvedReason;
 	  };
 
-export type PreviewRouteUnresolvedReason =
-	| "missing-host"
-	| "no-matching-preview-domain"
-	| "unknown-preview-subdomain";
+export type PreviewRouteResolutionOptions = {
+	managedPreviewAdminDomains?: readonly string[];
+	managedPreviewStorefrontDomains?: readonly string[];
+};
 
 @Injectable()
 export class PreviewRouteResolutionService {
-	constructor(private readonly options: PreviewRouteResolutionOptions = {}) {}
+	constructor(
+		private readonly options: PreviewRouteResolutionOptions = {}
+	) {}
 
-	resolvePreviewRoute(
-		request: PreviewRouteResolutionRequest
-	): PreviewRouteResolutionResult {
+	resolve(request: PreviewRouteResolutionRequest): PreviewRouteResolutionResult {
 		const normalizedHost = normalizeRequestHost(request.host);
 
 		if (!normalizedHost) {
 			return {
 				kind: "unresolved",
 				normalizedHost: null,
-				reason: "missing-host"
+				reason: "no-host"
 			};
 		}
 
-		const storefrontSubdomain = resolveManagedSubdomain(
-			normalizedHost,
-			this.options.managedPreviewStorefrontDomains || []
-		);
-
-		if (storefrontSubdomain) {
-			return this.resolveSubdomainToTenant(
-				request.tenants,
-				storefrontSubdomain,
-				"storefront",
-				normalizedHost
-			);
-		}
-
-		const adminSubdomain = resolveManagedSubdomain(
+		const adminMatch = this.resolvePreviewSubdomain(
 			normalizedHost,
 			this.options.managedPreviewAdminDomains || []
 		);
 
-		if (adminSubdomain) {
-			return this.resolveSubdomainToTenant(
-				request.tenants,
-				adminSubdomain,
+		if (adminMatch) {
+			return this.resolveForSurface(
+				normalizedHost,
+				adminMatch,
 				"admin",
-				normalizedHost
+				request.tenants
+			);
+		}
+
+		const storefrontMatch = this.resolvePreviewSubdomain(
+			normalizedHost,
+			this.options.managedPreviewStorefrontDomains || []
+		);
+
+		if (storefrontMatch) {
+			return this.resolveForSurface(
+				normalizedHost,
+				storefrontMatch,
+				"storefront",
+				request.tenants
 			);
 		}
 
 		return {
 			kind: "unresolved",
 			normalizedHost,
-			reason: "no-matching-preview-domain"
+			reason: "no-matching-domain"
 		};
 	}
 
-	private resolveSubdomainToTenant(
-		tenants: TenantResolutionTenantRecord[],
-		previewSubdomain: string,
-		surface: PreviewSurface,
-		normalizedHost: string
-	): PreviewRouteResolutionResult {
-		const tenant = tenants.find(
-			(t) => t.previewSubdomain.toLowerCase() === previewSubdomain
-		);
+	private resolvePreviewSubdomain(
+		host: string,
+		domains: readonly string[]
+	): string | null {
+		return resolveManagedSubdomain(host, domains);
+	}
 
-		if (tenant) {
+	private resolveForSurface(
+		normalizedHost: string,
+		subdomain: string,
+		surface: PreviewSurface,
+		tenants: TenantResolutionTenantRecord[]
+	): PreviewRouteResolutionResult {
+		const tenant = this.findTenantByPreviewSubdomain(tenants, subdomain);
+
+		if (!tenant) {
 			return {
-				kind: "resolved",
+				kind: "unresolved",
 				normalizedHost,
-				previewSubdomain,
-				surface,
-				tenant
+				reason: "tenant-not-found"
+			};
+		}
+
+		if (!canTenantAccessLifecycleMode(tenant.status, "preview-routing")) {
+			return {
+				kind: "unresolved",
+				normalizedHost,
+				reason: "tenant-not-accessible"
 			};
 		}
 
 		return {
-			kind: "unresolved",
+			kind: "resolved",
 			normalizedHost,
-			reason: "unknown-preview-subdomain"
+			subdomain,
+			surface,
+			tenant
 		};
+	}
+
+	private findTenantByPreviewSubdomain(
+		tenants: TenantResolutionTenantRecord[],
+		previewSubdomain: string
+	): TenantResolutionTenantRecord | null {
+		return (
+			tenants.find(
+				(tenant) =>
+					tenant.previewSubdomain.toLowerCase() === previewSubdomain.toLowerCase()
+			) || null
+		);
 	}
 }
