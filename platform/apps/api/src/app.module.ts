@@ -6,6 +6,7 @@ import { ImpersonationSessionService } from "./auth/impersonation-session.servic
 import { ManagedSubdomainService } from "./auth/managed-subdomain.service";
 import { MfaLifecycleService } from "./auth/mfa-lifecycle";
 import { PasswordResetLifecycleService } from "./auth/password-reset-lifecycle";
+import { PreviewRouteResolutionService } from "./auth/preview-route-resolution.service";
 import { PlatformAccessService } from "./auth/platform-access.service";
 import { PrivilegedAuthPolicyService } from "./auth/privileged-auth-policy.service";
 import { RequestContextService } from "./auth/request-context.service";
@@ -33,6 +34,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     MfaLifecycleService,
     PasswordResetLifecycleService,
     PlatformAccessService,
+    PreviewRouteResolutionService,
     PrivilegedAuthPolicyService,
     RequestContextService,
     SecurityEventService,
@@ -55,6 +57,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     MfaLifecycleService,
     PasswordResetLifecycleService,
     PlatformAccessService,
+    PreviewRouteResolutionService,
     PrivilegedAuthPolicyService,
     RequestContextService,
     SecurityEventService,
