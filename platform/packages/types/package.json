@@ -1,0 +1,17 @@
+{
+  "name": "@platform/types",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "echo build types",
+    "clean": "echo clean types",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "src/index.ts"
+}

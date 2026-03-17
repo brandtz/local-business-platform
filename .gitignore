@@ -1,0 +1,11 @@
+.DS_Store
+platform/node_modules/
+platform/.turbo/
+platform/coverage/
+platform/apps/**/dist/
+platform/packages/**/dist/
+platform/playwright-report/
+platform/test-results/
+platform/.env
+platform/.env.*
+!platform/**/.env.example

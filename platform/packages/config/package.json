@@ -1,0 +1,20 @@
+{
+  "name": "@platform/config",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "echo build config",
+    "clean": "echo clean config",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./eslint": "./eslint.config.mjs",
+    "./prettier": "./prettier.config.mjs",
+    "./vitest": "./vitest.config.mjs"
+  },
+  "main": "src/index.ts"
+}

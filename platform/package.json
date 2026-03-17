@@ -1,0 +1,54 @@
+{
+  "name": "local-business-platform",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22.12.0",
+    "pnpm": ">=9.15.9"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "setup": "pnpm install",
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "dev:customer": "turbo run dev --filter=@platform/web-customer",
+    "dev:admin": "turbo run dev --filter=@platform/web-admin",
+    "dev:platform": "turbo run dev --filter=@platform/web-platform-admin",
+    "dev:api": "turbo run dev --filter=@platform/api",
+    "dev:worker": "turbo run dev --filter=@platform/worker",
+    "start:api": "pnpm --filter @platform/api start",
+    "start:worker": "pnpm --filter @platform/worker start",
+    "preview:customer": "pnpm --filter @platform/web-customer preview",
+    "preview:admin": "pnpm --filter @platform/web-admin preview",
+    "preview:platform": "pnpm --filter @platform/web-platform-admin preview",
+    "playwright:install": "playwright install chromium",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:e2e": "playwright test",
+    "test:e2e:smoke": "playwright test --project=web-customer-smoke --project=web-admin-smoke --project=web-platform-admin-smoke",
+    "typecheck:contracts": "tsc -p contracts/tsconfig.json",
+    "typecheck": "turbo run typecheck",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "clean": "turbo run clean --continue --only"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@playwright/test": "^1.58.2",
+    "@rolldown/binding-win32-x64-msvc": "1.0.0-rc.9",
+    "@types/node": "^25.5.0",
+    "eslint": "^9.22.0",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3",
+    "tsx": "^4.21.0",
+    "turbo": "^2.4.4",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.1",
+    "vitest": "^3.0.8"
+  }
+}

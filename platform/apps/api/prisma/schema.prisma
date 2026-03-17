@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ActorType {
+  PLATFORM
+  TENANT
+  CUSTOMER
+}
+
+enum UserStatus {
+  INVITED
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
+}
+
+enum PlatformRole {
+  OWNER
+  ADMIN
+  SUPPORT
+  ANALYST
+}
+
+enum TenantStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
+}
+
+enum TenantRole {
+  OWNER
+  ADMIN
+  MANAGER
+  STAFF
+}
+
+enum CredentialKind {
+  PASSWORD
+}
+
+enum SessionScope {
+  PLATFORM
+  TENANT
+  CUSTOMER
+}
+
+model User {
+  id                String               @id @default(uuid())
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  email             String               @unique
+  normalizedEmail   String               @unique
+  displayName       String?
+  actorType         ActorType
+  status            UserStatus           @default(INVITED)
+  platformRole      PlatformRole?
+  isEmailVerified   Boolean              @default(false)
+  lastAuthenticatedAt DateTime?
+  passwordCredential PasswordCredential?
+  sessions          AuthSession[]
+  memberships       TenantMembership[]
+
+  @@index([actorType, status])
+}
+
+model Tenant {
+  id               String             @id @default(uuid())
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  displayName      String
+  slug             String             @unique
+  status           TenantStatus       @default(DRAFT)
+  previewSubdomain String             @unique
+  memberships      TenantMembership[]
+}
+
+model TenantMembership {
+  id          String     @id @default(uuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  tenantId    String
+  userId      String
+  role        TenantRole
+  isPrimary   Boolean    @default(false)
+  joinedAt    DateTime   @default(now())
+  revokedAt   DateTime?
+  tenant      Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([userId, role])
+  @@index([tenantId, role])
+}
+
+model PasswordCredential {
+  id                String         @id @default(uuid())
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  userId            String         @unique
+  kind              CredentialKind @default(PASSWORD)
+  passwordHash      String
+  hashAlgorithm     String
+  passwordVersion   Int            @default(1)
+  passwordChangedAt DateTime       @default(now())
+  mustRotate        Boolean        @default(false)
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuthSession {
+  id                String       @id @default(uuid())
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  userId            String
+  actorType         ActorType
+  scope             SessionScope
+  refreshTokenHash  String       @unique
+  issuedAt          DateTime     @default(now())
+  expiresAt         DateTime
+  idleExpiresAt     DateTime
+  lastSeenAt        DateTime?
+  revokedAt         DateTime?
+  revokeReason      String?
+  ipAddress         String?
+  userAgent         String?
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, scope])
+  @@index([expiresAt])
+  @@index([revokedAt])
+}

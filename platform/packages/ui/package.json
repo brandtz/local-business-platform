@@ -1,0 +1,21 @@
+{
+  "name": "@platform/ui",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "echo build ui",
+    "clean": "echo clean ui",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc -b tsconfig.json --force"
+  },
+  "dependencies": {
+    "@platform/types": "workspace:*",
+    "@platform/utils": "workspace:*"
+  },
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "src/index.ts"
+}
