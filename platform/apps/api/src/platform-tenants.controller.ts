@@ -2,8 +2,11 @@ import { Body, Controller, Post, Req } from "@nestjs/common";
 
 import {
 	assertValidPlatformTenantOperationalSummaryQueryRequest,
-	assertValidTenantProvisioningRequest
+	assertValidTenantModuleAssignmentRequest,
+	assertValidTenantProvisioningRequest,
+	assertValidTenantTemplateAssignmentRequest
 } from "./auth/api-contracts";
+import { ModuleTemplateAssignmentService } from "./auth/module-template-assignment.service";
 import { PlatformTenantOperationalSummaryService } from "./auth/platform-tenant-operational-summary.service";
 import { TenantProvisioningService } from "./auth/tenant-provisioning.service";
 import { TenantProvisioningSummaryService } from "./auth/tenant-provisioning-summary.service";
@@ -23,7 +26,8 @@ export class PlatformTenantsController {
 	constructor(
 		private readonly tenantProvisioningService: TenantProvisioningService,
 		private readonly tenantProvisioningSummaryService: TenantProvisioningSummaryService,
-		private readonly platformTenantOperationalSummaryService: PlatformTenantOperationalSummaryService
+		private readonly platformTenantOperationalSummaryService: PlatformTenantOperationalSummaryService,
+		private readonly moduleTemplateAssignmentService: ModuleTemplateAssignmentService
 	) {}
 
 	@Post()

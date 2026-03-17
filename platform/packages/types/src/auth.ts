@@ -434,6 +434,29 @@ export type TenantProvisioningSummary = {
 	verticalTemplate: TenantVerticalTemplateKey;
 };
 
+export type TenantModuleAssignmentRequest = {
+	enabledModules: readonly string[];
+	tenantId: string;
+};
+
+export type TenantModuleAssignmentResult = {
+	enabledModules: readonly TenantModuleKey[];
+	tenantId: string;
+	updatedAt: string;
+};
+
+export type TenantTemplateAssignmentRequest = {
+	enabledModules: readonly string[];
+	templateKey: string;
+	tenantId: string;
+};
+
+export type TenantTemplateAssignmentResult = {
+	association: TenantTemplateAssociation;
+	enabledModules: readonly TenantModuleKey[];
+	tenantId: string;
+};
+
 export const platformTenantOperationalPreviewStatuses = [
 	"configured",
 	"missing"

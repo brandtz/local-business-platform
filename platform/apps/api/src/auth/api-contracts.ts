@@ -10,7 +10,9 @@ import {
 	type PasswordResetRequestInitiate,
 	type PasswordLoginRequest,
 	type SessionRefreshRequest,
-	type TenantProvisioningRequest
+	type TenantModuleAssignmentRequest,
+	type TenantProvisioningRequest,
+	type TenantTemplateAssignmentRequest
 } from "@platform/types";
 
 export class AuthApiContractError extends Error {}
@@ -274,6 +276,78 @@ export function assertValidPlatformTenantOperationalSummaryQueryRequest(
 		) {
 			throw new AuthApiContractError(
 				`Operational summary tenant at index ${index} lastLifecycleAuditAt must be a non-empty string when provided.`
+			);
+		}
+	});
+}
+
+export function assertValidTenantModuleAssignmentRequest(
+	payload: unknown
+): asserts payload is TenantModuleAssignmentRequest {
+	if (!isRecord(payload)) {
+		throw new AuthApiContractError("Module assignment payload must be an object.");
+	}
+
+	if (!isNonEmptyString(payload.tenantId)) {
+		throw new AuthApiContractError(
+			"Module assignment payload requires a non-empty tenantId."
+		);
+	}
+
+	if (!Array.isArray(payload.enabledModules)) {
+		throw new AuthApiContractError(
+			"Module assignment payload requires an enabledModules array."
+		);
+	}
+
+	payload.enabledModules.forEach((moduleKey, index) => {
+		if (!isNonEmptyString(moduleKey)) {
+			throw new AuthApiContractError(
+				`Module assignment enabledModules[${index}] must be a non-empty string.`
+			);
+		}
+	});
+}
+
+export function assertValidTenantTemplateAssignmentRequest(
+	payload: unknown
+): asserts payload is TenantTemplateAssignmentRequest {
+	if (!isRecord(payload)) {
+		throw new AuthApiContractError("Template assignment payload must be an object.");
+	}
+
+	if (!isNonEmptyString(payload.tenantId)) {
+		throw new AuthApiContractError(
+			"Template assignment payload requires a non-empty tenantId."
+		);
+	}
+
+	if (!isNonEmptyString(payload.templateKey)) {
+		throw new AuthApiContractError(
+			"Template assignment payload requires a non-empty templateKey."
+		);
+	}
+
+	if (
+		!tenantVerticalTemplateKeys.includes(
+			payload.templateKey as (typeof tenantVerticalTemplateKeys)[number]
+		)
+	) {
+		throw new AuthApiContractError(
+			"Template assignment payload requires a supported templateKey."
+		);
+	}
+
+	if (!Array.isArray(payload.enabledModules)) {
+		throw new AuthApiContractError(
+			"Template assignment payload requires an enabledModules array."
+		);
+	}
+
+	payload.enabledModules.forEach((moduleKey, index) => {
+		if (!isNonEmptyString(moduleKey)) {
+			throw new AuthApiContractError(
+				`Template assignment enabledModules[${index}] must be a non-empty string.`
 			);
 		}
 	});

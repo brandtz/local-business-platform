@@ -23,6 +23,7 @@ import { TenantLifecyclePolicyService } from "./auth/tenant-lifecycle-policy.ser
 import { TenantLifecycleService } from "./auth/tenant-lifecycle.service";
 import { TenantCustomDomainPolicyService } from "./auth/tenant-custom-domain-policy.service";
 import { ModuleRegistryService } from "./auth/module-registry.service";
+import { ModuleTemplateAssignmentService } from "./auth/module-template-assignment.service";
 import { TenantProvisioningService } from "./auth/tenant-provisioning.service";
 import { TenantProvisioningSummaryService } from "./auth/tenant-provisioning-summary.service";
 import { TenantProvisioningTemplateService } from "./auth/tenant-provisioning-template.service";
@@ -56,6 +57,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     TenantAccessService,
     TenantCustomDomainPolicyService,
     ModuleRegistryService,
+    ModuleTemplateAssignmentService,
     TenantLifecycleAuditService,
     TenantLifecyclePolicyService,
     TenantLifecycleService,
@@ -88,6 +90,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     TenantAccessService,
     TenantCustomDomainPolicyService,
     ModuleRegistryService,
+    ModuleTemplateAssignmentService,
     TenantLifecycleAuditService,
     TenantLifecyclePolicyService,
     TenantLifecycleService,
