@@ -25,6 +25,13 @@ import {
 	getAllowedTenantLifecycleTransitions,
 	getAllowedTenantStatusesForAccessMode,
 	getTenantRequestFailureReasonForAccessMode,
+	getFullModuleRegistry,
+	getModuleDependencies,
+	getModuleRegistryEntry,
+	isValidModuleKey,
+	moduleCategories,
+	validateModuleEnablementSet,
+	type TenantModuleEnablementRecord,
 	hasResolvedTenant,
 	impersonationSessionStates,
 	logoutReasons,
@@ -266,6 +273,46 @@ describe("auth types contract", () => {
 			"rolled-back",
 			"denied"
 		]);
+	});
+
+	it("defines a stable module registry with categories, dependencies, and enablement validation", () => {
+		expect(moduleCategories).toEqual(["commerce", "scheduling", "content", "operations"]);
+		expect(isValidModuleKey("catalog")).toBe(true);
+		expect(isValidModuleKey("nonexistent")).toBe(false);
+
+		const registry = getFullModuleRegistry();
+		expect(registry).toHaveLength(5);
+		expect(registry.map((e) => e.key)).toEqual([
+			"catalog", "ordering", "bookings", "content", "operations"
+		]);
+
+		const ordering = getModuleRegistryEntry("ordering");
+		expect(ordering.category).toBe("commerce");
+		expect(ordering.requiredDependencies).toEqual(["catalog"]);
+
+		expect(getModuleDependencies("bookings")).toEqual(["catalog"]);
+		expect(getModuleDependencies("content")).toEqual([]);
+
+		expect(validateModuleEnablementSet(["catalog", "ordering"])).toEqual({ valid: true });
+		expect(validateModuleEnablementSet(["ordering"])).toEqual({
+			valid: false,
+			reason: "missing-dependency",
+			module: "ordering",
+			missingDependency: "catalog"
+		});
+		expect(validateModuleEnablementSet([])).toEqual({ valid: false, reason: "empty-set" });
+		expect(validateModuleEnablementSet(["catalog", "invalid"])).toEqual({
+			valid: false,
+			reason: "unknown-module",
+			invalidKey: "invalid"
+		});
+
+		const enablementRecord: TenantModuleEnablementRecord = {
+			enabledModules: ["catalog", "content"],
+			tenantId: "tenant-1",
+			verticalTemplate: "restaurant-core"
+		};
+		expect(enablementRecord.tenantId).toBe("tenant-1");
 	});
 
 	it("defines the allowed tenant lifecycle transitions without reopening archived tenants", () => {

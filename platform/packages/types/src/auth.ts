@@ -172,6 +172,127 @@ export const tenantModuleKeys = [
 
 export type TenantModuleKey = (typeof tenantModuleKeys)[number];
 
+export const moduleCategories = [
+	"commerce",
+	"scheduling",
+	"content",
+	"operations"
+] as const;
+
+export type ModuleCategory = (typeof moduleCategories)[number];
+
+export type ModuleRegistryEntry = {
+	category: ModuleCategory;
+	description: string;
+	displayName: string;
+	key: TenantModuleKey;
+	requiredDependencies: readonly TenantModuleKey[];
+};
+
+const moduleRegistry: Record<TenantModuleKey, ModuleRegistryEntry> = {
+	catalog: {
+		category: "commerce",
+		description: "Product and service catalog management",
+		displayName: "Catalog",
+		key: "catalog",
+		requiredDependencies: []
+	},
+	ordering: {
+		category: "commerce",
+		description: "Online ordering and checkout",
+		displayName: "Ordering",
+		key: "ordering",
+		requiredDependencies: ["catalog"]
+	},
+	bookings: {
+		category: "scheduling",
+		description: "Appointment and reservation scheduling",
+		displayName: "Bookings",
+		key: "bookings",
+		requiredDependencies: ["catalog"]
+	},
+	content: {
+		category: "content",
+		description: "Storefront content and page management",
+		displayName: "Content",
+		key: "content",
+		requiredDependencies: []
+	},
+	operations: {
+		category: "operations",
+		description: "Business operations, hours, and fulfillment configuration",
+		displayName: "Operations",
+		key: "operations",
+		requiredDependencies: []
+	}
+};
+
+export function getModuleRegistryEntry(
+	key: TenantModuleKey
+): ModuleRegistryEntry {
+	return moduleRegistry[key];
+}
+
+export function getFullModuleRegistry(): readonly ModuleRegistryEntry[] {
+	return tenantModuleKeys.map((key) => moduleRegistry[key]);
+}
+
+export function isValidModuleKey(
+	key: string
+): key is TenantModuleKey {
+	return (tenantModuleKeys as readonly string[]).includes(key);
+}
+
+export function getModuleDependencies(
+	key: TenantModuleKey
+): readonly TenantModuleKey[] {
+	return moduleRegistry[key].requiredDependencies;
+}
+
+export type ModuleEnablementValidationResult =
+	| { valid: true }
+	| { valid: false; reason: "unknown-module"; invalidKey: string }
+	| { valid: false; reason: "missing-dependency"; module: TenantModuleKey; missingDependency: TenantModuleKey }
+	| { valid: false; reason: "empty-set" };
+
+export function validateModuleEnablementSet(
+	modules: readonly string[]
+): ModuleEnablementValidationResult {
+	if (modules.length === 0) {
+		return { valid: false, reason: "empty-set" };
+	}
+
+	for (const key of modules) {
+		if (!isValidModuleKey(key)) {
+			return { valid: false, reason: "unknown-module", invalidKey: key };
+		}
+	}
+
+	const enabledSet = new Set(modules);
+
+	for (const key of modules) {
+		const deps = getModuleDependencies(key as TenantModuleKey);
+		for (const dep of deps) {
+			if (!enabledSet.has(dep)) {
+				return {
+					valid: false,
+					reason: "missing-dependency",
+					module: key as TenantModuleKey,
+					missingDependency: dep
+				};
+			}
+		}
+	}
+
+	return { valid: true };
+}
+
+export type TenantModuleEnablementRecord = {
+	enabledModules: readonly TenantModuleKey[];
+	tenantId: string;
+	verticalTemplate: TenantVerticalTemplateKey;
+};
+
 export const tenantVerticalTemplateKeys = [
 	"restaurant-core",
 	"services-core",

@@ -4,9 +4,7 @@ Use this file to track the active execution queue.
 
 ## Ready
 
-- E3-S4-T1 | owner lane: Backend Domain Lane | packet: ../packets/epic-03/E3-S4-T1.md
-- E3-S5-T1 | owner lane: Platform Control Lane | packet: ../packets/epic-03/E3-S5-T1.md
-- E3-S6-T1 | owner lane: Platform Control Lane | packet: ../packets/epic-03/E3-S6-T1.md
+- none
 
 ## In Progress
 
@@ -80,6 +78,9 @@ Use this file to track the active execution queue.
 - E4-S1-T2 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S1-T2.md | handoff: ./2026-03-17-E4-foundation.md
 - E4-S6-T1 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S6-T1.md | handoff: ./2026-03-17-E4-foundation.md
 - E4-S6-T3 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S6-T3.md | handoff: ./2026-03-17-E4-foundation.md
+- E3-S4-T1 | owner lane: Backend Domain Lane | packet: ../packets/epic-03/E3-S4-T1.md | handoff: ./2026-03-17-E3-S4-T1.md
+- E3-S6-T1 | owner lane: Platform Control Lane | packet: ../packets/epic-03/E3-S6-T1.md | handoff: ./2026-03-17-E3-S6-T1.md
+- E3-S5-T1 | owner lane: Platform Control Lane | packet: ../packets/epic-03/E3-S5-T1.md | handoff: ./2026-03-17-E3-S5-T1.md
 
 ## Board Rules
 
