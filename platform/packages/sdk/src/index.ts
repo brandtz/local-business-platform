@@ -16,3 +16,6 @@ export function createSdkClientDescriptor(
 		transport: "http"
 	};
 }
+
+// E4-S6-T1: Shared API client conventions and error boundary patterns
+export * from "./api-client";

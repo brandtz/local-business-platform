@@ -65,9 +65,18 @@ importers:
 
   apps/web-admin:
     dependencies:
+      '@platform/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
       '@platform/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@platform/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@platform/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       vue:
         specifier: ^3.5.30
         version: 3.5.30(typescript@5.9.3)
@@ -81,9 +90,18 @@ importers:
 
   apps/web-customer:
     dependencies:
+      '@platform/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
       '@platform/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@platform/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@platform/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       vue:
         specifier: ^3.5.30
         version: 3.5.30(typescript@5.9.3)
@@ -97,9 +115,18 @@ importers:
 
   apps/web-platform-admin:
     dependencies:
+      '@platform/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
       '@platform/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@platform/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@platform/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       vue:
         specifier: ^3.5.30
         version: 3.5.30(typescript@5.9.3)
@@ -539,7 +566,6 @@ packages:
   '@rolldown/binding-win32-x64-msvc@1.0.0-rc.9':
     resolution: {integrity: sha512-G0oA4+w1iY5AGi5HcDTxWsoxF509hrFIPB2rduV5aDqS9FtDg1CAfa7V34qImbjfhIcA8C+RekocJZA96EarwQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [x64]
     os: [win32]
 
   '@rolldown/pluginutils@1.0.0-rc.9':

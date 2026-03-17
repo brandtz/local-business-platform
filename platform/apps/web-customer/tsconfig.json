@@ -8,7 +8,12 @@
     "outDir": "dist/types",
     "rootDir": "src"
   },
-  "references": [{ "path": "../../packages/types/tsconfig.json" }],
+  "references": [
+    { "path": "../../packages/types/tsconfig.json" },
+    { "path": "../../packages/utils/tsconfig.json" },
+    { "path": "../../packages/ui/tsconfig.json" },
+    { "path": "../../packages/sdk/tsconfig.json" }
+  ],
   "include": ["src/**/*.ts"],
   "exclude": ["dist", "node_modules"]
 }

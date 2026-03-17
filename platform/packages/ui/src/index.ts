@@ -17,3 +17,9 @@ export function createUiShellDescriptor(
 		title: trimToUndefined(title) || "Untitled Shell"
 	};
 }
+
+// E4-S1-T1: Shared visual tokens
+export * from "./tokens";
+
+// E4-S1-T2: Layout primitives and feedback components
+export * from "./primitives";

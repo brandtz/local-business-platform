@@ -12,7 +12,10 @@
     "typecheck": "tsc -b tsconfig.json --force"
   },
   "dependencies": {
+    "@platform/sdk": "workspace:*",
     "@platform/types": "workspace:*",
+    "@platform/ui": "workspace:*",
+    "@platform/utils": "workspace:*",
     "vue": "^3.5.30",
     "vue-router": "^5.0.3"
   },
