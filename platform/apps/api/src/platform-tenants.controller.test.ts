@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import { AuthApiContractError } from "./auth/api-contracts";
+import { ModuleRegistryService } from "./auth/module-registry.service";
+import {
+	ModuleTemplateAssignmentError,
+	ModuleTemplateAssignmentService
+} from "./auth/module-template-assignment.service";
 import { PlatformAccessDeniedError, PlatformAccessService } from "./auth/platform-access.service";
 import { PlatformTenantOperationalSummaryService } from "./auth/platform-tenant-operational-summary.service";
+import { TemplateRegistryService } from "./auth/template-registry.service";
 import { TenantProvisioningService } from "./auth/tenant-provisioning.service";
 import { TenantProvisioningSummaryService } from "./auth/tenant-provisioning-summary.service";
 import { TenantProvisioningTemplateService } from "./auth/tenant-provisioning-template.service";
@@ -10,6 +16,9 @@ import { TenantPublishPolicyService } from "./auth/tenant-publish-policy.service
 import { PlatformTenantsController } from "./platform-tenants.controller";
 
 function createController(): PlatformTenantsController {
+	const moduleRegistryService = new ModuleRegistryService();
+	const templateRegistryService = new TemplateRegistryService(moduleRegistryService);
+
 	return new PlatformTenantsController(
 		new TenantProvisioningService(
 			new PlatformAccessService(),
@@ -19,6 +28,10 @@ function createController(): PlatformTenantsController {
 		new PlatformTenantOperationalSummaryService(
 			new PlatformAccessService(),
 			new TenantPublishPolicyService()
+		),
+		new ModuleTemplateAssignmentService(
+			moduleRegistryService,
+			templateRegistryService
 		)
 	);
 }
@@ -196,5 +209,134 @@ describe("PlatformTenantsController", () => {
 				}
 			)
 		).toThrow(PlatformAccessDeniedError);
+	});
+
+	it("assigns modules to a tenant for authorized platform admins", () => {
+		const controller = createController();
+
+		expect(
+			controller.assignModules(
+				{
+					enabledModules: ["catalog", "ordering"],
+					tenantId: "tenant-1"
+				},
+				{
+					platformViewer: {
+						actorType: "platform",
+						platformRole: "admin",
+						userId: "platform-user-1"
+					}
+				}
+			)
+		).toMatchObject({
+			enabledModules: ["catalog", "ordering"],
+			kind: "assigned",
+			tenantId: "tenant-1"
+		});
+	});
+
+	it("rejects invalid module assignment payloads", () => {
+		const controller = createController();
+
+		expect(() =>
+			controller.assignModules(
+				{
+					enabledModules: "not-an-array",
+					tenantId: "tenant-1"
+				},
+				{
+					platformViewer: {
+						actorType: "platform",
+						platformRole: "admin",
+						userId: "platform-user-1"
+					}
+				}
+			)
+		).toThrow(AuthApiContractError);
+	});
+
+	it("rejects unauthorized module assignment requests", () => {
+		const controller = createController();
+
+		expect(() =>
+			controller.assignModules(
+				{
+					enabledModules: ["catalog"],
+					tenantId: "tenant-1"
+				},
+				{
+					platformViewer: {
+						actorType: "tenant",
+						platformRole: null,
+						userId: "tenant-user-1"
+					}
+				}
+			)
+		).toThrow(ModuleTemplateAssignmentError);
+	});
+
+	it("assigns a template to a tenant for authorized platform admins", () => {
+		const controller = createController();
+
+		expect(
+			controller.assignTemplate(
+				{
+					tenantId: "tenant-1",
+					verticalTemplate: "restaurant-core"
+				},
+				{
+					platformViewer: {
+						actorType: "platform",
+						platformRole: "owner",
+						userId: "platform-user-1"
+					}
+				}
+			)
+		).toMatchObject({
+			association: {
+				tenantId: "tenant-1",
+				verticalTemplate: "restaurant-core"
+			},
+			kind: "assigned"
+		});
+	});
+
+	it("rejects invalid template assignment payloads", () => {
+		const controller = createController();
+
+		expect(() =>
+			controller.assignTemplate(
+				{
+					tenantId: "tenant-1"
+				},
+				{
+					platformViewer: {
+						actorType: "platform",
+						platformRole: "admin",
+						userId: "platform-user-1"
+					}
+				}
+			)
+		).toThrow(AuthApiContractError);
+	});
+
+	it("rejects unauthorized template assignment requests", () => {
+		const controller = createController();
+
+		expect(() =>
+			controller.assignTemplate(
+				{
+					tenantId: "tenant-1",
+					verticalTemplate: "restaurant-core"
+				},
+				{
+					platformViewer: {
+						actorType: "platform",
+						platformRole: "support",
+						userId: "platform-user-1"
+					}
+				}
+			)
+		).toThrow(ModuleTemplateAssignmentError);
 	});
 });

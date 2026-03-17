@@ -62,4 +62,39 @@ export class PlatformTenantsController {
 			payload.tenants
 		);
 	}
+
+	@Post("module-assignment")
+	assignModules(@Body() payload: unknown, @Req() request: PlatformRequestCarrier) {
+		assertValidTenantModuleAssignmentRequest(payload);
+
+		return this.moduleTemplateAssignmentService.assignModules(
+			request.platformViewer || {
+				actorType: null,
+				platformRole: null,
+				userId: null
+			},
+			{
+				enabledModules: payload.enabledModules,
+				tenantId: payload.tenantId
+			}
+		);
+	}
+
+	@Post("template-assignment")
+	assignTemplate(@Body() payload: unknown, @Req() request: PlatformRequestCarrier) {
+		assertValidTenantTemplateAssignmentRequest(payload);
+
+		return this.moduleTemplateAssignmentService.assignTemplate(
+			request.platformViewer || {
+				actorType: null,
+				platformRole: null,
+				userId: null
+			},
+			{
+				tenantId: payload.tenantId,
+				verticalTemplate: payload.templateKey as import("@platform/types").TenantVerticalTemplateKey,
+				currentTemplate: null
+			}
+		);
+	}
 }

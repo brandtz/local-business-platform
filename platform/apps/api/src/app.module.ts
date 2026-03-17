@@ -22,6 +22,7 @@ import { TenantLifecycleAuditService } from "./auth/tenant-lifecycle-audit.servi
 import { TenantLifecyclePolicyService } from "./auth/tenant-lifecycle-policy.service";
 import { TenantLifecycleService } from "./auth/tenant-lifecycle.service";
 import { TenantCustomDomainPolicyService } from "./auth/tenant-custom-domain-policy.service";
+import { ModuleCapabilityService } from "./auth/module-capability.service";
 import { ModuleRegistryService } from "./auth/module-registry.service";
 import { ModuleTemplateAssignmentService } from "./auth/module-template-assignment.service";
 import { TenantProvisioningService } from "./auth/tenant-provisioning.service";
@@ -45,6 +46,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     ImpersonationSessionService,
     ManagedSubdomainService,
     MfaLifecycleService,
+    ModuleCapabilityService,
     PasswordResetLifecycleService,
     PlatformAccessService,
     PlatformTenantOperationalSummaryService,
@@ -78,6 +80,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     ImpersonationSessionService,
     ManagedSubdomainService,
     MfaLifecycleService,
+    ModuleCapabilityService,
     PasswordResetLifecycleService,
     PlatformAccessService,
     PlatformTenantOperationalSummaryService,
