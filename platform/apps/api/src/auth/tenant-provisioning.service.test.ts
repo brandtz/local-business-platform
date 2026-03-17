@@ -31,6 +31,10 @@ describe("tenant provisioning service", () => {
 			},
 			{
 				now: new Date("2026-03-16T23:15:00.000Z"),
+				previewEnvironment: {
+					managedPreviewAdminDomain: "admin.preview.local",
+					managedPreviewStorefrontDomain: "preview.local"
+				},
 				tenantIdFactory: () => "tenant-1"
 			}
 		);
@@ -57,6 +61,23 @@ describe("tenant provisioning service", () => {
 					status: "draft"
 				},
 				userId: "tenant-user-1"
+			},
+			previewMetadata: {
+				environmentStatus: "configured",
+				previewSubdomain: "alpha",
+				surfaces: [
+					{
+						available: true,
+						previewUrl: "alpha.preview.local",
+						surface: "storefront"
+					},
+					{
+						available: true,
+						previewUrl: "alpha.admin.preview.local",
+						surface: "admin"
+					}
+				],
+				tenantId: "tenant-1"
 			},
 			tenant: {
 				displayName: "Alpha Fitness",
@@ -93,6 +114,9 @@ describe("tenant provisioning service", () => {
 					currency: "CAD",
 					timezone: "America/Toronto"
 				},
+				previewEnvironment: {
+					managedPreviewStorefrontDomain: "preview.local"
+				},
 				tenantIdFactory: () => "tenant-2"
 			}
 		);
@@ -107,6 +131,8 @@ describe("tenant provisioning service", () => {
 			"operations"
 		]);
 		expect(result.tenant.status).toBe("draft");
+		expect(result.previewMetadata.environmentStatus).toBe("configured");
+		expect(result.previewMetadata.previewSubdomain).toBe("bravo");
 	});
 
 	it("denies provisioning for actors without platform tenant-write authority", () => {

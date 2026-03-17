@@ -30,6 +30,23 @@ describe("tenant provisioning summary service", () => {
 					},
 					userId: "tenant-user-1"
 				},
+				previewMetadata: {
+					environmentStatus: "configured",
+					previewSubdomain: "alpha",
+					surfaces: [
+						{
+							available: true,
+							previewUrl: "alpha.preview.local",
+							surface: "storefront"
+						},
+						{
+							available: true,
+							previewUrl: "alpha.admin.preview.local",
+							surface: "admin"
+						}
+					],
+					tenantId: "tenant-1"
+				},
 				tenant: {
 					displayName: "Alpha Fitness",
 					id: "tenant-1",
@@ -51,6 +68,23 @@ describe("tenant provisioning summary service", () => {
 			},
 			enabledModules: ["catalog", "ordering", "bookings", "content", "operations"],
 			ownerUserId: "tenant-user-1",
+			previewMetadata: {
+				environmentStatus: "configured",
+				previewSubdomain: "alpha",
+				surfaces: [
+					{
+						available: true,
+						previewUrl: "alpha.preview.local",
+						surface: "storefront"
+					},
+					{
+						available: true,
+						previewUrl: "alpha.admin.preview.local",
+						surface: "admin"
+					}
+				],
+				tenantId: "tenant-1"
+			},
 			previewSubdomain: "alpha",
 			tenantDisplayName: "Alpha Fitness",
 			tenantId: "tenant-1",

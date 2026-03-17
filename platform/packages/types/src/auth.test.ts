@@ -8,6 +8,8 @@ import {
 	authActorTypes,
 	authAssuranceLevels,
 	authViewerStatuses,
+	buildPreviewEnvironmentMetadata,
+	buildPreviewSurfaceUrl,
 	canTransitionCustomDomainPromotionState,
 	canTransitionCustomDomainVerificationState,
 	canTransitionTenantStatus,
@@ -19,6 +21,7 @@ import {
 	credentialKinds,
 	customDomainPromotionStates,
 	customDomainVerificationStates,
+	derivePreviewEnvironmentStatus,
 	describeImpersonationIndicator,
 	getAllowedCustomDomainPromotionStates,
 	getAllowedCustomDomainVerificationStates,
@@ -30,7 +33,10 @@ import {
 	getModuleRegistryEntry,
 	isValidModuleKey,
 	moduleCategories,
+	previewEnvironmentStatuses,
+	previewSurfaceTypes,
 	validateModuleEnablementSet,
+	type PreviewEnvironmentMetadata,
 	type TenantModuleEnablementRecord,
 	hasResolvedTenant,
 	impersonationSessionStates,
@@ -184,6 +190,14 @@ describe("auth types contract", () => {
 				userId: "tenant-user-1"
 			},
 			enabledModules: ["catalog", "ordering", "bookings", "content", "operations"],
+			previewMetadata: buildPreviewEnvironmentMetadata(
+				"tenant-1",
+				provisioningRequest.previewSubdomain,
+				{
+					managedPreviewAdminDomain: "admin.preview.local",
+					managedPreviewStorefrontDomain: "preview.local"
+				}
+			),
 			tenant: {
 				displayName: provisioningRequest.displayName,
 				id: "tenant-1",
@@ -197,6 +211,7 @@ describe("auth types contract", () => {
 			defaultConfiguration: provisioningResult.defaultConfiguration,
 			enabledModules: provisioningResult.enabledModules,
 			ownerUserId: provisioningResult.ownerMembership.userId,
+			previewMetadata: provisioningResult.previewMetadata,
 			previewSubdomain: provisioningResult.tenant.previewSubdomain,
 			tenantDisplayName: provisioningResult.tenant.displayName,
 			tenantId: provisioningResult.tenant.id,
@@ -557,5 +572,106 @@ describe("auth types contract", () => {
 				source: "unresolved"
 			})
 		).toBe(false);
+	});
+
+	it("defines preview environment metadata types and builder functions", () => {
+		expect(previewSurfaceTypes).toEqual(["storefront", "admin"]);
+		expect(previewEnvironmentStatuses).toEqual(["configured", "not-configured"]);
+	});
+
+	it("builds preview surface URLs from subdomain and managed domain", () => {
+		expect(buildPreviewSurfaceUrl("alpha", "preview.local")).toBe("alpha.preview.local");
+		expect(buildPreviewSurfaceUrl("alpha", "admin.preview.local")).toBe("alpha.admin.preview.local");
+		expect(buildPreviewSurfaceUrl("alpha", null)).toBeNull();
+		expect(buildPreviewSurfaceUrl("alpha", undefined)).toBeNull();
+		expect(buildPreviewSurfaceUrl("alpha", "")).toBeNull();
+		expect(buildPreviewSurfaceUrl("", "preview.local")).toBeNull();
+	});
+
+	it("derives preview environment status from surface availability", () => {
+		expect(
+			derivePreviewEnvironmentStatus([
+				{ available: true, previewUrl: "alpha.preview.local", surface: "storefront" },
+				{ available: true, previewUrl: "alpha.admin.preview.local", surface: "admin" }
+			])
+		).toBe("configured");
+		expect(
+			derivePreviewEnvironmentStatus([
+				{ available: false, previewUrl: null, surface: "storefront" },
+				{ available: false, previewUrl: null, surface: "admin" }
+			])
+		).toBe("not-configured");
+		expect(
+			derivePreviewEnvironmentStatus([
+				{ available: true, previewUrl: "alpha.preview.local", surface: "storefront" },
+				{ available: false, previewUrl: null, surface: "admin" }
+			])
+		).toBe("configured");
+	});
+
+	it("builds complete preview environment metadata with both surfaces configured", () => {
+		const metadata: PreviewEnvironmentMetadata = buildPreviewEnvironmentMetadata(
+			"tenant-1",
+			"alpha",
+			{
+				managedPreviewAdminDomain: "admin.preview.local",
+				managedPreviewStorefrontDomain: "preview.local"
+			}
+		);
+
+		expect(metadata).toEqual({
+			environmentStatus: "configured",
+			previewSubdomain: "alpha",
+			surfaces: [
+				{
+					available: true,
+					previewUrl: "alpha.preview.local",
+					surface: "storefront"
+				},
+				{
+					available: true,
+					previewUrl: "alpha.admin.preview.local",
+					surface: "admin"
+				}
+			],
+			tenantId: "tenant-1"
+		});
+	});
+
+	it("builds preview environment metadata with not-configured status when no domains present", () => {
+		const metadata = buildPreviewEnvironmentMetadata("tenant-1", "alpha");
+
+		expect(metadata.environmentStatus).toBe("not-configured");
+		expect(metadata.surfaces.every((s) => !s.available)).toBe(true);
+		expect(metadata.surfaces.every((s) => s.previewUrl === null)).toBe(true);
+	});
+
+	it("builds preview environment metadata with partial surface availability", () => {
+		const metadata = buildPreviewEnvironmentMetadata("tenant-1", "alpha", {
+			managedPreviewStorefrontDomain: "preview.local"
+		});
+
+		expect(metadata.environmentStatus).toBe("configured");
+		const storefront = metadata.surfaces.find((s) => s.surface === "storefront");
+		const admin = metadata.surfaces.find((s) => s.surface === "admin");
+		expect(storefront?.available).toBe(true);
+		expect(storefront?.previewUrl).toBe("alpha.preview.local");
+		expect(admin?.available).toBe(false);
+		expect(admin?.previewUrl).toBeNull();
+	});
+
+	it("ensures preview metadata is tenant-scoped and does not cross tenant boundaries", () => {
+		const metadata1 = buildPreviewEnvironmentMetadata("tenant-1", "alpha", {
+			managedPreviewStorefrontDomain: "preview.local"
+		});
+		const metadata2 = buildPreviewEnvironmentMetadata("tenant-2", "bravo", {
+			managedPreviewStorefrontDomain: "preview.local"
+		});
+
+		expect(metadata1.tenantId).toBe("tenant-1");
+		expect(metadata2.tenantId).toBe("tenant-2");
+		expect(metadata1.previewSubdomain).toBe("alpha");
+		expect(metadata2.previewSubdomain).toBe("bravo");
+		expect(metadata1.surfaces[0]?.previewUrl).not.toBe(metadata2.surfaces[0]?.previewUrl);
 	});
 });

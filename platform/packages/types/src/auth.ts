@@ -314,6 +314,7 @@ export type TenantProvisioningResult = {
 	defaultConfiguration: TenantProvisioningDefaults;
 	enabledModules: TenantModuleKey[];
 	ownerMembership: TenantMembershipRecord;
+	previewMetadata: PreviewEnvironmentMetadata;
 	tenant: TenantResolutionTenantRecord;
 	verticalTemplate: TenantVerticalTemplateKey;
 };
@@ -322,6 +323,7 @@ export type TenantProvisioningSummary = {
 	defaultConfiguration: TenantProvisioningDefaults;
 	enabledModules: TenantModuleKey[];
 	ownerUserId: string;
+	previewMetadata: PreviewEnvironmentMetadata;
 	previewSubdomain: string;
 	tenantDisplayName: string;
 	tenantId: string;
@@ -696,6 +698,84 @@ export function getTenantRequestFailureReasonForAccessMode(
 	}
 
 	return null;
+}
+
+export const previewSurfaceTypes = ["storefront", "admin"] as const;
+
+export type PreviewSurfaceType = (typeof previewSurfaceTypes)[number];
+
+export const previewEnvironmentStatuses = ["configured", "not-configured"] as const;
+
+export type PreviewEnvironmentStatus = (typeof previewEnvironmentStatuses)[number];
+
+export type PreviewSurfaceMetadata = {
+	available: boolean;
+	previewUrl: string | null;
+	surface: PreviewSurfaceType;
+};
+
+export type PreviewEnvironmentMetadata = {
+	environmentStatus: PreviewEnvironmentStatus;
+	previewSubdomain: string;
+	surfaces: readonly PreviewSurfaceMetadata[];
+	tenantId: string;
+};
+
+export type PreviewEnvironmentMetadataOptions = {
+	managedPreviewAdminDomain?: string | null;
+	managedPreviewStorefrontDomain?: string | null;
+};
+
+export function buildPreviewSurfaceUrl(
+	previewSubdomain: string,
+	managedDomain: string | null | undefined
+): string | null {
+	if (!managedDomain || !previewSubdomain) {
+		return null;
+	}
+
+	return `${previewSubdomain}.${managedDomain}`;
+}
+
+export function derivePreviewEnvironmentStatus(
+	surfaces: readonly PreviewSurfaceMetadata[]
+): PreviewEnvironmentStatus {
+	return surfaces.some((s) => s.available) ? "configured" : "not-configured";
+}
+
+export function buildPreviewEnvironmentMetadata(
+	tenantId: string,
+	previewSubdomain: string,
+	options: PreviewEnvironmentMetadataOptions = {}
+): PreviewEnvironmentMetadata {
+	const storefrontUrl = buildPreviewSurfaceUrl(
+		previewSubdomain,
+		options.managedPreviewStorefrontDomain
+	);
+	const adminUrl = buildPreviewSurfaceUrl(
+		previewSubdomain,
+		options.managedPreviewAdminDomain
+	);
+
+	const surfaces: PreviewSurfaceMetadata[] = [
+		{
+			available: storefrontUrl !== null,
+			previewUrl: storefrontUrl,
+			surface: "storefront"
+		},
+		{
+			available: adminUrl !== null,
+			previewUrl: adminUrl,
+			surface: "admin"
+		}
+	];
+
+	return {
+		environmentStatus: derivePreviewEnvironmentStatus(surfaces),
+		previewSubdomain,
+		surfaces,
+		tenantId
+	};
 }
 
 export const authAssuranceLevels = ["single-factor", "multi-factor"] as const;

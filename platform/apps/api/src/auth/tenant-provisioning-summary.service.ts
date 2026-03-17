@@ -12,6 +12,7 @@ export class TenantProvisioningSummaryService {
 			defaultConfiguration: result.defaultConfiguration,
 			enabledModules: result.enabledModules,
 			ownerUserId: result.ownerMembership.userId,
+			previewMetadata: result.previewMetadata,
 			previewSubdomain: result.tenant.previewSubdomain,
 			tenantDisplayName: result.tenant.displayName,
 			tenantId: result.tenant.id,

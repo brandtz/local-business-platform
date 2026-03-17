@@ -8,6 +8,7 @@ import { MfaLifecycleService } from "./auth/mfa-lifecycle";
 import { PasswordResetLifecycleService } from "./auth/password-reset-lifecycle";
 import { PlatformAccessService } from "./auth/platform-access.service";
 import { PlatformTenantOperationalSummaryService } from "./auth/platform-tenant-operational-summary.service";
+import { PreviewEnvironmentMetadataService } from "./auth/preview-environment-metadata.service";
 import { PreviewRouteResolutionService } from "./auth/preview-route-resolution.service";
 import { PrivilegedAuthPolicyService } from "./auth/privileged-auth-policy.service";
 import { RequestContextService } from "./auth/request-context.service";
@@ -38,6 +39,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     PasswordResetLifecycleService,
     PlatformAccessService,
     PlatformTenantOperationalSummaryService,
+    PreviewEnvironmentMetadataService,
     PreviewRouteResolutionService,
     PrivilegedAuthPolicyService,
     RequestContextService,
@@ -64,6 +66,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     PasswordResetLifecycleService,
     PlatformAccessService,
     PlatformTenantOperationalSummaryService,
+    PreviewEnvironmentMetadataService,
     PreviewRouteResolutionService,
     PrivilegedAuthPolicyService,
     RequestContextService,

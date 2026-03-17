@@ -4,11 +4,14 @@ import { Injectable } from "@nestjs/common";
 
 import type {
 	PlatformActorRole,
+	PreviewEnvironmentMetadataOptions,
 	TenantProvisioningDefaults,
 	TenantProvisioningRequest,
 	TenantProvisioningResult,
 	TenantResolutionTenantRecord
 } from "@platform/types";
+
+import { buildPreviewEnvironmentMetadata } from "@platform/types";
 
 import { PlatformAccessService } from "./platform-access.service";
 import { TenantProvisioningTemplateService } from "./tenant-provisioning-template.service";
@@ -22,6 +25,7 @@ export type TenantProvisioningActor = {
 export type TenantProvisioningOptions = {
 	defaults?: Partial<TenantProvisioningDefaults>;
 	now?: Date;
+	previewEnvironment?: PreviewEnvironmentMetadataOptions;
 	tenantIdFactory?: () => string;
 };
 
@@ -86,6 +90,11 @@ export class TenantProvisioningService {
 				},
 				userId: request.owner.id
 			},
+			previewMetadata: buildPreviewEnvironmentMetadata(
+				tenantId,
+				request.previewSubdomain,
+				options.previewEnvironment
+			),
 			tenant,
 			verticalTemplate: templateProfile.verticalTemplate
 		};
