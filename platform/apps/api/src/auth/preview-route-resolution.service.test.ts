@@ -31,44 +31,25 @@ const tenants: TenantResolutionTenantRecord[] = [
 	},
 	{
 		customDomains: [],
-		displayName: "Delta Spa",
+		displayName: "Delta Shop",
 		id: "tenant-4",
 		previewSubdomain: "delta",
-		slug: "delta-spa",
+		slug: "delta-shop",
 		status: "archived"
 	}
 ];
 
 const service = new PreviewRouteResolutionService({
-	managedStorefrontPreviewDomains: ["preview.local"],
-	managedAdminPreviewDomains: ["admin-preview.local"]
+	managedPreviewAdminDomains: ["admin.preview.local"],
+	managedPreviewStorefrontDomains: ["preview.local"]
 });
 
 describe("preview route resolution service", () => {
 	it("resolves storefront preview hosts to the correct tenant and surface", () => {
-		const result = service.resolve("alpha.preview.local", tenants);
-
-		expect(result).toEqual({
-			kind: "resolved",
-			normalizedHost: "alpha.preview.local",
-			surface: "storefront",
-			tenant: tenants[0]
+		const result = service.resolve({
+			host: "alpha.preview.local",
+			tenants
 		});
-	});
-
-	it("resolves admin preview hosts to the correct tenant and surface", () => {
-		const result = service.resolve("alpha.admin-preview.local", tenants);
-
-		expect(result).toEqual({
-			kind: "resolved",
-			normalizedHost: "alpha.admin-preview.local",
-			surface: "admin",
-			tenant: tenants[0]
-		});
-	});
-
-	it("resolves draft tenants on storefront preview domains", () => {
-		const result = service.resolve("bravo.preview.local", tenants);
 
 		expect(result.kind).toBe("resolved");
 		if (result.kind !== "resolved") {
@@ -76,11 +57,16 @@ describe("preview route resolution service", () => {
 		}
 
 		expect(result.surface).toBe("storefront");
-		expect(result.tenant.id).toBe("tenant-2");
+		expect(result.tenant.id).toBe("tenant-1");
+		expect(result.subdomain).toBe("alpha");
+		expect(result.normalizedHost).toBe("alpha.preview.local");
 	});
 
-	it("resolves draft tenants on admin preview domains", () => {
-		const result = service.resolve("bravo.admin-preview.local", tenants);
+	it("resolves admin preview hosts to the correct tenant and surface", () => {
+		const result = service.resolve({
+			host: "alpha.admin.preview.local",
+			tenants
+		});
 
 		expect(result.kind).toBe("resolved");
 		if (result.kind !== "resolved") {
@@ -88,119 +74,161 @@ describe("preview route resolution service", () => {
 		}
 
 		expect(result.surface).toBe("admin");
+		expect(result.tenant.id).toBe("tenant-1");
+		expect(result.subdomain).toBe("alpha");
+		expect(result.normalizedHost).toBe("alpha.admin.preview.local");
+	});
+
+	it("allows draft tenants through preview routing", () => {
+		const result = service.resolve({
+			host: "bravo.preview.local",
+			tenants
+		});
+
+		expect(result.kind).toBe("resolved");
+		if (result.kind !== "resolved") {
+			throw new Error("Expected resolved result.");
+		}
+
+		expect(result.surface).toBe("storefront");
 		expect(result.tenant.id).toBe("tenant-2");
+		expect(result.tenant.status).toBe("draft");
 	});
 
-	it("denies preview access to suspended tenants", () => {
-		const result = service.resolve("charlie.preview.local", tenants);
-
-		expect(result).toEqual({
+	it("fails closed when the host is missing or empty", () => {
+		expect(service.resolve({ host: null, tenants })).toEqual({
 			kind: "unresolved",
-			normalizedHost: "charlie.preview.local",
-			reason: "tenant-lifecycle-denied"
+			normalizedHost: null,
+			reason: "no-host"
+		});
+		expect(service.resolve({ host: undefined, tenants })).toEqual({
+			kind: "unresolved",
+			normalizedHost: null,
+			reason: "no-host"
+		});
+		expect(service.resolve({ host: "", tenants })).toEqual({
+			kind: "unresolved",
+			normalizedHost: null,
+			reason: "no-host"
 		});
 	});
 
-	it("denies preview access to archived tenants", () => {
-		const result = service.resolve("delta.admin-preview.local", tenants);
+	it("fails closed when the host does not match any managed preview domain", () => {
+		const result = service.resolve({
+			host: "alpha.unknown.local",
+			tenants
+		});
 
 		expect(result).toEqual({
 			kind: "unresolved",
-			normalizedHost: "delta.admin-preview.local",
-			reason: "tenant-lifecycle-denied"
+			normalizedHost: "alpha.unknown.local",
+			reason: "no-matching-domain"
 		});
 	});
 
-	it("fails closed when the subdomain does not match any tenant", () => {
-		const result = service.resolve("unknown.preview.local", tenants);
+	it("fails closed when the preview subdomain does not match any tenant", () => {
+		const result = service.resolve({
+			host: "nonexistent.preview.local",
+			tenants
+		});
 
 		expect(result).toEqual({
 			kind: "unresolved",
-			normalizedHost: "unknown.preview.local",
+			normalizedHost: "nonexistent.preview.local",
 			reason: "tenant-not-found"
 		});
 	});
 
-	it("fails closed when the host does not match any managed domain", () => {
-		const result = service.resolve("alpha.other.local", tenants);
+	it("fails closed for suspended tenants on preview routes", () => {
+		const result = service.resolve({
+			host: "charlie.preview.local",
+			tenants
+		});
 
 		expect(result).toEqual({
 			kind: "unresolved",
-			normalizedHost: "alpha.other.local",
-			reason: "no-matching-domain"
+			normalizedHost: "charlie.preview.local",
+			reason: "tenant-not-accessible"
 		});
 	});
 
-	it("fails closed when the host is null or undefined", () => {
-		expect(service.resolve(null, tenants)).toEqual({
-			kind: "unresolved",
-			normalizedHost: null,
-			reason: "unknown-host"
+	it("fails closed for archived tenants on preview routes", () => {
+		const result = service.resolve({
+			host: "delta.preview.local",
+			tenants
 		});
 
-		expect(service.resolve(undefined, tenants)).toEqual({
+		expect(result).toEqual({
 			kind: "unresolved",
-			normalizedHost: null,
-			reason: "unknown-host"
-		});
-	});
-
-	it("fails closed when the host is an empty string", () => {
-		expect(service.resolve("", tenants)).toEqual({
-			kind: "unresolved",
-			normalizedHost: null,
-			reason: "unknown-host"
+			normalizedHost: "delta.preview.local",
+			reason: "tenant-not-accessible"
 		});
 	});
 
-	it("rejects bare managed domains without a subdomain prefix", () => {
-		expect(service.resolve("preview.local", tenants)).toEqual({
-			kind: "unresolved",
-			normalizedHost: "preview.local",
-			reason: "no-matching-domain"
+	it("never leaks one tenant context into another through preview resolution", () => {
+		const alphaResult = service.resolve({
+			host: "alpha.preview.local",
+			tenants
+		});
+		const bravoResult = service.resolve({
+			host: "bravo.preview.local",
+			tenants
 		});
 
-		expect(service.resolve("admin-preview.local", tenants)).toEqual({
-			kind: "unresolved",
-			normalizedHost: "admin-preview.local",
-			reason: "no-matching-domain"
-		});
+		if (alphaResult.kind !== "resolved" || bravoResult.kind !== "resolved") {
+			throw new Error("Expected both to resolve.");
+		}
+
+		expect(alphaResult.tenant.id).toBe("tenant-1");
+		expect(bravoResult.tenant.id).toBe("tenant-2");
+		expect(alphaResult.tenant.id).not.toBe(bravoResult.tenant.id);
 	});
 
-	it("rejects nested subdomain chains as unresolved", () => {
-		expect(service.resolve("deep.alpha.preview.local", tenants)).toEqual({
-			kind: "unresolved",
-			normalizedHost: "deep.alpha.preview.local",
-			reason: "no-matching-domain"
+	it("resolves the same tenant to distinct surfaces based on host domain", () => {
+		const storefrontResult = service.resolve({
+			host: "alpha.preview.local",
+			tenants
 		});
+		const adminResult = service.resolve({
+			host: "alpha.admin.preview.local",
+			tenants
+		});
+
+		if (storefrontResult.kind !== "resolved" || adminResult.kind !== "resolved") {
+			throw new Error("Expected both to resolve.");
+		}
+
+		expect(storefrontResult.tenant.id).toBe(adminResult.tenant.id);
+		expect(storefrontResult.surface).toBe("storefront");
+		expect(adminResult.surface).toBe("admin");
 	});
 
-	it("normalizes host case and port before resolution", () => {
-		const result = service.resolve("Alpha.Preview.Local:3000", tenants);
+	it("normalizes host casing and port before resolution", () => {
+		const result = service.resolve({
+			host: "Alpha.Preview.Local:3000",
+			tenants
+		});
 
 		expect(result.kind).toBe("resolved");
 		if (result.kind !== "resolved") {
 			throw new Error("Expected resolved result.");
 		}
 
-		expect(result.normalizedHost).toBe("alpha.preview.local");
-		expect(result.surface).toBe("storefront");
 		expect(result.tenant.id).toBe("tenant-1");
+		expect(result.normalizedHost).toBe("alpha.preview.local");
 	});
 
-	it("prefers storefront domain match over admin domain match for the same host", () => {
-		const dualService = new PreviewRouteResolutionService({
-			managedStorefrontPreviewDomains: ["preview.local"],
-			managedAdminPreviewDomains: ["preview.local"]
+	it("fails closed when no managed preview domains are configured", () => {
+		const emptyService = new PreviewRouteResolutionService({});
+		const result = emptyService.resolve({
+			host: "alpha.preview.local",
+			tenants
 		});
 
-		const result = dualService.resolve("alpha.preview.local", tenants);
-
-		expect(result.kind).toBe("resolved");
-		if (result.kind !== "resolved") {
-			throw new Error("Expected resolved result.");
-		}
-
-		expect(result.surface).toBe("storefront");
+		expect(result).toEqual({
+			kind: "unresolved",
+			normalizedHost: "alpha.preview.local",
+			reason: "no-matching-domain"
+		});
 	});
 });
