@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 
 import { AdminTenantController } from "./admin-tenant.controller";
 import { AuditAttributionService } from "./auth/audit-attribution.service";
+import { DomainPromotionWorkflowService } from "./auth/domain-promotion-workflow.service";
 import { DomainVerificationWorkflowService } from "./auth/domain-verification-workflow.service";
 import { ImpersonationSessionService } from "./auth/impersonation-session.service";
 import { ManagedSubdomainService } from "./auth/managed-subdomain.service";
@@ -35,6 +36,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
   controllers: [AdminTenantController, HealthController, PlatformTenantsController],
   providers: [
     AuditAttributionService,
+    DomainPromotionWorkflowService,
     DomainVerificationWorkflowService,
     ImpersonationSessionService,
     ManagedSubdomainService,
@@ -64,6 +66,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
   ],
   exports: [
     AuditAttributionService,
+    DomainPromotionWorkflowService,
     DomainVerificationWorkflowService,
     ImpersonationSessionService,
     ManagedSubdomainService,
