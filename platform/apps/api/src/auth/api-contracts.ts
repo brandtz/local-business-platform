@@ -2,8 +2,10 @@ import {
 	authActorTypes,
 	logoutReasons,
 	sessionScopes,
+	tenantStatuses,
 	tenantVerticalTemplateKeys,
 	type LogoutRequest,
+	type PlatformTenantOperationalSummaryQueryRequest,
 	type PasswordResetRequestComplete,
 	type PasswordResetRequestInitiate,
 	type PasswordLoginRequest,
@@ -191,4 +193,88 @@ export function assertValidTenantProvisioningRequest(
 			"Tenant provisioning owner status must be invited or active."
 		);
 	}
+}
+
+export function assertValidPlatformTenantOperationalSummaryQueryRequest(
+	payload: unknown
+): asserts payload is PlatformTenantOperationalSummaryQueryRequest {
+	if (!isRecord(payload)) {
+		throw new AuthApiContractError(
+			"Platform tenant operational summary query payload must be an object."
+		);
+	}
+
+	if (!Array.isArray(payload.tenants)) {
+		throw new AuthApiContractError(
+			"Platform tenant operational summary query payload requires a tenants array."
+		);
+	}
+
+	payload.tenants.forEach((tenant, index) => {
+		if (!isRecord(tenant)) {
+			throw new AuthApiContractError(
+				`Operational summary tenant at index ${index} must be an object.`
+			);
+		}
+
+		if (!isNonEmptyString(tenant.id)) {
+			throw new AuthApiContractError(
+				`Operational summary tenant at index ${index} requires a non-empty id.`
+			);
+		}
+
+		if (!isNonEmptyString(tenant.displayName)) {
+			throw new AuthApiContractError(
+				`Operational summary tenant at index ${index} requires a non-empty displayName.`
+			);
+		}
+
+		if (!isNonEmptyString(tenant.slug)) {
+			throw new AuthApiContractError(
+				`Operational summary tenant at index ${index} requires a non-empty slug.`
+			);
+		}
+
+		if (!tenantStatuses.includes(tenant.status as (typeof tenantStatuses)[number])) {
+			throw new AuthApiContractError(
+				`Operational summary tenant at index ${index} requires a supported status.`
+			);
+		}
+
+		if (
+			tenant.previewSubdomain !== undefined &&
+			tenant.previewSubdomain !== null &&
+			!isNonEmptyString(tenant.previewSubdomain)
+		) {
+			throw new AuthApiContractError(
+				`Operational summary tenant at index ${index} previewSubdomain must be a non-empty string when provided.`
+			);
+		}
+
+		if (tenant.customDomains !== undefined) {
+			if (!Array.isArray(tenant.customDomains)) {
+				throw new AuthApiContractError(
+					`Operational summary tenant at index ${index} customDomains must be an array when provided.`
+				);
+			}
+
+			tenant.customDomains.forEach((domain, domainIndex) => {
+				if (!isNonEmptyString(domain)) {
+					throw new AuthApiContractError(
+						`Operational summary tenant at index ${index} customDomains[${domainIndex}] must be a non-empty string.`
+					);
+				}
+			});
+		}
+
+		if (
+			tenant.lastLifecycleAuditAt !== undefined &&
+			tenant.lastLifecycleAuditAt !== null &&
+			!isNonEmptyString(tenant.lastLifecycleAuditAt)
+		) {
+			throw new AuthApiContractError(
+				`Operational summary tenant at index ${index} lastLifecycleAuditAt must be a non-empty string when provided.`
+			);
+		}
+	});
 }

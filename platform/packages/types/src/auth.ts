@@ -29,6 +29,29 @@ export const tenantLifecycleEvents = [
 
 export type TenantLifecycleEvent = (typeof tenantLifecycleEvents)[number];
 
+export const customDomainVerificationStates = [
+	"pending",
+	"verified",
+	"failed",
+	"denied"
+] as const;
+
+export type CustomDomainVerificationState =
+	(typeof customDomainVerificationStates)[number];
+
+export const customDomainPromotionStates = [
+	"not-requested",
+	"ready",
+	"promoted",
+	"failed",
+	"rollback-pending",
+	"rolled-back",
+	"denied"
+] as const;
+
+export type CustomDomainPromotionState =
+	(typeof customDomainPromotionStates)[number];
+
 export const tenantActorRoles = ["owner", "admin", "manager", "staff"] as const;
 
 export type TenantActorRole = (typeof tenantActorRoles)[number];
@@ -186,6 +209,103 @@ export type TenantProvisioningSummary = {
 	verticalTemplate: TenantVerticalTemplateKey;
 };
 
+export const platformTenantOperationalPreviewStatuses = [
+	"configured",
+	"missing"
+] as const;
+
+export type PlatformTenantOperationalPreviewStatus =
+	(typeof platformTenantOperationalPreviewStatuses)[number];
+
+export const platformTenantOperationalLiveRoutingStatuses = [
+	"managed-subdomain-only",
+	"custom-domain-configured"
+] as const;
+
+export type PlatformTenantOperationalLiveRoutingStatus =
+	(typeof platformTenantOperationalLiveRoutingStatuses)[number];
+
+export const platformTenantOperationalPublishStatuses = [
+	"ready",
+	"blocked"
+] as const;
+
+export type PlatformTenantOperationalPublishStatus =
+	(typeof platformTenantOperationalPublishStatuses)[number];
+
+export const platformTenantOperationalHealthStatuses = [
+	"healthy",
+	"attention-required"
+] as const;
+
+export type PlatformTenantOperationalHealthStatus =
+	(typeof platformTenantOperationalHealthStatuses)[number];
+
+export const platformTenantOperationalHealthReasons = [
+	"tenant-inactive",
+	"tenant-suspended",
+	"tenant-archived",
+	"preview-route-missing"
+] as const;
+
+export type PlatformTenantOperationalHealthReason =
+	(typeof platformTenantOperationalHealthReasons)[number];
+
+export type PlatformTenantOperationalSummaryQueryTenant = {
+	customDomains?: readonly string[];
+	displayName: string;
+	id: string;
+	lastLifecycleAuditAt?: string | null;
+	previewSubdomain?: string | null;
+	slug: string;
+	status: TenantStatus;
+};
+
+export type PlatformTenantOperationalSummaryQueryRequest = {
+	tenants: PlatformTenantOperationalSummaryQueryTenant[];
+};
+
+export type PlatformTenantOperationalSummary = {
+	customDomainCount: number;
+	healthReasons: PlatformTenantOperationalHealthReason[];
+	healthStatus: PlatformTenantOperationalHealthStatus;
+	lastLifecycleAuditAt: string | null;
+	lifecycleStatus: TenantStatus;
+	liveRoutingStatus: PlatformTenantOperationalLiveRoutingStatus;
+	previewStatus: PlatformTenantOperationalPreviewStatus;
+	previewSubdomain: string | null;
+	publishBlockedReason: Exclude<TenantRequestFailureReason, "tenant-unresolved"> | null;
+	publishStatus: PlatformTenantOperationalPublishStatus;
+	tenantDisplayName: string;
+	tenantId: string;
+	tenantSlug: string;
+};
+
+export type CustomDomainVerificationEvidence = {
+	checkedAt: string;
+	details?: string | null;
+	method: "dns-cname" | "dns-txt" | "http-token" | "manual";
+	observedValue?: string | null;
+	providerReference?: string | null;
+};
+
+export type TenantCustomDomainRecord = {
+	createdAt: string;
+	hostname: string;
+	id: string;
+	promotionFailureReason?: string | null;
+	promotionState: CustomDomainPromotionState;
+	promotionStateChangedAt?: string | null;
+	promotedAt?: string | null;
+	rollbackCompletedAt?: string | null;
+	tenantId: string;
+	updatedAt: string;
+	verificationEvidence?: CustomDomainVerificationEvidence | null;
+	verificationFailureReason?: string | null;
+	verificationState: CustomDomainVerificationState;
+	verificationStateChangedAt?: string | null;
+};
+
 export const logoutReasons = ["user_logout", "security_event"] as const;
 
 export type LogoutReason = (typeof logoutReasons)[number];
@@ -237,6 +357,7 @@ export const tenantResolutionSources = [
 export type TenantResolutionSource = (typeof tenantResolutionSources)[number];
 
 export type TenantResolutionTenantRecord = TenantSummary & {
+	customDomainRecords?: readonly TenantCustomDomainRecord[];
 	customDomains?: readonly string[];
 	previewSubdomain: string;
 };
@@ -339,6 +460,55 @@ export function resolveTenantLifecycleEvent(
 			(transition) => transition.to === to
 		)?.event || null
 	);
+}
+
+const customDomainVerificationTransitionsByState: Record<
+	CustomDomainVerificationState,
+	readonly CustomDomainVerificationState[]
+> = {
+	pending: ["verified", "failed", "denied"],
+	verified: ["failed", "denied"],
+	failed: ["pending", "verified", "denied"],
+	denied: ["pending"]
+};
+
+export function getAllowedCustomDomainVerificationStates(
+	state: CustomDomainVerificationState
+): readonly CustomDomainVerificationState[] {
+	return customDomainVerificationTransitionsByState[state];
+}
+
+export function canTransitionCustomDomainVerificationState(
+	from: CustomDomainVerificationState,
+	to: CustomDomainVerificationState
+): boolean {
+	return getAllowedCustomDomainVerificationStates(from).includes(to);
+}
+
+const customDomainPromotionTransitionsByState: Record<
+	CustomDomainPromotionState,
+	readonly CustomDomainPromotionState[]
+> = {
+	"not-requested": ["ready", "denied"],
+	ready: ["promoted", "failed", "denied"],
+	promoted: ["rollback-pending"],
+	failed: ["ready", "denied"],
+	"rollback-pending": ["rolled-back", "failed"],
+	"rolled-back": ["ready", "denied"],
+	denied: ["ready"]
+};
+
+export function getAllowedCustomDomainPromotionStates(
+	state: CustomDomainPromotionState
+): readonly CustomDomainPromotionState[] {
+	return customDomainPromotionTransitionsByState[state];
+}
+
+export function canTransitionCustomDomainPromotionState(
+	from: CustomDomainPromotionState,
+	to: CustomDomainPromotionState
+): boolean {
+	return getAllowedCustomDomainPromotionStates(from).includes(to);
 }
 
 export const tenantRequestFailureReasons = [

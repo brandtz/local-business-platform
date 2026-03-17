@@ -7,7 +7,7 @@ import type {
 	TenantProvisioningDefaults,
 	TenantProvisioningRequest,
 	TenantProvisioningResult,
-	TenantSummary
+	TenantResolutionTenantRecord
 } from "@platform/types";
 
 import { PlatformAccessService } from "./platform-access.service";
@@ -59,7 +59,7 @@ export class TenantProvisioningService {
 		const templateProfile = this.tenantProvisioningTemplateService.getTemplateProfile(
 			request.verticalTemplate
 		);
-		const tenant: TenantSummary & { previewSubdomain: string; customDomains?: readonly string[] } = {
+		const tenant: TenantResolutionTenantRecord = {
 			displayName: request.displayName,
 			id: tenantId,
 			previewSubdomain: request.previewSubdomain,

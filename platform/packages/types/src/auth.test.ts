@@ -8,6 +8,8 @@ import {
 	authActorTypes,
 	authAssuranceLevels,
 	authViewerStatuses,
+	canTransitionCustomDomainPromotionState,
+	canTransitionCustomDomainVerificationState,
 	canTransitionTenantStatus,
 	canTenantAccessLifecycleMode,
 	createAnonymousRequestViewerContext,
@@ -15,7 +17,11 @@ import {
 	createAuthenticatedRequestViewerContext,
 	createAuthenticatedAuthViewerState,
 	credentialKinds,
+	customDomainPromotionStates,
+	customDomainVerificationStates,
 	describeImpersonationIndicator,
+	getAllowedCustomDomainPromotionStates,
+	getAllowedCustomDomainVerificationStates,
 	getAllowedTenantLifecycleTransitions,
 	getAllowedTenantStatusesForAccessMode,
 	getTenantRequestFailureReasonForAccessMode,
@@ -24,6 +30,13 @@ import {
 	logoutReasons,
 	type PasswordResetRequestComplete,
 	type PasswordResetRequestInitiate,
+	platformTenantOperationalHealthReasons,
+	platformTenantOperationalHealthStatuses,
+	platformTenantOperationalLiveRoutingStatuses,
+	platformTenantOperationalPreviewStatuses,
+	platformTenantOperationalPublishStatuses,
+	type PlatformTenantOperationalSummary,
+	type PlatformTenantOperationalSummaryQueryRequest,
 	tenantModuleKeys,
 	tenantVerticalTemplateKeys,
 	type TenantProvisioningRequest,
@@ -189,6 +202,70 @@ describe("auth types contract", () => {
 		expect(tenantVerticalTemplateKeys).toContain("restaurant-core");
 		expect(provisioningResult.tenant.previewSubdomain).toBe("alpha");
 		expect(provisioningSummary.tenantStatus).toBe("draft");
+		expect(platformTenantOperationalPreviewStatuses).toEqual([
+			"configured",
+			"missing"
+		]);
+		expect(platformTenantOperationalLiveRoutingStatuses).toEqual([
+			"managed-subdomain-only",
+			"custom-domain-configured"
+		]);
+		expect(platformTenantOperationalPublishStatuses).toEqual(["ready", "blocked"]);
+		expect(platformTenantOperationalHealthStatuses).toEqual([
+			"healthy",
+			"attention-required"
+		]);
+		expect(platformTenantOperationalHealthReasons).toEqual([
+			"tenant-inactive",
+			"tenant-suspended",
+			"tenant-archived",
+			"preview-route-missing"
+		]);
+		const operationalSummaryQuery: PlatformTenantOperationalSummaryQueryRequest = {
+			tenants: [
+				{
+					customDomains: ["alpha.example.com"],
+					displayName: "Alpha Fitness",
+					id: "tenant-1",
+					lastLifecycleAuditAt: "2026-03-17T05:00:00.000Z",
+					previewSubdomain: "alpha",
+					slug: "alpha-fitness",
+					status: "active"
+				}
+			]
+		};
+		const operationalSummary: PlatformTenantOperationalSummary = {
+			customDomainCount: 1,
+			healthReasons: [],
+			healthStatus: "healthy",
+			lastLifecycleAuditAt: "2026-03-17T05:00:00.000Z",
+			lifecycleStatus: "active",
+			liveRoutingStatus: "custom-domain-configured",
+			previewStatus: "configured",
+			previewSubdomain: "alpha",
+			publishBlockedReason: null,
+			publishStatus: "ready",
+			tenantDisplayName: "Alpha Fitness",
+			tenantId: "tenant-1",
+			tenantSlug: "alpha-fitness"
+		};
+		expect(operationalSummaryQuery.tenants[0]?.status).toBe("active");
+		expect(operationalSummary.publishStatus).toBe("ready");
+		expect(customDomainVerificationStates).toEqual([
+			"pending",
+			"verified",
+			"failed",
+			"denied"
+		]);
+		expect(customDomainPromotionStates).toEqual([
+			"not-requested",
+			"ready",
+			"promoted",
+			"failed",
+			"rollback-pending",
+			"rolled-back",
+			"denied"
+		]);
 	});
 
 	it("defines the allowed tenant lifecycle transitions without reopening archived tenants", () => {
@@ -234,6 +311,26 @@ describe("auth types contract", () => {
 		expect(canTransitionTenantStatus("archived", "active")).toBe(false);
 		expect(resolveTenantLifecycleEvent("suspended", "active")).toBe("activate");
 		expect(resolveTenantLifecycleEvent("active", "draft")).toBeNull();
+	});
+
+	it("defines custom domain verification and promotion transitions without conflating routing behavior", () => {
+		expect(getAllowedCustomDomainVerificationStates("pending")).toEqual([
+			"verified",
+			"failed",
+			"denied"
+		]);
+		expect(getAllowedCustomDomainPromotionStates("ready")).toEqual([
+			"promoted",
+			"failed",
+			"denied"
+		]);
+		expect(getAllowedCustomDomainPromotionStates("promoted")).toEqual([
+			"rollback-pending"
+		]);
+		expect(canTransitionCustomDomainVerificationState("failed", "pending")).toBe(true);
+		expect(canTransitionCustomDomainVerificationState("denied", "verified")).toBe(false);
+		expect(canTransitionCustomDomainPromotionState("ready", "promoted")).toBe(true);
+		expect(canTransitionCustomDomainPromotionState("not-requested", "promoted")).toBe(false);
 	});
 
 	it("defines lifecycle access modes for admin, preview, live routing, and publish control", () => {

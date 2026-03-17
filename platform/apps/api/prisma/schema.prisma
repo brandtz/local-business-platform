@@ -41,6 +41,23 @@ enum TenantRole {
   STAFF
 }
 
+enum CustomDomainVerificationState {
+  PENDING
+  VERIFIED
+  FAILED
+  DENIED
+}
+
+enum CustomDomainPromotionState {
+  NOT_REQUESTED
+  READY
+  PROMOTED
+  FAILED
+  ROLLBACK_PENDING
+  ROLLED_BACK
+  DENIED
+}
+
 enum CredentialKind {
   PASSWORD
 }
@@ -78,7 +95,31 @@ model Tenant {
   slug             String             @unique
   status           TenantStatus       @default(DRAFT)
   previewSubdomain String             @unique
+  customDomainRecords TenantCustomDomain[]
   memberships      TenantMembership[]
+}
+
+model TenantCustomDomain {
+  id                         String                        @id @default(uuid())
+  createdAt                  DateTime                      @default(now())
+  updatedAt                  DateTime                      @updatedAt
+  tenantId                   String
+  hostname                   String
+  verificationState          CustomDomainVerificationState @default(PENDING)
+  verificationStateChangedAt DateTime?
+  verificationFailureReason  String?
+  verificationEvidence       Json?
+  promotionState             CustomDomainPromotionState    @default(NOT_REQUESTED)
+  promotionStateChangedAt    DateTime?
+  promotionFailureReason     String?
+  promotedAt                 DateTime?
+  rollbackCompletedAt        DateTime?
+  tenant                     Tenant                        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, hostname])
+  @@index([hostname])
+  @@index([tenantId, verificationState])
+  @@index([tenantId, promotionState])
 }
 
 model TenantMembership {

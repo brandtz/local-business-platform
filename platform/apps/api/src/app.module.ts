@@ -7,6 +7,7 @@ import { ManagedSubdomainService } from "./auth/managed-subdomain.service";
 import { MfaLifecycleService } from "./auth/mfa-lifecycle";
 import { PasswordResetLifecycleService } from "./auth/password-reset-lifecycle";
 import { PlatformAccessService } from "./auth/platform-access.service";
+import { PlatformTenantOperationalSummaryService } from "./auth/platform-tenant-operational-summary.service";
 import { PreviewRouteResolutionService } from "./auth/preview-route-resolution.service";
 import { PrivilegedAuthPolicyService } from "./auth/privileged-auth-policy.service";
 import { RequestContextService } from "./auth/request-context.service";
@@ -15,6 +16,7 @@ import { TenantAccessService } from "./auth/tenant-access.service";
 import { TenantLifecycleAuditService } from "./auth/tenant-lifecycle-audit.service";
 import { TenantLifecyclePolicyService } from "./auth/tenant-lifecycle-policy.service";
 import { TenantLifecycleService } from "./auth/tenant-lifecycle.service";
+import { TenantCustomDomainPolicyService } from "./auth/tenant-custom-domain-policy.service";
 import { TenantProvisioningService } from "./auth/tenant-provisioning.service";
 import { TenantProvisioningSummaryService } from "./auth/tenant-provisioning-summary.service";
 import { TenantProvisioningTemplateService } from "./auth/tenant-provisioning-template.service";
@@ -34,11 +36,13 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     MfaLifecycleService,
     PasswordResetLifecycleService,
     PlatformAccessService,
+    PlatformTenantOperationalSummaryService,
     PreviewRouteResolutionService,
     PrivilegedAuthPolicyService,
     RequestContextService,
     SecurityEventService,
     TenantAccessService,
+    TenantCustomDomainPolicyService,
     TenantLifecycleAuditService,
     TenantLifecyclePolicyService,
     TenantLifecycleService,
@@ -57,11 +61,13 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     MfaLifecycleService,
     PasswordResetLifecycleService,
     PlatformAccessService,
+    PlatformTenantOperationalSummaryService,
     PreviewRouteResolutionService,
     PrivilegedAuthPolicyService,
     RequestContextService,
     SecurityEventService,
     TenantAccessService,
+    TenantCustomDomainPolicyService,
     TenantLifecycleAuditService,
     TenantLifecyclePolicyService,
     TenantLifecycleService,
