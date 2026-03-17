@@ -80,6 +80,7 @@ Use this file to track the active execution queue.
 - E4-S6-T3 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S6-T3.md | handoff: ./2026-03-17-E4-foundation.md
 - E3-S3-T3 | owner lane: Platform Control Lane | packet: ../packets/epic-03/E3-S3-T3.md | handoff: ./2026-03-17-E3-S3-T3.md
 - E3-S3-T4 | owner lane: Platform Control Lane | packet: ../packets/epic-03/E3-S3-T4.md | handoff: ./2026-03-17-E3-S3-T4.md
+- E3-S4-T2 | owner lane: Backend Domain Lane | packet: ../packets/epic-03/E3-S4-T2.md | handoff: ./2026-03-17-E3-S4-T2.md
 - E3-S4-T1 | owner lane: Backend Domain Lane | packet: ../packets/epic-03/E3-S4-T1.md | handoff: ./2026-03-17-E3-S4-T1.md
 - E3-S6-T1 | owner lane: Platform Control Lane | packet: ../packets/epic-03/E3-S6-T1.md | handoff: ./2026-03-17-E3-S6-T1.md
 - E3-S5-T1 | owner lane: Platform Control Lane | packet: ../packets/epic-03/E3-S5-T1.md | handoff: ./2026-03-17-E3-S5-T1.md
