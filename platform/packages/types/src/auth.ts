@@ -302,6 +302,108 @@ export const tenantVerticalTemplateKeys = [
 export type TenantVerticalTemplateKey =
 	(typeof tenantVerticalTemplateKeys)[number];
 
+export type TemplateRegistryEntry = {
+	configurationDefaults: Partial<TenantProvisioningDefaults>;
+	description: string;
+	displayName: string;
+	key: TenantVerticalTemplateKey;
+	operatingMode: TenantProvisioningDefaults["operatingMode"];
+	requiredModules: readonly TenantModuleKey[];
+};
+
+export type TenantTemplateAssociation = {
+	assignedAt: string;
+	templateKey: TenantVerticalTemplateKey;
+	tenantId: string;
+};
+
+export type TemplateModuleCompatibilityResult =
+	| { compatible: true }
+	| { compatible: false; reason: "missing-required-module"; missingModule: TenantModuleKey }
+	| { compatible: false; reason: "unknown-template"; templateKey: string };
+
+const templateRegistry: Record<TenantVerticalTemplateKey, TemplateRegistryEntry> = {
+	"restaurant-core": {
+		configurationDefaults: {
+			brandPreset: "starter-restaurant",
+			navigationPreset: "restaurant-default",
+			operatingMode: "ordering",
+			themePreset: "starter-warm"
+		},
+		description: "Full-service restaurant with online ordering, menu management, and operations",
+		displayName: "Restaurant",
+		key: "restaurant-core",
+		operatingMode: "ordering",
+		requiredModules: ["catalog", "ordering", "content", "operations"]
+	},
+	"services-core": {
+		configurationDefaults: {
+			brandPreset: "starter-services",
+			navigationPreset: "services-default",
+			operatingMode: "booking",
+			themePreset: "starter-clean"
+		},
+		description: "Service-based business with appointment booking and scheduling",
+		displayName: "Services",
+		key: "services-core",
+		operatingMode: "booking",
+		requiredModules: ["catalog", "bookings", "content", "operations"]
+	},
+	"hybrid-local-business": {
+		configurationDefaults: {
+			brandPreset: "starter-brand",
+			navigationPreset: "service-default",
+			operatingMode: "hybrid",
+			themePreset: "starter-light"
+		},
+		description: "Versatile local business combining ordering, bookings, and content",
+		displayName: "Local Business",
+		key: "hybrid-local-business",
+		operatingMode: "hybrid",
+		requiredModules: ["catalog", "ordering", "bookings", "content", "operations"]
+	}
+};
+
+export function getTemplateRegistryEntry(
+	key: TenantVerticalTemplateKey
+): TemplateRegistryEntry {
+	return templateRegistry[key];
+}
+
+export function getFullTemplateRegistry(): readonly TemplateRegistryEntry[] {
+	return tenantVerticalTemplateKeys.map((key) => templateRegistry[key]);
+}
+
+export function isValidTemplateKey(
+	key: string
+): key is TenantVerticalTemplateKey {
+	return (tenantVerticalTemplateKeys as readonly string[]).includes(key);
+}
+
+export function validateTemplateModuleCompatibility(
+	templateKey: string,
+	enabledModules: readonly TenantModuleKey[]
+): TemplateModuleCompatibilityResult {
+	if (!isValidTemplateKey(templateKey)) {
+		return { compatible: false, reason: "unknown-template", templateKey };
+	}
+
+	const entry = templateRegistry[templateKey];
+	const enabledSet = new Set(enabledModules);
+
+	for (const required of entry.requiredModules) {
+		if (!enabledSet.has(required)) {
+			return {
+				compatible: false,
+				reason: "missing-required-module",
+				missingModule: required
+			};
+		}
+	}
+
+	return { compatible: true };
+}
+
 export type TenantProvisioningRequest = {
 	displayName: string;
 	owner: TenantProvisioningOwner;

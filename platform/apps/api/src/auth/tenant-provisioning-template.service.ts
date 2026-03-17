@@ -1,51 +1,15 @@
 import { Injectable } from "@nestjs/common";
 
 import type {
-	TenantModuleKey,
-	TenantProvisioningDefaults,
 	TenantVerticalTemplateKey
 } from "@platform/types";
 
-export type TenantProvisioningTemplateProfile = {
-	configurationDefaults: Partial<TenantProvisioningDefaults>;
-	enabledModules: TenantModuleKey[];
-	verticalTemplate: TenantVerticalTemplateKey;
-};
+import { getTemplateRegistryEntry } from "@platform/types";
 
-const templateProfiles: Record<
-	TenantVerticalTemplateKey,
-	TenantProvisioningTemplateProfile
-> = {
-	"restaurant-core": {
-		configurationDefaults: {
-			brandPreset: "starter-restaurant",
-			navigationPreset: "restaurant-default",
-			operatingMode: "ordering",
-			themePreset: "starter-warm"
-		},
-		enabledModules: ["catalog", "ordering", "content", "operations"],
-		verticalTemplate: "restaurant-core"
-	},
-	"services-core": {
-		configurationDefaults: {
-			brandPreset: "starter-services",
-			navigationPreset: "services-default",
-			operatingMode: "booking",
-			themePreset: "starter-clean"
-		},
-		enabledModules: ["catalog", "bookings", "content", "operations"],
-		verticalTemplate: "services-core"
-	},
-	"hybrid-local-business": {
-		configurationDefaults: {
-			brandPreset: "starter-brand",
-			navigationPreset: "service-default",
-			operatingMode: "hybrid",
-			themePreset: "starter-light"
-		},
-		enabledModules: ["catalog", "ordering", "bookings", "content", "operations"],
-		verticalTemplate: "hybrid-local-business"
-	}
+export type TenantProvisioningTemplateProfile = {
+	configurationDefaults: ReturnType<typeof getTemplateRegistryEntry>["configurationDefaults"];
+	enabledModules: ReturnType<typeof getTemplateRegistryEntry>["requiredModules"] extends readonly (infer T)[] ? T[] : never;
+	verticalTemplate: TenantVerticalTemplateKey;
 };
 
 @Injectable()
@@ -53,6 +17,11 @@ export class TenantProvisioningTemplateService {
 	getTemplateProfile(
 		verticalTemplate: TenantVerticalTemplateKey
 	): TenantProvisioningTemplateProfile {
-		return templateProfiles[verticalTemplate];
+		const entry = getTemplateRegistryEntry(verticalTemplate);
+		return {
+			configurationDefaults: entry.configurationDefaults,
+			enabledModules: [...entry.requiredModules],
+			verticalTemplate: entry.key
+		};
 	}
 }

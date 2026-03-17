@@ -29,15 +29,21 @@ import {
 	getAllowedTenantStatusesForAccessMode,
 	getTenantRequestFailureReasonForAccessMode,
 	getFullModuleRegistry,
+	getFullTemplateRegistry,
 	getModuleDependencies,
 	getModuleRegistryEntry,
+	getTemplateRegistryEntry,
 	isValidModuleKey,
+	isValidTemplateKey,
 	moduleCategories,
 	previewEnvironmentStatuses,
 	previewSurfaceTypes,
 	validateModuleEnablementSet,
+	validateTemplateModuleCompatibility,
 	type PreviewEnvironmentMetadata,
+	type TemplateRegistryEntry,
 	type TenantModuleEnablementRecord,
+	type TenantTemplateAssociation,
 	hasResolvedTenant,
 	impersonationSessionStates,
 	logoutReasons,
@@ -673,5 +679,112 @@ describe("auth types contract", () => {
 		expect(metadata1.previewSubdomain).toBe("alpha");
 		expect(metadata2.previewSubdomain).toBe("bravo");
 		expect(metadata1.surfaces[0]?.previewUrl).not.toBe(metadata2.surfaces[0]?.previewUrl);
+	});
+
+	it("defines a stable template registry with display metadata and required modules", () => {
+		const registry = getFullTemplateRegistry();
+		expect(registry).toHaveLength(3);
+		expect(registry.map((e) => e.key)).toEqual([
+			"restaurant-core",
+			"services-core",
+			"hybrid-local-business"
+		]);
+
+		const restaurant: TemplateRegistryEntry = getTemplateRegistryEntry("restaurant-core");
+		expect(restaurant.displayName).toBe("Restaurant");
+		expect(restaurant.operatingMode).toBe("ordering");
+		expect(restaurant.requiredModules).toEqual(["catalog", "ordering", "content", "operations"]);
+		expect(restaurant.description).toBeTruthy();
+
+		const services = getTemplateRegistryEntry("services-core");
+		expect(services.displayName).toBe("Services");
+		expect(services.operatingMode).toBe("booking");
+		expect(services.requiredModules).toContain("bookings");
+
+		const hybrid = getTemplateRegistryEntry("hybrid-local-business");
+		expect(hybrid.displayName).toBe("Local Business");
+		expect(hybrid.operatingMode).toBe("hybrid");
+		expect(hybrid.requiredModules).toContain("ordering");
+		expect(hybrid.requiredModules).toContain("bookings");
+	});
+
+	it("validates template key recognition", () => {
+		expect(isValidTemplateKey("restaurant-core")).toBe(true);
+		expect(isValidTemplateKey("services-core")).toBe(true);
+		expect(isValidTemplateKey("hybrid-local-business")).toBe(true);
+		expect(isValidTemplateKey("nonexistent")).toBe(false);
+		expect(isValidTemplateKey("")).toBe(false);
+	});
+
+	it("validates template-module compatibility for complete module sets", () => {
+		expect(
+			validateTemplateModuleCompatibility(
+				"restaurant-core",
+				["catalog", "ordering", "content", "operations"]
+			)
+		).toEqual({ compatible: true });
+
+		expect(
+			validateTemplateModuleCompatibility(
+				"services-core",
+				["catalog", "bookings", "content", "operations"]
+			)
+		).toEqual({ compatible: true });
+
+		expect(
+			validateTemplateModuleCompatibility(
+				"hybrid-local-business",
+				["catalog", "ordering", "bookings", "content", "operations"]
+			)
+		).toEqual({ compatible: true });
+	});
+
+	it("rejects template-module compatibility for missing required modules", () => {
+		expect(
+			validateTemplateModuleCompatibility("restaurant-core", ["catalog", "content"])
+		).toEqual({
+			compatible: false,
+			reason: "missing-required-module",
+			missingModule: "ordering"
+		});
+	});
+
+	it("rejects template-module compatibility for unknown templates", () => {
+		expect(
+			validateTemplateModuleCompatibility("nonexistent", ["catalog"])
+		).toEqual({
+			compatible: false,
+			reason: "unknown-template",
+			templateKey: "nonexistent"
+		});
+	});
+
+	it("allows superset module sets for template compatibility", () => {
+		expect(
+			validateTemplateModuleCompatibility(
+				"restaurant-core",
+				["catalog", "ordering", "bookings", "content", "operations"]
+			)
+		).toEqual({ compatible: true });
+	});
+
+	it("defines tenant-template association shape", () => {
+		const association: TenantTemplateAssociation = {
+			assignedAt: "2026-03-17T10:00:00.000Z",
+			templateKey: "restaurant-core",
+			tenantId: "tenant-1"
+		};
+
+		expect(association.tenantId).toBe("tenant-1");
+		expect(association.templateKey).toBe("restaurant-core");
+		expect(association.assignedAt).toBeTruthy();
+	});
+
+	it("ensures each template declares configuration defaults consistent with its operating mode", () => {
+		const registry = getFullTemplateRegistry();
+
+		for (const entry of registry) {
+			expect(entry.configurationDefaults.operatingMode).toBe(entry.operatingMode);
+		}
 	});
 });

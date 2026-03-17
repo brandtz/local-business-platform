@@ -27,6 +27,7 @@ import { TenantProvisioningService } from "./auth/tenant-provisioning.service";
 import { TenantProvisioningSummaryService } from "./auth/tenant-provisioning-summary.service";
 import { TenantProvisioningTemplateService } from "./auth/tenant-provisioning-template.service";
 import { TenantPublishPolicyService } from "./auth/tenant-publish-policy.service";
+import { TemplateRegistryService } from "./auth/template-registry.service";
 import { TenantRequestPolicyService } from "./auth/tenant-request-policy.service";
 import { TenantResolutionService } from "./auth/tenant-resolution.service";
 import { HealthController } from "./health.controller";
@@ -62,6 +63,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     TenantProvisioningSummaryService,
     TenantProvisioningTemplateService,
     TenantPublishPolicyService,
+    TemplateRegistryService,
     TenantRequestPolicyService,
     TenantDirectoryQueryService,
     TenantResolutionService
@@ -93,6 +95,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     TenantProvisioningSummaryService,
     TenantProvisioningTemplateService,
     TenantPublishPolicyService,
+    TemplateRegistryService,
     TenantRequestPolicyService,
     TenantDirectoryQueryService,
     TenantResolutionService
