@@ -1,6 +1,6 @@
-# Cloud Agent Overnight Runbook
+# Parallel Agent Overnight Runbook
 
-Use this runbook when assigning background or parallel GitHub cloud-agent work.
+Use this runbook when assigning background or parallel VS Code agent work.
 
 ## Goal
 
@@ -17,19 +17,19 @@ Each agent should read only:
 
 If more context is needed, the task is too broad or the upstream handoff is incomplete.
 
-## Claim Rules
+## Assignment Rules
 
-- claim only tasks listed in agents/epics/handoffs/active-task-board.md under Ready
-- one agent claims one task only
-- move the task to In Progress before changing code
+- assign exact task IDs before launching agents; do not ask multiple agents to self-claim from the same Ready queue
+- one agent gets one task only
+- implementation agents should not edit agents/epics/handoffs/active-task-board.md during execution unless they are the designated coordinator agent
 - do not absorb follow-on work from dependent tasks just because the files are open
 
 ## Parallelism Rules
 
 Safe overnight parallelism for the current backlog:
-- one Platform Control or Backend Domain task on preview routing or domains
 - one Platform Control or Backend Domain task on module registry or template contracts
 - one Platform Control or API task on platform summary queries
+- one Platform Control task on publish-control or routing policy only if it does not touch the same files as another running task
 - one Verification or Frontend task only after its backing contract task is complete
 
 Avoid parallel work when tasks share:
@@ -56,9 +56,13 @@ Every handoff must include:
 - Playwright projects run and artifact paths when applicable
 - remaining risk, blockers, or follow-on tasks
 
+Default coordination rule:
+- implementation agents write handoff notes only
+- one human or one designated coordinator agent updates the active task board after reviewing the handoff
+
 ## Overnight Ready Queue
 
-Start from agents/epics/overnight-priority-queue.md and keep the active board synchronized with it.
+Start from agents/epics/overnight-priority-queue.md and keep the active board synchronized with it through a single coordinator.
 
 Current guidance:
 - keep at most four concurrent tasks overnight
@@ -67,10 +71,10 @@ Current guidance:
 
 ## Suggested Task Prompt Template
 
-Use this shape when assigning a cloud agent:
+Use this shape when assigning a VS Code agent:
 
 Task: <task id and title>
 Read: <task packet>, <dependency handoff>, agents/README.md, agents/PLAYWRIGHT_AGENT_STANDARD.md if UI is affected
 Do: implement only the scoped objective and required tests
 Validate: run the packet command list exactly
-Handoff: create the required handoff note, update the active board, and list any artifact paths
+Handoff: create the required handoff note, do not update the active board unless explicitly assigned as coordinator, and list any artifact paths
