@@ -114,7 +114,7 @@ export class PreviewRouteResolutionService {
 	): TenantResolutionTenantRecord | null {
 		return (
 			tenants.find(
-				(tenant) => tenant.previewSubdomain.toLowerCase() === previewSubdomain
+				(tenant) => tenant.previewSubdomain.toLowerCase() === previewSubdomain.toLowerCase()
 			) || null
 		);
 	}
