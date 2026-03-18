@@ -9,6 +9,12 @@ import {
 
 import { getAuthViewerState } from "./auth-state";
 import type { WebPlatformAdminRuntimeConfig } from "./runtime-config";
+import { TenantListPage } from "./tenant-list-page";
+import { TenantDetailPage } from "./tenant-detail-page";
+import {
+  resolveListAccessState,
+  resolveDetailAccessState
+} from "./tenant-dashboard";
 
 function createPage(title: string, description: string): Component {
   return defineComponent({
@@ -69,6 +75,59 @@ export function createRoutes(
         "Access Denied",
         "This route requires a platform-admin session."
       )
+    },
+    ...createTenantDashboardRoutes(authViewerState)
+  ];
+}
+
+function createTenantDashboardRoutes(
+  authViewerState: AuthViewerState
+): RouteRecordRaw[] {
+  const listAccess = resolveListAccessState(authViewerState);
+  const detailAccess = resolveDetailAccessState(authViewerState);
+
+  return [
+    {
+      path: "/tenants",
+      ...(listAccess
+        ? {
+            redirect:
+              listAccess.kind === "auth-required"
+                ? "/auth-required"
+                : "/access-denied"
+          }
+        : {
+            component: defineComponent({
+              name: "TenantListRoute",
+              setup() {
+                return () =>
+                  h(TenantListPage, {
+                    viewState: { kind: "loading" }
+                  });
+              }
+            })
+          })
+    },
+    {
+      path: "/tenants/:tenantId",
+      ...(detailAccess
+        ? {
+            redirect:
+              detailAccess.kind === "auth-required"
+                ? "/auth-required"
+                : "/access-denied"
+          }
+        : {
+            component: defineComponent({
+              name: "TenantDetailRoute",
+              setup() {
+                return () =>
+                  h(TenantDetailPage, {
+                    viewState: { kind: "loading" }
+                  });
+              }
+            })
+          })
     }
   ];
 }

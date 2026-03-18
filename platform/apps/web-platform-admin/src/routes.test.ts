@@ -17,7 +17,9 @@ describe("web platform admin routes", () => {
       "/",
       "/status",
       "/auth-required",
-      "/access-denied"
+      "/access-denied",
+      "/tenants",
+      "/tenants/:tenantId"
     ]);
   });
 
@@ -98,6 +100,82 @@ describe("web platform admin routes", () => {
         securityBanner: "Impersonation active for Alpha Fitness until 2026-03-16T21:30:00.000Z."
       },
       path: "/"
+    });
+  });
+
+  describe("tenant dashboard routes", () => {
+    it("redirects anonymous viewers from tenant list to auth-required", () => {
+      const routes = createRoutes(
+        resolveRuntimeConfig({}),
+        createAnonymousAuthViewerState("platform")
+      );
+
+      const tenantListRoute = routes.find((r) => r.path === "/tenants");
+
+      expect(tenantListRoute).toMatchObject({
+        redirect: "/auth-required"
+      });
+    });
+
+    it("redirects non-platform viewers from tenant list to access-denied", () => {
+      const routes = createRoutes(
+        resolveRuntimeConfig({}),
+        createAuthenticatedAuthViewerState(
+          { actorType: "tenant", displayName: "Tenant Admin", id: "t-user-1" },
+          "tenant"
+        )
+      );
+
+      const tenantListRoute = routes.find((r) => r.path === "/tenants");
+
+      expect(tenantListRoute).toMatchObject({
+        redirect: "/access-denied"
+      });
+    });
+
+    it("allows platform-admin viewers into the tenant list route", () => {
+      const routes = createRoutes(
+        resolveRuntimeConfig({}),
+        createAuthenticatedAuthViewerState(
+          { actorType: "platform", displayName: "Operator", id: "p-user-1" },
+          "platform"
+        )
+      );
+
+      const tenantListRoute = routes.find((r) => r.path === "/tenants");
+
+      expect(tenantListRoute).toBeDefined();
+      expect("redirect" in tenantListRoute!).toBe(false);
+      expect("component" in tenantListRoute!).toBe(true);
+    });
+
+    it("redirects anonymous viewers from tenant detail to auth-required", () => {
+      const routes = createRoutes(
+        resolveRuntimeConfig({}),
+        createAnonymousAuthViewerState("platform")
+      );
+
+      const tenantDetailRoute = routes.find((r) => r.path === "/tenants/:tenantId");
+
+      expect(tenantDetailRoute).toMatchObject({
+        redirect: "/auth-required"
+      });
+    });
+
+    it("allows platform-admin viewers into the tenant detail route", () => {
+      const routes = createRoutes(
+        resolveRuntimeConfig({}),
+        createAuthenticatedAuthViewerState(
+          { actorType: "platform", displayName: "Operator", id: "p-user-1" },
+          "platform"
+        )
+      );
+
+      const tenantDetailRoute = routes.find((r) => r.path === "/tenants/:tenantId");
+
+      expect(tenantDetailRoute).toBeDefined();
+      expect("redirect" in tenantDetailRoute!).toBe(false);
+      expect("component" in tenantDetailRoute!).toBe(true);
     });
   });
 });

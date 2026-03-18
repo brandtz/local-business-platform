@@ -25,6 +25,8 @@ const AppShell = defineComponent({
 				h("nav", [
 					h(RouterLink, { to: "/" }, { default: () => "Overview" }),
 					" | ",
+					h(RouterLink, { to: "/tenants" }, { default: () => "Tenants" }),
+					" | ",
 					h(RouterLink, { to: "/status" }, { default: () => "Status" })
 				]),
 				h("main", [h(RouterView)])
