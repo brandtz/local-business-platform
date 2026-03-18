@@ -53,4 +53,16 @@ describe("repository governance contract", () => {
     expect(adr).toContain("### Prohibited Patterns");
     expect(adr).toContain("accepted");
   });
+
+  it("documents permitted divergence from shared conventions", () => {
+    const engineeringConventions = readRepoFile("platform", "docs", "engineering-conventions.md");
+    const adr = readRepoFile("platform", "docs", "adr", "0002-permitted-divergence.md");
+
+    expect(engineeringConventions).toContain("## Convention Divergence");
+    expect(adr).toContain("## Decision");
+    expect(adr).toContain("### Mandatory Conventions");
+    expect(adr).toContain("### Flexible Conventions");
+    expect(adr).toContain("### Divergence Evaluation Checklist");
+    expect(adr).toContain("accepted");
+  });
 });

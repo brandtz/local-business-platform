@@ -92,6 +92,10 @@ Use this file to track the active execution queue.
 - E3-S6-T2 | owner lane: Frontend Systems Lane | packet: ../packets/epic-03/E3-S6-T2.md | handoff: ./2026-03-17-E3-S6-T2.md
 - E3-S6-T3 | owner lane: Platform Control Lane | packet: ../packets/epic-03/E3-S6-T3.md | handoff: ./2026-03-17-E3-S6-T3.md
 - E3-S6-T4 | owner lane: Platform Control Lane | packet: ../packets/epic-03/E3-S6-T4.md | handoff: ./2026-03-17-E3-S6-T4.md
+- E4-S1-T3 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S1-T3.md | handoff: ./2026-03-17-E4-S1-T3.md
+- E4-S6-T2 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S6-T2.md | handoff: ./2026-03-17-E4-S6-T2.md
+- E4-S1-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S1-T4.md | handoff: ./2026-03-17-E4-S1-T4.md
+- E4-S6-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S6-T4.md | handoff: ./2026-03-17-E4-S6-T4.md
 
 ## Board Rules
 

@@ -40,3 +40,13 @@ Summary:
 - shared primitives are extended through designated factory functions and override parameters, not by forking
 - a type or function moves to `@platform/ui` only when at least two of three apps require the same contract
 - direct token mutation, component forks, cross-app imports, and tenant-detail leakage in security states are prohibited
+
+## Convention Divergence
+
+Refer to [ADR 0002 — Permitted Divergence from Shared Frontend Conventions](adr/0002-permitted-divergence.md) for the full decision record.
+
+Summary:
+
+- mandatory conventions (tenant isolation, auth transitions, error classification, token source of truth, security messaging, cross-app import ban) cannot be diverged from
+- flexible conventions (routing, layout, local state, descriptor text, API client config, rendering approach) may be overridden with justification documented in the PR description
+- use the divergence evaluation checklist in ADR 0002 before proposing app-specific patterns
