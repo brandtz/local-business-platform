@@ -26,3 +26,6 @@ export * from "./primitives";
 
 // E4-S1-T3: Theme override mechanism for tenant branding
 export * from "./theme";
+
+// E4-S6-T2: App shell integration guidance
+export * from "./app-shell";
