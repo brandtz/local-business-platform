@@ -41,4 +41,16 @@ describe("repository governance contract", () => {
     expect(agentExecutionNorms).toContain("## Before Editing");
     expect(agentExecutionNorms).toContain("## At Task Completion");
   });
+
+  it("documents component ownership and extension rules", () => {
+    const engineeringConventions = readRepoFile("platform", "docs", "engineering-conventions.md");
+    const adr = readRepoFile("platform", "docs", "adr", "0001-component-ownership.md");
+
+    expect(engineeringConventions).toContain("## Component Ownership");
+    expect(adr).toContain("## Decision");
+    expect(adr).toContain("### Ownership Boundary");
+    expect(adr).toContain("### Extension Rules");
+    expect(adr).toContain("### Prohibited Patterns");
+    expect(adr).toContain("accepted");
+  });
 });

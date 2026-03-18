@@ -28,3 +28,15 @@
 - Foundation Lane work should receive review from an adjacent lane when possible
 - changes that affect CI, package boundaries, or cross-app contracts should include explicit validation notes
 - architecture-affecting changes should link an ADR or explain why the existing ADR set is sufficient
+
+## Component Ownership
+
+Refer to [ADR 0001 — Component Ownership and Extension Rules](adr/0001-component-ownership.md) for the full decision record.
+
+Summary:
+
+- `@platform/ui` owns shared design tokens, primitive descriptors, theme overrides, and shell state conventions
+- apps own Vue component implementations, routes, view state composables, and page components
+- shared primitives are extended through designated factory functions and override parameters, not by forking
+- a type or function moves to `@platform/ui` only when at least two of three apps require the same contract
+- direct token mutation, component forks, cross-app imports, and tenant-detail leakage in security states are prohibited
