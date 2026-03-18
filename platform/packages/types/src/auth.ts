@@ -1119,6 +1119,52 @@ export function resolveAdminRouteAccess(
 	return "allow";
 }
 
+// ── Platform Tenant Filter Types ─────────────────────────────────────────────
+
+export type PlatformTenantFilterCriteria = {
+	healthStatus?: PlatformTenantOperationalHealthStatus | null;
+	lifecycleStatus?: TenantStatus | null;
+	liveRoutingStatus?: PlatformTenantOperationalLiveRoutingStatus | null;
+	publishStatus?: PlatformTenantOperationalPublishStatus | null;
+	searchText?: string | null;
+};
+
+export function applyTenantFilterCriteria(
+	summaries: readonly PlatformTenantOperationalSummary[],
+	criteria: PlatformTenantFilterCriteria
+): PlatformTenantOperationalSummary[] {
+	let result = [...summaries];
+
+	if (criteria.lifecycleStatus) {
+		result = result.filter((s) => s.lifecycleStatus === criteria.lifecycleStatus);
+	}
+
+	if (criteria.publishStatus) {
+		result = result.filter((s) => s.publishStatus === criteria.publishStatus);
+	}
+
+	if (criteria.healthStatus) {
+		result = result.filter((s) => s.healthStatus === criteria.healthStatus);
+	}
+
+	if (criteria.liveRoutingStatus) {
+		result = result.filter((s) => s.liveRoutingStatus === criteria.liveRoutingStatus);
+	}
+
+	if (criteria.searchText) {
+		const lowerSearch = criteria.searchText.toLowerCase();
+
+		result = result.filter(
+			(s) =>
+				s.tenantDisplayName.toLowerCase().includes(lowerSearch) ||
+				s.tenantSlug.toLowerCase().includes(lowerSearch) ||
+				(s.previewSubdomain && s.previewSubdomain.toLowerCase().includes(lowerSearch))
+		);
+	}
+
+	return result;
+}
+
 // ── Platform Operations Widget Types ─────────────────────────────────────────
 
 export type PlatformAuditSummaryWidget = {

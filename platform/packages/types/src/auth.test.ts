@@ -57,6 +57,7 @@ import {
 	type PlatformTenantOperationalSummary,
 	type PlatformTenantOperationalSummaryQueryRequest,
 	derivePlatformOperationsWidgets,
+	applyTenantFilterCriteria,
 	tenantModuleKeys,
 	tenantVerticalTemplateKeys,
 	type TenantProvisioningRequest,
@@ -907,6 +908,82 @@ describe("auth types contract", () => {
 			]);
 
 			expect(widgets.jobStatus.status).toBe("attention-required");
+		});
+	});
+
+	describe("platform tenant filter criteria", () => {
+		const summaries: PlatformTenantOperationalSummary[] = [
+			{
+				customDomainCount: 0,
+				healthReasons: [],
+				healthStatus: "healthy",
+				lastLifecycleAuditAt: null,
+				lifecycleStatus: "active",
+				liveRoutingStatus: "managed-subdomain-only",
+				previewStatus: "configured",
+				previewSubdomain: "alpha",
+				publishBlockedReason: null,
+				publishStatus: "ready",
+				tenantDisplayName: "Alpha",
+				tenantId: "t-1",
+				tenantSlug: "alpha"
+			},
+			{
+				customDomainCount: 0,
+				healthReasons: ["tenant-inactive"],
+				healthStatus: "attention-required",
+				lastLifecycleAuditAt: null,
+				lifecycleStatus: "inactive",
+				liveRoutingStatus: "managed-subdomain-only",
+				previewStatus: "configured",
+				previewSubdomain: "bravo",
+				publishBlockedReason: "tenant-inactive",
+				publishStatus: "blocked",
+				tenantDisplayName: "Bravo",
+				tenantId: "t-2",
+				tenantSlug: "bravo"
+			}
+		];
+
+		it("returns all summaries with empty criteria", () => {
+			expect(applyTenantFilterCriteria(summaries, {})).toHaveLength(2);
+		});
+
+		it("filters by lifecycle status", () => {
+			const result = applyTenantFilterCriteria(summaries, { lifecycleStatus: "active" });
+
+			expect(result).toHaveLength(1);
+			expect(result[0].tenantId).toBe("t-1");
+		});
+
+		it("filters by publish status", () => {
+			const result = applyTenantFilterCriteria(summaries, { publishStatus: "blocked" });
+
+			expect(result).toHaveLength(1);
+			expect(result[0].tenantId).toBe("t-2");
+		});
+
+		it("searches by display name case-insensitively", () => {
+			const result = applyTenantFilterCriteria(summaries, { searchText: "ALPHA" });
+
+			expect(result).toHaveLength(1);
+			expect(result[0].tenantId).toBe("t-1");
+		});
+
+		it("returns empty for non-matching criteria", () => {
+			expect(
+				applyTenantFilterCriteria(summaries, { lifecycleStatus: "archived" })
+			).toHaveLength(0);
+		});
+
+		it("applies compound filters", () => {
+			const result = applyTenantFilterCriteria(summaries, {
+				healthStatus: "attention-required",
+				publishStatus: "blocked"
+			});
+
+			expect(result).toHaveLength(1);
+			expect(result[0].tenantId).toBe("t-2");
 		});
 	});
 });
