@@ -23,3 +23,6 @@ export * from "./tokens";
 
 // E4-S1-T2: Layout primitives and feedback components
 export * from "./primitives";
+
+// E4-S1-T3: Theme override mechanism for tenant branding
+export * from "./theme";

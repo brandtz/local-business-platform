@@ -871,7 +871,7 @@ describe("auth types contract", () => {
 					healthReasons: ["tenant-inactive"],
 					healthStatus: "attention-required",
 					lastLifecycleAuditAt: null,
-					lifecycleStatus: "inactive",
+					lifecycleStatus: "suspended",
 					liveRoutingStatus: "managed-subdomain-only",
 					previewStatus: "configured",
 					previewSubdomain: "b",
@@ -933,7 +933,7 @@ describe("auth types contract", () => {
 				healthReasons: ["tenant-inactive"],
 				healthStatus: "attention-required",
 				lastLifecycleAuditAt: null,
-				lifecycleStatus: "inactive",
+				lifecycleStatus: "suspended",
 				liveRoutingStatus: "managed-subdomain-only",
 				previewStatus: "configured",
 				previewSubdomain: "bravo",
@@ -950,10 +950,10 @@ describe("auth types contract", () => {
 		});
 
 		it("filters by lifecycle status", () => {
-			const result = applyTenantFilterCriteria(summaries, { lifecycleStatus: "active" });
+			const result = applyTenantFilterCriteria(summaries, { lifecycleStatus: "suspended" });
 
 			expect(result).toHaveLength(1);
-			expect(result[0].tenantId).toBe("t-1");
+			expect(result[0].tenantId).toBe("t-2");
 		});
 
 		it("filters by publish status", () => {
