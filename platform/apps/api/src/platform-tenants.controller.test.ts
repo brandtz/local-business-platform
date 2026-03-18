@@ -281,8 +281,9 @@ describe("PlatformTenantsController", () => {
 		expect(
 			controller.assignTemplate(
 				{
-					tenantId: "tenant-1",
-					verticalTemplate: "restaurant-core"
+					enabledModules: ["catalog", "ordering", "content", "operations"],
+					templateKey: "restaurant-core",
+					tenantId: "tenant-1"
 				},
 				{
 					platformViewer: {
@@ -326,8 +327,9 @@ describe("PlatformTenantsController", () => {
 		expect(() =>
 			controller.assignTemplate(
 				{
-					tenantId: "tenant-1",
-					verticalTemplate: "restaurant-core"
+					enabledModules: ["catalog", "ordering", "content", "operations"],
+					templateKey: "restaurant-core",
+					tenantId: "tenant-1"
 				},
 				{
 					platformViewer: {
