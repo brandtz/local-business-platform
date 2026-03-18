@@ -56,6 +56,7 @@ import {
 	platformTenantOperationalPublishStatuses,
 	type PlatformTenantOperationalSummary,
 	type PlatformTenantOperationalSummaryQueryRequest,
+	derivePlatformOperationsWidgets,
 	tenantModuleKeys,
 	tenantVerticalTemplateKeys,
 	type TenantProvisioningRequest,
@@ -786,5 +787,126 @@ describe("auth types contract", () => {
 		for (const entry of registry) {
 			expect(entry.configurationDefaults.operatingMode).toBe(entry.operatingMode);
 		}
+	});
+
+	describe("platform operations widget derivation", () => {
+		it("returns empty widget set for no summaries", () => {
+			const widgets = derivePlatformOperationsWidgets([]);
+
+			expect(widgets.auditSummary).toEqual({
+				lastAuditAt: null,
+				totalDenied: 0,
+				totalTransitions: 0
+			});
+			expect(widgets.publishSummary).toEqual({
+				blockedCount: 0,
+				commonBlockReasons: [],
+				readyCount: 0
+			});
+			expect(widgets.jobStatus).toEqual({
+				failedCount: 0,
+				pendingCount: 0,
+				status: "idle"
+			});
+		});
+
+		it("tracks audit transitions and latest audit timestamp", () => {
+			const widgets = derivePlatformOperationsWidgets([
+				{
+					customDomainCount: 0,
+					healthReasons: [],
+					healthStatus: "healthy",
+					lastLifecycleAuditAt: "2026-03-17T05:00:00.000Z",
+					lifecycleStatus: "active",
+					liveRoutingStatus: "managed-subdomain-only",
+					previewStatus: "configured",
+					previewSubdomain: "alpha",
+					publishBlockedReason: null,
+					publishStatus: "ready",
+					tenantDisplayName: "Alpha",
+					tenantId: "t-1",
+					tenantSlug: "alpha"
+				},
+				{
+					customDomainCount: 0,
+					healthReasons: [],
+					healthStatus: "healthy",
+					lastLifecycleAuditAt: "2026-03-17T08:00:00.000Z",
+					lifecycleStatus: "active",
+					liveRoutingStatus: "managed-subdomain-only",
+					previewStatus: "configured",
+					previewSubdomain: "bravo",
+					publishBlockedReason: null,
+					publishStatus: "ready",
+					tenantDisplayName: "Bravo",
+					tenantId: "t-2",
+					tenantSlug: "bravo"
+				}
+			]);
+
+			expect(widgets.auditSummary.totalTransitions).toBe(2);
+			expect(widgets.auditSummary.lastAuditAt).toBe("2026-03-17T08:00:00.000Z");
+		});
+
+		it("counts publish-ready and blocked tenants with common reasons", () => {
+			const widgets = derivePlatformOperationsWidgets([
+				{
+					customDomainCount: 0,
+					healthReasons: [],
+					healthStatus: "healthy",
+					lastLifecycleAuditAt: null,
+					lifecycleStatus: "active",
+					liveRoutingStatus: "managed-subdomain-only",
+					previewStatus: "configured",
+					previewSubdomain: "a",
+					publishBlockedReason: null,
+					publishStatus: "ready",
+					tenantDisplayName: "A",
+					tenantId: "t-1",
+					tenantSlug: "a"
+				},
+				{
+					customDomainCount: 0,
+					healthReasons: ["tenant-inactive"],
+					healthStatus: "attention-required",
+					lastLifecycleAuditAt: null,
+					lifecycleStatus: "inactive",
+					liveRoutingStatus: "managed-subdomain-only",
+					previewStatus: "configured",
+					previewSubdomain: "b",
+					publishBlockedReason: "tenant-inactive",
+					publishStatus: "blocked",
+					tenantDisplayName: "B",
+					tenantId: "t-2",
+					tenantSlug: "b"
+				}
+			]);
+
+			expect(widgets.publishSummary.readyCount).toBe(1);
+			expect(widgets.publishSummary.blockedCount).toBe(1);
+			expect(widgets.publishSummary.commonBlockReasons).toContain("tenant-inactive");
+		});
+
+		it("marks job status as attention-required when any tenant needs attention", () => {
+			const widgets = derivePlatformOperationsWidgets([
+				{
+					customDomainCount: 0,
+					healthReasons: ["preview-route-missing"],
+					healthStatus: "attention-required",
+					lastLifecycleAuditAt: null,
+					lifecycleStatus: "active",
+					liveRoutingStatus: "managed-subdomain-only",
+					previewStatus: "missing",
+					previewSubdomain: null,
+					publishBlockedReason: null,
+					publishStatus: "ready",
+					tenantDisplayName: "C",
+					tenantId: "t-3",
+					tenantSlug: "c"
+				}
+			]);
+
+			expect(widgets.jobStatus.status).toBe("attention-required");
+		});
 	});
 });

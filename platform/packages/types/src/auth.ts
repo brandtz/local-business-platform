@@ -1118,3 +1118,90 @@ export function resolveAdminRouteAccess(
 
 	return "allow";
 }
+
+// ── Platform Operations Widget Types ─────────────────────────────────────────
+
+export type PlatformAuditSummaryWidget = {
+	totalTransitions: number;
+	totalDenied: number;
+	lastAuditAt: string | null;
+};
+
+export type PlatformJobStatusWidget = {
+	status: "idle" | "healthy" | "attention-required";
+	pendingCount: number;
+	failedCount: number;
+};
+
+export type PlatformPublishSummaryWidget = {
+	readyCount: number;
+	blockedCount: number;
+	commonBlockReasons: string[];
+};
+
+export type PlatformOperationsWidgetSet = {
+	auditSummary: PlatformAuditSummaryWidget;
+	jobStatus: PlatformJobStatusWidget;
+	publishSummary: PlatformPublishSummaryWidget;
+};
+
+export function derivePlatformOperationsWidgets(
+	summaries: readonly PlatformTenantOperationalSummary[]
+): PlatformOperationsWidgetSet {
+	let totalTransitions = 0;
+	let totalDenied = 0;
+	let lastAuditAt: string | null = null;
+	let readyCount = 0;
+	let blockedCount = 0;
+	let attentionCount = 0;
+	const blockReasonCounts = new Map<string, number>();
+
+	for (const summary of summaries) {
+		if (summary.lastLifecycleAuditAt) {
+			totalTransitions += 1;
+
+			if (!lastAuditAt || summary.lastLifecycleAuditAt > lastAuditAt) {
+				lastAuditAt = summary.lastLifecycleAuditAt;
+			}
+		}
+
+		if (summary.publishStatus === "ready") {
+			readyCount += 1;
+		} else {
+			blockedCount += 1;
+		}
+
+		if (summary.publishBlockedReason) {
+			const count = blockReasonCounts.get(summary.publishBlockedReason) ?? 0;
+
+			blockReasonCounts.set(summary.publishBlockedReason, count + 1);
+			totalDenied += 1;
+		}
+
+		if (summary.healthStatus === "attention-required") {
+			attentionCount += 1;
+		}
+	}
+
+	const commonBlockReasons = [...blockReasonCounts.entries()]
+		.sort((a, b) => b[1] - a[1])
+		.map(([reason]) => reason);
+
+	return {
+		auditSummary: {
+			lastAuditAt,
+			totalDenied,
+			totalTransitions
+		},
+		jobStatus: {
+			failedCount: 0,
+			pendingCount: 0,
+			status: attentionCount > 0 ? "attention-required" : "idle"
+		},
+		publishSummary: {
+			blockedCount,
+			commonBlockReasons,
+			readyCount
+		}
+	};
+}
