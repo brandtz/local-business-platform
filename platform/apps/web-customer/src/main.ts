@@ -29,6 +29,7 @@ import {
 	TENANT_BOOTSTRAP_RESULT_KEY,
 	TENANT_CONTEXT_KEY
 } from "./tenant-context";
+import { freezeTenantContext } from "./tenant-context-consumer";
 
 const runtimeConfig = getRuntimeConfig();
 
@@ -66,11 +67,13 @@ function mountApp(
 	context: TenantFrontendContext,
 	result: BootstrapResult
 ): void {
-	document.title = context.displayName;
+	const frozenContext = freezeTenantContext(context);
+
+	document.title = frozenContext.displayName;
 
 	const router = createRouter({
 		history: createWebHistory(),
-		routes: createRoutes(runtimeConfig, context)
+		routes: createRoutes(runtimeConfig, frozenContext)
 	});
 
 	const AppShell = defineComponent({
@@ -79,8 +82,8 @@ function mountApp(
 			return () =>
 				h("div", { class: "app-shell" }, [
 					h("header", [
-						h("h1", context.displayName),
-						h("p", `Tenant: ${context.slug} | Template: ${context.templateKey}`)
+						h("h1", frozenContext.displayName),
+						h("p", `Tenant: ${frozenContext.slug} | Template: ${frozenContext.templateKey}`)
 					]),
 					h("nav", [
 						h(RouterLink, { to: "/" }, { default: () => "Home" }),
@@ -94,7 +97,7 @@ function mountApp(
 
 	const app = createApp(AppShell);
 
-	app.provide(TENANT_CONTEXT_KEY, context);
+	app.provide(TENANT_CONTEXT_KEY, frozenContext);
 	app.provide(TENANT_BOOTSTRAP_RESULT_KEY, result);
 	app.use(router);
 	app.mount("#app");
