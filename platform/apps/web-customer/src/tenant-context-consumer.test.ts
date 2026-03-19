@@ -213,29 +213,30 @@ describe("isAnyTenantModuleEnabled", () => {
 
 // ── requireTenantContext (route guard) ────────────────────────────────────────
 
+// Navigation guards returned by requireTenantContext / requireTenantModule
+// ignore their parameters; we call them directly with a concrete callable type.
+type GuardFn = () => string | boolean;
+
 describe("requireTenantContext", () => {
 	it("allows navigation when tenant context is present", () => {
 		const context = createTestContext();
-		const guard = requireTenantContext(context);
-		const result = (guard as Function)();
+		const guard = requireTenantContext(context) as GuardFn;
 
-		expect(result).toBe(true);
+		expect(guard()).toBe(true);
 	});
 
 	it("redirects to '/' when tenant context is missing", () => {
-		const guard = requireTenantContext(undefined);
-		const result = (guard as Function)();
+		const guard = requireTenantContext(undefined) as GuardFn;
 
-		expect(result).toBe("/");
+		expect(guard()).toBe("/");
 	});
 
 	it("redirects to custom path when context is missing", () => {
 		const guard = requireTenantContext(undefined, {
 			redirectTo: "/error"
-		});
-		const result = (guard as Function)();
+		}) as GuardFn;
 
-		expect(result).toBe("/error");
+		expect(guard()).toBe("/error");
 	});
 });
 
@@ -247,33 +248,29 @@ describe("requireTenantModule", () => {
 	});
 
 	it("allows navigation when module is enabled", () => {
-		const guard = requireTenantModule(context, "catalog");
-		const result = (guard as Function)();
+		const guard = requireTenantModule(context, "catalog") as GuardFn;
 
-		expect(result).toBe(true);
+		expect(guard()).toBe(true);
 	});
 
 	it("redirects when module is not enabled", () => {
-		const guard = requireTenantModule(context, "bookings");
-		const result = (guard as Function)();
+		const guard = requireTenantModule(context, "bookings") as GuardFn;
 
-		expect(result).toBe("/");
+		expect(guard()).toBe("/");
 	});
 
 	it("redirects to custom path when module is not enabled", () => {
 		const guard = requireTenantModule(context, "bookings", {
 			redirectTo: "/not-available"
-		});
-		const result = (guard as Function)();
+		}) as GuardFn;
 
-		expect(result).toBe("/not-available");
+		expect(guard()).toBe("/not-available");
 	});
 
 	it("redirects when context is undefined", () => {
-		const guard = requireTenantModule(undefined, "catalog");
-		const result = (guard as Function)();
+		const guard = requireTenantModule(undefined, "catalog") as GuardFn;
 
-		expect(result).toBe("/");
+		expect(guard()).toBe("/");
 	});
 });
 
