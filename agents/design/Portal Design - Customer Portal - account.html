@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal - Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"M PLUS 1p"', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#FF4B3A', // Adjusted to match inspiration
+                        primaryHover: '#E03E2F',
+                        surface: '#FFFFFF',
+                        background: '#F9FAFB',
+                        textMain: '#111827',
+                        textMuted: '#6B7280',
+                        border: '#E5E7EB',
+                        error: '#EF4444',
+                        success: '#10B981',
+                        accent: '#F3F4F6',
+                        indigo: '#4F46E5',
+                        cyan: '#06B6D4',
+                        cardBg1: '#E8F5E9',
+                        cardBg2: '#FFF3E0',
+                        cardBg3: '#E3F2FD',
+                        cardBg4: '#FCE4EC'
+                    },
+                    boxShadow: {
+                        'card': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+                        'floating': '0 20px 40px -10px rgba(0,0,0,0.1)'
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                        '3xl': '2rem'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: '"M PLUS 1p"', sans-serif; }
+        ::-webkit-scrollbar { display: none; }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen w-full text-textMain flex flex-col m-0 p-0 overflow-x-hidden">
+
+    <!-- Top Announcement Bar -->
+    <div id="announcement-bar" class="bg-primary text-white text-sm py-2 px-4 text-center font-medium flex justify-center items-center gap-4">
+        <span>🎉 Spring Sale! Get 20% off all services with code SPRING20</span>
+        <button class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Main Header -->
+    <header id="header" class="w-full glass-nav border-b border-border sticky top-0 z-50">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center gap-8">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-2 cursor-pointer">
+                        <span class="font-extrabold text-2xl tracking-tight text-primary">Veshoe</span>
+                    </div>
+
+                    <!-- Desktop Nav -->
+                    <nav class="hidden lg:flex items-center gap-8 ml-8">
+                        <a href="#" class="text-textMuted hover:text-textMain font-medium transition-colors">Home</a>
+                        <a href="#" class="text-textMuted hover:text-textMain font-medium transition-colors">Menu & Services</a>
+                        <a href="#" class="text-textMuted hover:text-textMain font-medium transition-colors">Cart & Checkout</a>
+                        <a href="#" class="text-primary font-bold border-b-2 border-primary pb-1">Account</a>
+                    </nav>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-6">
+                    <button class="text-textMuted hover:text-textMain transition-colors">
+                        <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                    </button>
+                    <button class="text-textMuted hover:text-textMain transition-colors relative">
+                        <i class="fa-regular fa-bell text-lg"></i>
+                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+                    </button>
+                    <button class="text-textMuted hover:text-textMain transition-colors">
+                        <i class="fa-regular fa-heart text-lg"></i>
+                    </button>
+                    <button class="text-textMuted hover:text-textMain transition-colors relative">
+                        <i class="fa-solid fa-cart-shopping text-lg"></i>
+                        <span class="absolute -top-2 -right-2 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">2</span>
+                    </button>
+                    
+                    <div class="w-8 h-8 rounded-full overflow-hidden border border-border cursor-pointer">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg" alt="User Avatar" class="w-full h-full object-cover">
+                    </div>
+
+                    <button class="lg:hidden text-textMain text-2xl ml-2">
+                        <i class="fa-solid fa-bars-staggered"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="flex-grow w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Sidebar Navigation -->
+            <aside id="account-sidebar" class="w-full lg:w-64 flex-shrink-0">
+                <div class="bg-surface rounded-3xl p-6 shadow-card sticky top-24">
+                    <div class="flex items-center gap-4 mb-8 pb-6 border-b border-border">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg" alt="Jane Foster" class="w-16 h-16 rounded-full object-cover border-2 border-primary/20">
+                        <div>
+                            <h2 class="font-bold text-lg text-textMain">Jane Foster</h2>
+                            <p class="text-sm text-textMuted">Gold Member</p>
+                        </div>
+                    </div>
+
+                    <nav class="space-y-2">
+                        <a href="#profile" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-bold transition-colors">
+                            <i class="fa-regular fa-user w-5 text-center"></i>
+                            <span>Profile Details</span>
+                        </a>
+                        <a href="#orders" class="flex items-center gap-3 px-4 py-3 rounded-xl text-textMuted hover:bg-accent hover:text-textMain font-medium transition-colors">
+                            <i class="fa-solid fa-bag-shopping w-5 text-center"></i>
+                            <span>Orders History</span>
+                        </a>
+                        <a href="#bookings" class="flex items-center gap-3 px-4 py-3 rounded-xl text-textMuted hover:bg-accent hover:text-textMain font-medium transition-colors">
+                            <i class="fa-regular fa-calendar-check w-5 text-center"></i>
+                            <span>Bookings</span>
+                        </a>
+                        <a href="#addresses" class="flex items-center gap-3 px-4 py-3 rounded-xl text-textMuted hover:bg-accent hover:text-textMain font-medium transition-colors">
+                            <i class="fa-solid fa-location-dot w-5 text-center"></i>
+                            <span>Saved Addresses</span>
+                        </a>
+                        <a href="#payments" class="flex items-center gap-3 px-4 py-3 rounded-xl text-textMuted hover:bg-accent hover:text-textMain font-medium transition-colors">
+                            <i class="fa-regular fa-credit-card w-5 text-center"></i>
+                            <span>Payment Methods</span>
+                        </a>
+                        <a href="#loyalty" class="flex items-center gap-3 px-4 py-3 rounded-xl text-textMuted hover:bg-accent hover:text-textMain font-medium transition-colors">
+                            <i class="fa-solid fa-star w-5 text-center"></i>
+                            <span>Loyalty & Rewards</span>
+                        </a>
+                        <a href="#notifications" class="flex items-center gap-3 px-4 py-3 rounded-xl text-textMuted hover:bg-accent hover:text-textMain font-medium transition-colors">
+                            <i class="fa-regular fa-bell w-5 text-center"></i>
+                            <span>Notifications</span>
+                        </a>
+                    </nav>
+
+                    <div class="mt-8 pt-6 border-t border-border">
+                        <button class="flex items-center gap-3 px-4 py-3 rounded-xl text-error hover:bg-error/10 w-full font-bold transition-colors">
+                            <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i>
+                            <span>Log Out</span>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="flex-grow space-y-8">
+                
+                <!-- Profile Details Section -->
+                <section id="profile" class="bg-surface rounded-3xl shadow-card p-6 md:p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-textMain">Profile Details</h3>
+                        <button class="text-primary font-bold hover:text-primaryHover text-sm bg-primary/10 px-4 py-2 rounded-full">Edit Profile</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-textMuted uppercase tracking-wider">First Name</label>
+                            <div class="p-3 bg-accent rounded-xl border border-border text-textMain font-medium">Jane</div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-textMuted uppercase tracking-wider">Last Name</label>
+                            <div class="p-3 bg-accent rounded-xl border border-border text-textMain font-medium">Foster</div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-textMuted uppercase tracking-wider">Email Address</label>
+                            <div class="p-3 bg-accent rounded-xl border border-border text-textMain font-medium">jfoster@example.com</div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-textMuted uppercase tracking-wider">Phone Number</label>
+                            <div class="p-3 bg-accent rounded-xl border border-border text-textMain font-medium">+1 (555) 123-4567</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-border">
+                        <h4 class="font-bold text-textMain mb-4">Security</h4>
+                        <button class="border border-border hover:border-textMain text-textMain font-bold py-2 px-6 rounded-xl transition-colors text-sm">
+                            Change Password
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Orders History Section -->
+                <section id="orders" class="bg-surface rounded-3xl shadow-card p-6 md:p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-textMain">Recent Orders</h3>
+                        <a href="#" class="text-primary font-bold hover:text-primaryHover text-sm">View All</a>
+                    </div>
+
+                    <!-- Mobile Cards / Desktop Table Pattern -->
+                    <div class="space-y-4">
+                        <!-- Order Card 1 -->
+                        <div class="border border-border rounded-2xl p-4 hover:shadow-hover transition-shadow">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-16 bg-cardBg1 rounded-xl flex items-center justify-center p-2">
+                                        <img class="w-full h-full object-contain mix-blend-multiply" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/a42d2aaf09-821ac0d53d88611fa1f8.png" alt="Nike Air Max red and white running shoe side view" />
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="font-bold text-textMain">#ORD-9823</span>
+                                            <span class="px-2 py-0.5 bg-success/10 text-success text-[10px] font-bold rounded-full uppercase">Delivered</span>
+                                        </div>
+                                        <p class="text-sm text-textMuted">Dec 12, 2023 • 2 Items</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-border">
+                                    <div class="text-left md:text-right">
+                                        <p class="font-bold text-lg text-textMain">$257.65</p>
+                                    </div>
+                                    <button class="bg-primary text-white font-bold py-2 px-4 rounded-xl text-sm hover:bg-primaryHover transition-colors">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Card 2 -->
+                        <div class="border border-border rounded-2xl p-4 hover:shadow-hover transition-shadow">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-16 bg-cardBg3 rounded-xl flex items-center justify-center p-2">
+                                        <img class="w-full h-full object-contain mix-blend-multiply" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e267f07deb-299aafabbf87dc13ec93.png" alt="Blue running shoe side profile minimal" />
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="font-bold text-textMain">#ORD-8742</span>
+                                            <span class="px-2 py-0.5 bg-textMuted/10 text-textMuted text-[10px] font-bold rounded-full uppercase">Processing</span>
+                                        </div>
+                                        <p class="text-sm text-textMuted">Nov 28, 2023 • 1 Item</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-border">
+                                    <div class="text-left md:text-right">
+                                        <p class="font-bold text-lg text-textMain">$129.99</p>
+                                    </div>
+                                    <button class="bg-surface border border-border text-textMain font-bold py-2 px-4 rounded-xl text-sm hover:border-primary transition-colors">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Saved Addresses Section -->
+                <section id="addresses" class="bg-surface rounded-3xl shadow-card p-6 md:p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-textMain">Saved Addresses</h3>
+                        <button class="flex items-center gap-2 text-primary font-bold hover:text-primaryHover text-sm">
+                            <i class="fa-solid fa-plus"></i> Add New
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Address 1 -->
+                        <div class="border-2 border-primary rounded-2xl p-5 relative">
+                            <div class="absolute top-4 right-4 flex gap-2">
+                                <button class="text-textMuted hover:text-primary"><i class="fa-regular fa-pen-to-square"></i></button>
+                                <button class="text-textMuted hover:text-error"><i class="fa-regular fa-trash-can"></i></button>
+                            </div>
+                            <span class="inline-block px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded mb-3 uppercase tracking-wide">Default Billing & Shipping</span>
+                            <h4 class="font-bold text-textMain mb-1">Jane Foster</h4>
+                            <p class="text-sm text-textMuted leading-relaxed">
+                                123 Main St, Apt 4B<br>
+                                New York, NY 10001<br>
+                                United States
+                            </p>
+                            <p class="text-sm text-textMuted mt-2"><i class="fa-solid fa-phone text-xs mr-1"></i> +1 (555) 123-4567</p>
+                        </div>
+
+                        <!-- Address 2 -->
+                        <div class="border border-border rounded-2xl p-5 relative hover:border-primary/50 transition-colors">
+                            <div class="absolute top-4 right-4 flex gap-2">
+                                <button class="text-textMuted hover:text-primary"><i class="fa-regular fa-pen-to-square"></i></button>
+                                <button class="text-textMuted hover:text-error"><i class="fa-regular fa-trash-can"></i></button>
+                            </div>
+                            <span class="inline-block px-2 py-1 bg-accent text-textMuted text-[10px] font-bold rounded mb-3 uppercase tracking-wide">Office</span>
+                            <h4 class="font-bold text-textMain mb-1">Jane Foster</h4>
+                            <p class="text-sm text-textMuted leading-relaxed">
+                                456 Business Blvd, Suite 200<br>
+                                San Francisco, CA 94107<br>
+                                United States
+                            </p>
+                            <p class="text-sm text-textMuted mt-2"><i class="fa-solid fa-phone text-xs mr-1"></i> +1 (555) 987-6543</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Payment Methods Section -->
+                <section id="payments" class="bg-surface rounded-3xl shadow-card p-6 md:p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-textMain">Payment Methods</h3>
+                        <button class="flex items-center gap-2 text-primary font-bold hover:text-primaryHover text-sm">
+                            <i class="fa-solid fa-plus"></i> Add New
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Card 1 -->
+                        <div class="flex items-center justify-between p-4 border border-border rounded-2xl hover:border-primary/50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-10 bg-[#1A1F36] rounded flex items-center justify-center">
+                                    <i class="fa-brands fa-cc-visa text-2xl text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-textMain">Visa ending in 4242</p>
+                                    <p class="text-xs text-textMuted">Expires 12/25 <span class="ml-2 text-primary font-bold">• Default</span></p>
+                                </div>
+                            </div>
+                            <button class="text-textMuted hover:text-error p-2"><i class="fa-regular fa-trash-can"></i></button>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="flex items-center justify-between p-4 border border-border rounded-2xl hover:border-primary/50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-10 bg-[#FF5F00] rounded flex items-center justify-center">
+                                    <i class="fa-brands fa-cc-mastercard text-2xl text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-textMain">Mastercard ending in 8899</p>
+                                    <p class="text-xs text-textMuted">Expires 08/24</p>
+                                </div>
+                            </div>
+                            <button class="text-textMuted hover:text-error p-2"><i class="fa-regular fa-trash-can"></i></button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Loyalty & Rewards Section -->
+                <section id="loyalty" class="bg-surface rounded-3xl shadow-card p-6 md:p-8 overflow-hidden relative">
+                    <!-- Decorative background -->
+                    <div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+                    
+                    <h3 class="text-2xl font-bold text-textMain mb-6">Loyalty & Rewards</h3>
+                    
+                    <div class="bg-gradient-to-r from-[#111827] to-[#374151] rounded-2xl p-6 text-white relative overflow-hidden shadow-floating">
+                        <div class="absolute right-0 bottom-0 opacity-10">
+                            <i class="fa-solid fa-crown text-[120px] -mr-4 -mb-4"></i>
+                        </div>
+                        
+                        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                            <div>
+                                <p class="text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Current Tier</p>
+                                <h4 class="text-3xl font-extrabold text-[#FCD34D] flex items-center gap-2">
+                                    <i class="fa-solid fa-crown text-xl"></i> Gold Member
+                                </h4>
+                                <p class="text-sm mt-2 text-gray-300">You have <span class="font-bold text-white text-lg">2,450</span> points available</p>
+                            </div>
+                            
+                            <button class="bg-white text-textMain font-bold py-3 px-6 rounded-xl hover:bg-gray-100 transition-colors shadow-lg">
+                                Redeem Points
+                            </button>
+                        </div>
+                        
+                        <div class="relative z-10 mt-8">
+                            <div class="flex justify-between text-xs font-bold mb-2 text-gray-400">
+                                <span>Gold</span>
+                                <span>Platinum (5,000 pts)</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                <div class="bg-gradient-to-r from-[#FCD34D] to-primary h-2.5 rounded-full" style="width: 49%"></div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2 text-right">2,550 points to next tier</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer id="footer" class="w-full bg-[#1A1A1A] text-white pt-16 pb-8 px-4 sm:px-6 lg:px-8 mt-auto">
+        <div class="max-w-[1440px] mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <!-- Brand Col -->
+                <div class="space-y-4">
+                    <span class="font-extrabold text-2xl tracking-tight text-white">Veshoe</span>
+                    <p class="text-gray-400 text-sm leading-relaxed max-w-xs">
+                        Premium footwear and athletic gear. Delivering unrivaled comfort and style for your active lifestyle.
+                    </p>
+                </div>
+
+                <!-- Links Col 1 -->
+                <div>
+                    <h4 class="font-bold text-sm mb-6 text-white uppercase tracking-wider">About Us</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Information</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Store Locator</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Bulk Purchase</a></li>
+                    </ul>
+                </div>
+
+                <!-- Links Col 2 -->
+                <div>
+                    <h4 class="font-bold text-sm mb-6 text-white uppercase tracking-wider">Help</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Return Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Social Col -->
+                <div>
+                    <h4 class="font-bold text-sm mb-6 text-white uppercase tracking-wider">Social Media</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-3"><i class="fa-brands fa-twitter w-4"></i> Twitter</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-3"><i class="fa-brands fa-instagram w-4"></i> Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+                <p>@Veshoe 2024. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms and Conditions</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

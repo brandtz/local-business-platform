@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal - Confirmation & Order Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"M PLUS 1p"', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#116C50',
+                        primaryHover: '#0E5A42',
+                        surface: '#FFFFFF',
+                        background: '#F9FAFB',
+                        textMain: '#111827',
+                        textMuted: '#6B7280',
+                        border: '#E5E7EB',
+                        error: '#EF4444',
+                        success: '#10B981',
+                        accent: '#F3F4F6',
+                        indigo: '#4F46E5',
+                        cyan: '#06B6D4'
+                    },
+                    boxShadow: {
+                        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                        'hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: '"M PLUS 1p"', sans-serif; }
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background min-h-screen w-full text-textMain flex flex-col m-0 p-0 overflow-x-hidden">
+
+    <!-- Top Announcement Bar -->
+    <div id="announcement-bar" class="bg-primary text-white text-sm py-2 px-4 text-center font-medium flex justify-center items-center gap-4">
+        <span>🎉 Spring Sale! Get 20% off all services with code SPRING20</span>
+        <button class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Main Header -->
+    <header id="header" class="w-full bg-surface border-b border-border sticky top-0 z-50 shadow-sm">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center gap-8">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-2 cursor-pointer">
+                        <span class="font-extrabold text-2xl tracking-tight text-primary">Shopz</span>
+                    </div>
+
+                    <!-- Desktop Nav -->
+                    <nav class="hidden lg:flex items-center gap-8 ml-8">
+                        <a href="#" class="text-textMuted hover:text-textMain font-medium transition-colors">Home</a>
+                        <a href="#" class="text-textMuted hover:text-textMain font-medium transition-colors">Menu & Services</a>
+                        <a href="#" class="text-primary font-bold border-b-2 border-primary pb-1">Cart & Checkout</a>
+                        <a href="#" class="text-textMuted hover:text-textMain font-medium transition-colors">Account</a>
+                    </nav>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-6">
+                    <button class="text-textMuted hover:text-textMain transition-colors">
+                        <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                    </button>
+                    <button class="text-textMuted hover:text-textMain transition-colors relative">
+                        <i class="fa-regular fa-bell text-lg"></i>
+                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+                    </button>
+                    <button class="text-textMuted hover:text-textMain transition-colors">
+                        <i class="fa-regular fa-heart text-lg"></i>
+                    </button>
+                    <button class="text-textMuted hover:text-textMain transition-colors relative">
+                        <i class="fa-solid fa-cart-shopping text-lg"></i>
+                        <span class="absolute -top-2 -right-2 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+                    </button>
+                    
+                    <div class="w-8 h-8 rounded-full overflow-hidden border border-border cursor-pointer">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg" alt="User Avatar" class="w-full h-full object-cover">
+                    </div>
+
+                    <button class="lg:hidden text-textMain text-2xl ml-2">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="flex-grow w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+        
+        <div class="max-w-4xl mx-auto">
+            <!-- Order Status Hero -->
+            <section id="order-status-hero" class="text-center mb-12">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/10 text-success mb-6">
+                    <i class="fa-solid fa-check text-4xl"></i>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-textMain mb-4">Thank you for your order!</h1>
+                <p class="text-lg text-textMuted mb-6">Order <span class="font-bold text-textMain">#ORD-9823-XYZ</span> has been placed successfully.</p>
+                
+                <div class="inline-flex items-center gap-2 bg-indigo/10 text-indigo px-4 py-2 rounded-full font-bold text-sm">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Processing
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Main Details Column -->
+                <div class="md:col-span-2 space-y-8">
+                    
+                    <!-- Tracking & Time -->
+                    <section id="tracking-info" class="bg-surface rounded-2xl border border-border p-6 shadow-sm">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-bold text-textMain">Estimated Delivery</h2>
+                                <p class="text-textMuted">Arriving on Thursday, Dec 12</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="relative pt-8 pb-4">
+                            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-accent">
+                                <div style="width: 33%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"></div>
+                            </div>
+                            <div class="flex justify-between text-xs font-bold text-textMuted">
+                                <span class="text-primary">Order Placed</span>
+                                <span>Processing</span>
+                                <span>Shipped</span>
+                                <span>Delivered</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Order Details Summary -->
+                    <section id="order-details-summary" class="bg-surface rounded-2xl border border-border p-6 shadow-sm">
+                        <h2 class="text-xl font-bold text-textMain mb-6 border-b border-border pb-4">Order Details</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Item 1 -->
+                            <div class="flex gap-4 items-center">
+                                <div class="w-16 h-16 bg-accent rounded-lg flex-shrink-0 p-2">
+                                    <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/4adf8bc7cc-21abd6d4b40071892c02.png" alt="Product" class="w-full h-full object-contain mix-blend-multiply">
+                                </div>
+                                <div class="flex-grow">
+                                    <h3 class="font-bold text-textMain text-sm">Premium Wireless Headphones</h3>
+                                    <p class="text-xs text-textMuted">Qty: 1 | Matte Black</p>
+                                </div>
+                                <span class="font-bold text-textMain">$137.00</span>
+                            </div>
+
+                            <!-- Item 2 -->
+                            <div class="flex gap-4 items-center">
+                                <div class="w-16 h-16 bg-accent rounded-lg flex-shrink-0 p-2">
+                                    <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/2976587a20-606ae587e7f32917b221.png" alt="Product" class="w-full h-full object-contain mix-blend-multiply">
+                                </div>
+                                <div class="flex-grow">
+                                    <h3 class="font-bold text-textMain text-sm">Smart Coffee Maker</h3>
+                                    <p class="text-xs text-textMuted">Qty: 1 | Standard Edition</p>
+                                </div>
+                                <span class="font-bold text-textMain">$89.99</span>
+                            </div>
+                        </div>
+
+                        <!-- Breakdown -->
+                        <div class="mt-6 pt-6 border-t border-border space-y-3 text-sm">
+                            <div class="flex justify-between text-textMuted">
+                                <span>Subtotal</span>
+                                <span>$226.99</span>
+                            </div>
+                            <div class="flex justify-between text-textMuted">
+                                <span>Shipping</span>
+                                <span>$12.50</span>
+                            </div>
+                            <div class="flex justify-between text-textMuted">
+                                <span>Tax</span>
+                                <span>$18.16</span>
+                            </div>
+                            <div class="flex justify-between font-bold text-lg text-textMain pt-3 border-t border-border mt-3">
+                                <span>Total Paid</span>
+                                <span>$257.65</span>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+
+                <!-- Right Sidebar Column -->
+                <div class="space-y-8">
+                    
+                    <!-- Customer Info -->
+                    <section id="customer-info" class="bg-surface rounded-2xl border border-border p-6 shadow-sm">
+                        <h3 class="font-bold text-lg text-textMain mb-4">Customer Info</h3>
+                        
+                        <div class="mb-4">
+                            <span class="text-xs text-textMuted uppercase font-bold tracking-wider">Contact</span>
+                            <div class="flex items-center gap-3 mt-2">
+                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+                                <div>
+                                    <p class="text-sm font-bold text-textMain">Jane Foster</p>
+                                    <p class="text-xs text-textMuted">jfoster@example.com</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <span class="text-xs text-textMuted uppercase font-bold tracking-wider">Shipping Address</span>
+                            <p class="text-sm text-textMain mt-1">123 Main St, Apt 4B<br>New York, NY 10001</p>
+                        </div>
+
+                        <div>
+                            <span class="text-xs text-textMuted uppercase font-bold tracking-wider">Payment Method</span>
+                            <div class="flex items-center gap-2 mt-1 text-sm text-textMain">
+                                <i class="fa-brands fa-cc-visa text-lg text-indigo"></i>
+                                <span>Visa ending in 4242</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Next Actions Grid -->
+                    <section id="next-actions-grid" class="space-y-3">
+                        <button class="w-full bg-primary hover:bg-primaryHover text-white font-bold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-location-dot"></i> Track Order
+                        </button>
+                        <button class="w-full bg-surface border border-border hover:border-primary text-textMain font-bold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-file-invoice"></i> Download Receipt
+                        </button>
+                        <button class="w-full bg-surface border border-border hover:border-primary text-textMain font-bold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-regular fa-envelope"></i> Contact Support
+                        </button>
+                    </section>
+
+                </div>
+            </div>
+            
+            <!-- Additional Content Section -->
+            <section id="related-products" class="mt-16">
+                <h2 class="text-2xl font-bold text-textMain mb-6">You might also like</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    <!-- Product Card 1 -->
+                    <div class="bg-surface border border-border rounded-xl p-4 hover:shadow-hover transition-shadow cursor-pointer">
+                        <div class="h-40 bg-accent rounded-lg mb-4 p-4 flex items-center justify-center">
+                            <i class="fa-solid fa-camera text-4xl text-textMuted"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-textMain mb-1">Digital Camera</h3>
+                        <p class="text-primary font-bold">$450.00</p>
+                    </div>
+                    <!-- Product Card 2 -->
+                    <div class="bg-surface border border-border rounded-xl p-4 hover:shadow-hover transition-shadow cursor-pointer">
+                        <div class="h-40 bg-accent rounded-lg mb-4 p-4 flex items-center justify-center">
+                            <i class="fa-solid fa-laptop text-4xl text-textMuted"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-textMain mb-1">Pro Laptop</h3>
+                        <p class="text-primary font-bold">$1299.00</p>
+                    </div>
+                    <!-- Product Card 3 -->
+                    <div class="bg-surface border border-border rounded-xl p-4 hover:shadow-hover transition-shadow cursor-pointer">
+                        <div class="h-40 bg-accent rounded-lg mb-4 p-4 flex items-center justify-center">
+                            <i class="fa-solid fa-mobile-screen text-4xl text-textMuted"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-textMain mb-1">Smartphone 5G</h3>
+                        <p class="text-primary font-bold">$799.00</p>
+                    </div>
+                    <!-- Product Card 4 -->
+                    <div class="bg-surface border border-border rounded-xl p-4 hover:shadow-hover transition-shadow cursor-pointer">
+                        <div class="h-40 bg-accent rounded-lg mb-4 p-4 flex items-center justify-center">
+                            <i class="fa-solid fa-headphones-simple text-4xl text-textMuted"></i>
+                        </div>
+                        <h3 class="font-bold text-sm text-textMain mb-1">Basic Earbuds</h3>
+                        <p class="text-primary font-bold">$49.00</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer id="footer" class="w-full bg-[#1A1A1A] text-white pt-16 pb-8 px-4 sm:px-6 lg:px-8 mt-auto">
+        <div class="max-w-[1440px] mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <!-- Brand Col -->
+                <div class="space-y-4">
+                    <span class="font-extrabold text-2xl tracking-tight text-white">Shopz</span>
+                    <p class="text-gray-400 text-sm leading-relaxed max-w-xs">
+                        Online brand clothing founded in 2006 in Japan. Heavenly focuses on selling only quality and branded items, limited edition collections by best fashion designer.
+                    </p>
+                </div>
+
+                <!-- Links Col 1 -->
+                <div>
+                    <h4 class="font-bold text-sm mb-6 text-white uppercase tracking-wider">About Us</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Information</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Store Locator</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Bulk Purchase</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Alteration Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Gift Delivery Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Live Station</a></li>
+                    </ul>
+                </div>
+
+                <!-- Links Col 2 -->
+                <div>
+                    <h4 class="font-bold text-sm mb-6 text-white uppercase tracking-wider">Help</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Online Shopping Guide</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Return Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Accessibility</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Social Col -->
+                <div>
+                    <h4 class="font-bold text-sm mb-6 text-white uppercase tracking-wider">Social Media</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-3"><i class="fa-brands fa-twitter w-4"></i> Twitter</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-3"><i class="fa-brands fa-facebook-f w-4"></i> Facebook</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-3"><i class="fa-brands fa-instagram w-4"></i> Instagram</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-3"><i class="fa-brands fa-youtube w-4"></i> Youtube</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+                <p>@Shopz 2023. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms and Conditions</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

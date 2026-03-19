@@ -95,7 +95,7 @@ export class ModuleTemplateAssignmentService {
 			throw new ModuleTemplateAssignmentError("same-template");
 		}
 
-		const entry = this.templateRegistryService.getEntry(
+		this.templateRegistryService.getEntry(
 			request.verticalTemplate
 		);
 

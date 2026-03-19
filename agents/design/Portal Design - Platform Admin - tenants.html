@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Admin Portal - Tenants</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                            800: '#9f1239',
+                            900: '#881337',
+                            950: '#4c0519',
+                        },
+                        surface: {
+                            DEFAULT: '#0f1115',
+                            card: '#16181d',
+                            hover: '#1e2128',
+                            border: '#2a2d35'
+                        },
+                        primary: '#f43f5e',
+                        status: {
+                            success: '#4ade80',
+                            warning: '#fbbf24',
+                            error: '#f87171',
+                            info: '#60a5fa',
+                            offline: '#94a3b8'
+                        }
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(244, 63, 94, 0.15)',
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f1115; color: #f8fafc; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f1115; }
+        ::-webkit-scrollbar-thumb { background: #2a2d35; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f4450; }
+        
+        .glass-panel {
+            background: rgba(22, 24, 29, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .tenant-card {
+            background: #16181d;
+            border: 1px solid #2a2d35;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+        }
+        .tenant-card:hover {
+            border-color: #3f4450;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background-color: #1a1d24;
+            border: 1px solid #2a2d35;
+            color: #e2e8f0;
+            transition: all 0.2s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #2a2d35;
+            border-color: #3f4450;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #2a2d35;
+            color: #94a3b8;
+            transition: all 0.2s ease;
+        }
+        .btn-outline:hover {
+            border-color: #f43f5e;
+            color: #f43f5e;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(244, 63, 94, 0.1) 0%, transparent 100%);
+            border-left: 3px solid #f43f5e;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-badge::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .status-active { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.2); }
+        .status-active::before { background-color: #4ade80; }
+        .status-pending { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .status-pending::before { background-color: #fbbf24; }
+        .status-suspended { background: rgba(248, 113, 113, 0.1); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.2); }
+        .status-suspended::before { background-color: #f87171; }
+        .status-offline { background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
+        .status-offline::before { background-color: #94a3b8; }
+
+        .tag {
+            background: #1e2128;
+            border: 1px solid #2a2d35;
+            color: #cbd5e1;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+        
+        .filter-dropdown {
+            background: #16181d;
+            border: 1px solid #2a2d35;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="w-full min-h-screen flex m-0">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 w-64 glass-panel border-r border-surface-border z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col h-screen shrink-0">
+        <!-- Logo -->
+        <div class="p-6 flex items-center justify-between border-b border-surface-border">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid fa-layer-group text-white text-sm"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-white">Three<span class="text-brand-400">Portal</span></span>
+            </div>
+            <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-4">
+            <div class="px-4 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Platform Admin</div>
+            <ul class="space-y-1">
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-item active flex items-center gap-3 px-6 py-3 text-sm font-medium text-white transition-colors">
+                        <i class="fa-solid fa-users w-5 text-center"></i>
+                        Tenants
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-globe w-5 text-center"></i>
+                        Domains
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-rocket w-5 text-center"></i>
+                        Publishing
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-server w-5 text-center"></i>
+                        Operations
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-chart-line w-5 text-center"></i>
+                        Audit & Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-gear w-5 text-center"></i>
+                        Config & Integrations
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- User Info -->
+        <div class="p-4 border-t border-surface-border">
+            <div class="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-surface-hover cursor-pointer transition-colors">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Admin" class="w-10 h-10 rounded-full border border-surface-border object-cover">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate">System Admin</p>
+                    <p class="text-xs text-gray-400 truncate">admin@threeportal.com</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-gray-500 text-xs"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-h-screen overflow-hidden w-full relative">
+        
+        <!-- Header -->
+        <header id="header" class="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 glass-panel border-b border-surface-border sticky top-0 z-30 shrink-0">
+            <div class="flex items-center gap-4">
+                <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <h1 class="text-xl font-semibold text-white">Tenant Management</h1>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="relative hidden md:block">
+                    <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm"></i>
+                    <input type="text" placeholder="Search tenants..." class="bg-surface-card border border-surface-border rounded-lg pl-9 pr-4 py-1.5 text-sm text-white focus:outline-none focus:border-brand-500 w-64 transition-colors">
+                    <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+                        <kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-gray-500 bg-surface border border-surface-border rounded">⌘</kbd>
+                        <kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-gray-500 bg-surface border border-surface-border rounded">K</kbd>
+                    </div>
+                </div>
+                
+                <button class="relative p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-surface-hover">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-500 rounded-full border border-surface"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative" id="main-content">
+            
+            <!-- Controls Section -->
+            <section id="tenant-management-controls" class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+                <!-- Navigation Tabs -->
+                <div class="flex bg-surface-card p-1 rounded-lg border border-surface-border overflow-x-auto w-full lg:w-auto">
+                    <button class="px-4 py-2 text-sm font-medium text-white bg-surface-hover rounded-md shadow-sm whitespace-nowrap">All Tenants</button>
+                    <button class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-hover/50 rounded-md transition-colors whitespace-nowrap">Active</button>
+                    <button class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-hover/50 rounded-md transition-colors whitespace-nowrap">Pending Setup</button>
+                    <button class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-surface-hover/50 rounded-md transition-colors whitespace-nowrap">Suspended</button>
+                </div>
+
+                <!-- Actions & Filters -->
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    <div class="relative">
+                        <button class="btn-secondary px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2" onclick="document.getElementById('filter-dropdown').classList.toggle('hidden')">
+                            <i class="fa-solid fa-filter text-gray-400"></i> Filters
+                            <span class="bg-brand-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">2</span>
+                        </button>
+                        
+                        <!-- Filter Dropdown -->
+                        <div id="filter-dropdown" class="hidden absolute right-0 mt-2 w-64 filter-dropdown rounded-xl z-20 p-4">
+                            <div class="mb-4">
+                                <label class="block text-xs font-medium text-gray-400 mb-2">Plan Type</label>
+                                <select class="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+                                    <option>All Plans</option>
+                                    <option>Enterprise</option>
+                                    <option>Pro</option>
+                                    <option>Starter</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-xs font-medium text-gray-400 mb-2">Modules Enabled</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-2 text-sm text-gray-300">
+                                        <input type="checkbox" checked class="rounded border-surface-border bg-surface text-brand-500 focus:ring-brand-500 focus:ring-offset-surface"> Storefront
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-gray-300">
+                                        <input type="checkbox" checked class="rounded border-surface-border bg-surface text-brand-500 focus:ring-brand-500 focus:ring-offset-surface"> Bookings
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-gray-300">
+                                        <input type="checkbox" class="rounded border-surface-border bg-surface text-brand-500 focus:ring-brand-500 focus:ring-offset-surface"> Delivery
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-2 mt-4 pt-4 border-t border-surface-border">
+                                <button class="text-xs text-gray-400 hover:text-white">Clear</button>
+                                <button class="btn-primary px-3 py-1.5 rounded text-xs font-medium" onclick="document.getElementById('filter-dropdown').classList.add('hidden')">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-secondary px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                        <i class="fa-solid fa-file-import text-gray-400"></i> Import
+                    </button>
+                    
+                    <button class="btn-primary px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2" onclick="document.getElementById('create-tenant-modal').classList.remove('hidden')">
+                        <i class="fa-solid fa-plus"></i> New Tenant
+                    </button>
+                </div>
+            </section>
+
+            <!-- Active Filters Display -->
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-xs text-gray-500">Active Filters:</span>
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-card border border-surface-border text-xs text-gray-300">
+                    Plan: Enterprise <button class="text-gray-500 hover:text-white ml-1"><i class="fa-solid fa-xmark"></i></button>
+                </span>
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-surface-card border border-surface-border text-xs text-gray-300">
+                    Modules: Storefront, Bookings <button class="text-gray-500 hover:text-white ml-1"><i class="fa-solid fa-xmark"></i></button>
+                </span>
+                <button class="text-xs text-brand-400 hover:text-brand-300 ml-2">Clear All</button>
+            </div>
+
+            <!-- Tenant Grid (Cards View inspired by Dribbble) -->
+            <section id="tenant-list-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 mb-8">
+                
+                <!-- Card 1 -->
+                <div class="tenant-card p-5 flex flex-col h-full cursor-pointer" onclick="openTenantDetail('Bistro Local')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center border border-orange-500/30">
+                                <span class="text-xl font-bold text-orange-400">B</span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-white leading-tight">Bistro Local</h3>
+                                <p class="text-xs text-gray-400 mt-0.5">bistrolocal.threeportal.com</p>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button class="text-gray-500 hover:text-white p-1" onclick="event.stopPropagation(); toggleDropdown('dropdown-1')">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <div id="dropdown-1" class="hidden absolute right-0 mt-1 w-48 bg-surface-card border border-surface-border rounded-lg shadow-xl z-10 py-1">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-surface-hover hover:text-white">Edit Details</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-surface-hover hover:text-white">Manage Domains</a>
+                                <div class="border-t border-surface-border my-1"></div>
+                                <a href="#" class="block px-4 py-2 text-sm text-brand-400 hover:bg-surface-hover" onclick="event.stopPropagation(); openImpersonateModal('Bistro Local')"><i class="fa-solid fa-user-secret mr-2"></i> Impersonate Admin</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <span class="status-badge status-active mb-2">Active</span>
+                        <div class="flex items-center gap-1 text-xs text-gray-400 mt-1">
+                            <i class="fa-solid fa-location-dot"></i> Austin, TX
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 flex-1">
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1.5">Modules Enabled</p>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="tag">Storefront</span>
+                                <span class="tag">Menu</span>
+                                <span class="tag">Delivery</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1.5">Plan & Billing</p>
+                            <div class="flex justify-between items-center bg-surface p-2 rounded border border-surface-border">
+                                <span class="text-xs font-medium text-white">Pro Plan</span>
+                                <span class="text-xs text-green-400"><i class="fa-solid fa-check-circle mr-1"></i>Paid</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-surface-border flex justify-between items-center text-xs">
+                        <span class="text-gray-500">Created: Oct 12, 2023</span>
+                        <button class="btn-outline px-3 py-1.5 rounded-md text-xs font-medium" onclick="event.stopPropagation(); openTenantDetail('Bistro Local')">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="tenant-card p-5 flex flex-col h-full cursor-pointer" onclick="openTenantDetail('Salon Elegance')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center border border-purple-500/30">
+                                <span class="text-xl font-bold text-purple-400">S</span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-white leading-tight">Salon Elegance</h3>
+                                <p class="text-xs text-gray-400 mt-0.5">salonelegance.com</p>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button class="text-gray-500 hover:text-white p-1" onclick="event.stopPropagation(); toggleDropdown('dropdown-2')">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <div id="dropdown-2" class="hidden absolute right-0 mt-1 w-48 bg-surface-card border border-surface-border rounded-lg shadow-xl z-10 py-1">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-surface-hover hover:text-white">Edit Details</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-surface-hover hover:text-white">Manage Domains</a>
+                                <div class="border-t border-surface-border my-1"></div>
+                                <a href="#" class="block px-4 py-2 text-sm text-brand-400 hover:bg-surface-hover" onclick="event.stopPropagation(); openImpersonateModal('Salon Elegance')"><i class="fa-solid fa-user-secret mr-2"></i> Impersonate Admin</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <span class="status-badge status-active mb-2">Active</span>
+                        <div class="flex items-center gap-1 text-xs text-gray-400 mt-1">
+                            <i class="fa-solid fa-location-dot"></i> New York, NY
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 flex-1">
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1.5">Modules Enabled</p>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="tag">Storefront</span>
+                                <span class="tag">Bookings</span>
+                                <span class="tag">Staff</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1.5">Plan & Billing</p>
+                            <div class="flex justify-between items-center bg-surface p-2 rounded border border-surface-border">
+                                <span class="text-xs font-medium text-white">Enterprise</span>
+                                <span class="text-xs text-green-400"><i class="fa-solid fa-check-circle mr-1"></i>Paid</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-surface-border flex justify-between items-center text-xs">
+                        <span class="text-gray-500">Created: Jan 05, 2024</span>
+                        <button class="btn-outline px-3 py-1.5 rounded-md text-xs font-medium" onclick="event.stopPropagation(); openTenantDetail('Salon Elegance')">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="tenant-card p-5 flex flex-col h-full cursor-pointer" onclick="openTenantDetail('FitLife Gym')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center border border-blue-500/30">
+                                <span class="text-xl font-bold text-blue-400">F</span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-white leading-tight">FitLife Gym</h3>
+                                <p class="text-xs text-gray-400 mt-0.5">fitlife.threeportal.com</p>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button class="text-gray-500 hover:text-white p-1" onclick="event.stopPropagation(); toggleDropdown('dropdown-3')">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <div id="dropdown-3" class="hidden absolute right-0 mt-1 w-48 bg-surface-card border border-surface-border rounded-lg shadow-xl z-10 py-1">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-surface-hover hover:text-white">Edit Details</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-surface-hover hover:text-white">Manage Domains</a>
+                                <div class="border-t border-surface-border my-1"></div>
+                                <a href="#" class="block px-4 py-2 text-sm text-brand-400 hover:bg-surface-hover" onclick="event.stopPropagation(); openImpersonateModal('FitLife Gym')"><i class="fa-solid fa-user-secret mr-2"></i> Impersonate Admin</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <span class="status-badge status-pending mb-2">Pending Setup</span>
+                        <div class="flex items-center gap-1 text-xs text-gray-400 mt-1">
+                            <i class="fa-solid fa-location-dot"></i> San Francisco, CA
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 flex-1">
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1.5">Modules Enabled</p>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="tag">Bookings</span>
+                                <span class="tag">Memberships</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1.5">Plan & Billing</p>
+                            <div class="flex justify-between items-center bg-surface p-2 rounded border border-surface-border">
+                                <span class="text-xs font-medium text-white">Starter</span>
+                                <span class="text-xs text-amber-400"><i class="fa-solid fa-clock mr-1"></i>Awaiting</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-surface-border flex justify-between items-center text-xs">
+                        <span class="text-gray-500">Created: Today</span>
+                        <button class="btn-outline px-3 py-1.5 rounded-md text-xs font-medium" onclick="event.stopPropagation(); openTenantDetail('FitLife Gym')">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="tenant-card p-5 flex flex-col h-full cursor-pointer opacity-75" onclick="openTenantDetail('Tech Repair Hub')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-500/20 to-slate-500/20 flex items-center justify-center border border-gray-500/30">
+                                <span class="text-xl font-bold text-gray-400">T</span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-white leading-tight">Tech Repair Hub</h3>
+                                <p class="text-xs text-gray-400 mt-0.5">techrepair.com</p>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button class="text-gray-500 hover:text-white p-1" onclick="event.stopPropagation(); toggleDropdown('dropdown-4')">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <div id="dropdown-4" class="hidden absolute right-0 mt-1 w-48 bg-surface-card border border-surface-border rounded-lg shadow-xl z-10 py-1">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-surface-hover hover:text-white">Edit Details</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-surface-hover hover:text-white">Manage Domains</a>
+                                <div class="border-t border-surface-border my-1"></div>
+                                <a href="#" class="block px-4 py-2 text-sm text-brand-400 hover:bg-surface-hover" onclick="event.stopPropagation(); openImpersonateModal('Tech Repair Hub')"><i class="fa-solid fa-user-secret mr-2"></i> Impersonate Admin</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <span class="status-badge status-suspended mb-2">Suspended</span>
+                        <div class="flex items-center gap-1 text-xs text-gray-400 mt-1">
+                            <i class="fa-solid fa-location-dot"></i> Chicago, IL
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 flex-1">
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1.5">Modules Enabled</p>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="tag">Storefront</span>
+                                <span class="tag">Services</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1.5">Plan & Billing</p>
+                            <div class="flex justify-between items-center bg-surface p-2 rounded border border-surface-border border-red-500/30">
+                                <span class="text-xs font-medium text-white">Pro Plan</span>
+                                <span class="text-xs text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Overdue</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-surface-border flex justify-between items-center text-xs">
+                        <span class="text-gray-500">Suspended: 2 days ago</span>
+                        <button class="btn-outline px-3 py-1.5 rounded-md text-xs font-medium" onclick="event.stopPropagation(); openTenantDetail('Tech Repair Hub')">View Details</button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Pagination -->
+            <div class="flex items-center justify-between border-t border-surface-border pt-4">
+                <div class="text-sm text-gray-400">
+                    Showing <span class="font-medium text-white">1</span> to <span class="font-medium text-white">12</span> of <span class="font-medium text-white">1,284</span> tenants
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 rounded-md border border-surface-border text-gray-400 hover:text-white hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded-md bg-brand-500 text-white text-sm font-medium">1</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded-md border border-surface-border text-gray-300 hover:bg-surface-hover text-sm font-medium">2</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded-md border border-surface-border text-gray-300 hover:bg-surface-hover text-sm font-medium">3</button>
+                    <span class="text-gray-500">...</span>
+                    <button class="w-8 h-8 flex items-center justify-center rounded-md border border-surface-border text-gray-300 hover:bg-surface-hover text-sm font-medium">107</button>
+                    <button class="p-2 rounded-md border border-surface-border text-gray-400 hover:text-white hover:bg-surface-hover">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Create Tenant Modal -->
+    <div id="create-tenant-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 modal-overlay" onclick="document.getElementById('create-tenant-modal').classList.add('hidden')"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4 sm:p-6">
+            <div class="bg-surface-card border border-surface-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl relative">
+                
+                <!-- Modal Header -->
+                <div class="p-6 border-b border-surface-border flex justify-between items-center shrink-0">
+                    <div>
+                        <h2 class="text-xl font-semibold text-white">Create New Tenant</h2>
+                        <p class="text-sm text-gray-400 mt-1">Provision a new business workspace and configure initial modules.</p>
+                    </div>
+                    <button class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-surface-hover transition-colors" onclick="document.getElementById('create-tenant-modal').classList.add('hidden')">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body (Scrollable) -->
+                <div class="p-6 overflow-y-auto flex-1 space-y-6">
+                    
+                    <!-- Basic Info -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-white mb-4 flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs">1</div> Business Details</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="col-span-1 md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-300 mb-1.5">Business Name <span class="text-brand-500">*</span></label>
+                                <input type="text" placeholder="e.g. Acme Corporation" class="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1.5">Subdomain <span class="text-brand-500">*</span></label>
+                                <div class="flex">
+                                    <input type="text" placeholder="acme" class="w-full bg-surface border border-surface-border border-r-0 rounded-l-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors">
+                                    <span class="inline-flex items-center px-3 rounded-r-lg border border-l-0 border-surface-border bg-surface-hover text-gray-400 text-sm">.threeportal.com</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1.5">Admin Email <span class="text-brand-500">*</span></label>
+                                <input type="email" placeholder="admin@acme.com" class="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-surface-border"></div>
+
+                    <!-- Branding Template -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-white mb-4 flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs">2</div> Base Template</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <label class="relative flex flex-col p-4 border border-brand-500 bg-brand-500/5 rounded-xl cursor-pointer">
+                                <input type="radio" name="template" class="absolute right-4 top-4 text-brand-500 focus:ring-brand-500 bg-surface border-surface-border" checked>
+                                <i class="fa-solid fa-utensils text-2xl text-brand-400 mb-2"></i>
+                                <span class="text-sm font-medium text-white">Restaurant</span>
+                                <span class="text-xs text-gray-400 mt-1">Menu, Cart, Delivery</span>
+                            </label>
+                            <label class="relative flex flex-col p-4 border border-surface-border bg-surface hover:bg-surface-hover rounded-xl cursor-pointer transition-colors">
+                                <input type="radio" name="template" class="absolute right-4 top-4 text-brand-500 focus:ring-brand-500 bg-surface border-surface-border">
+                                <i class="fa-solid fa-scissors text-2xl text-gray-400 mb-2"></i>
+                                <span class="text-sm font-medium text-white">Service / Salon</span>
+                                <span class="text-xs text-gray-400 mt-1">Bookings, Staff, Services</span>
+                            </label>
+                            <label class="relative flex flex-col p-4 border border-surface-border bg-surface hover:bg-surface-hover rounded-xl cursor-pointer transition-colors">
+                                <input type="radio" name="template" class="absolute right-4 top-4 text-brand-500 focus:ring-brand-500 bg-surface border-surface-border">
+                                <i class="fa-solid fa-store text-2xl text-gray-400 mb-2"></i>
+                                <span class="text-sm font-medium text-white">Retail</span>
+                                <span class="text-xs text-gray-400 mt-1">Catalog, Inventory, Shipping</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-surface-border"></div>
+
+                    <!-- Modules Configuration -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-white mb-4 flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs">3</div> Enable Modules</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-start gap-3 p-3 rounded-lg border border-surface-border bg-surface hover:bg-surface-hover cursor-pointer transition-colors">
+                                <div class="flex items-center h-5 mt-0.5">
+                                    <input type="checkbox" checked class="w-4 h-4 rounded border-surface-border bg-surface-card text-brand-500 focus:ring-brand-500">
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-white">Customer Storefront</p>
+                                    <p class="text-xs text-gray-400">Public facing portal for browsing and transactions.</p>
+                                </div>
+                            </label>
+                            <label class="flex items-start gap-3 p-3 rounded-lg border border-surface-border bg-surface hover:bg-surface-hover cursor-pointer transition-colors">
+                                <div class="flex items-center h-5 mt-0.5">
+                                    <input type="checkbox" checked class="w-4 h-4 rounded border-surface-border bg-surface-card text-brand-500 focus:ring-brand-500">
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-white">Payments (Stripe Integration)</p>
+                                    <p class="text-xs text-gray-400">Allow tenant to process credit cards via platform Stripe Connect.</p>
+                                </div>
+                            </label>
+                            <label class="flex items-start gap-3 p-3 rounded-lg border border-surface-border bg-surface hover:bg-surface-hover cursor-pointer transition-colors">
+                                <div class="flex items-center h-5 mt-0.5">
+                                    <input type="checkbox" class="w-4 h-4 rounded border-surface-border bg-surface-card text-brand-500 focus:ring-brand-500">
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-white">Advanced Analytics</p>
+                                    <p class="text-xs text-gray-400">Provide detailed reporting and export capabilities to business admin.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="p-6 border-t border-surface-border bg-surface-card shrink-0 flex justify-end gap-3">
+                    <button class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium" onclick="document.getElementById('create-tenant-modal').classList.add('hidden')">Cancel</button>
+                    <button class="btn-primary px-6 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                        Create Tenant <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tenant Detail Slide-over -->
+    <div id="tenant-detail-panel" class="fixed inset-y-0 right-0 w-full md:w-[600px] bg-surface-card border-l border-surface-border shadow-2xl z-[90] transform translate-x-full transition-transform duration-300 flex flex-col">
+        
+        <!-- Header -->
+        <div class="p-6 border-b border-surface-border flex justify-between items-start bg-surface sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <div id="detail-logo" class="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center border border-orange-500/30">
+                    <span class="text-2xl font-bold text-orange-400">B</span>
+                </div>
+                <div>
+                    <h2 id="detail-name" class="text-xl font-bold text-white leading-tight">Bistro Local</h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <a href="#" class="text-sm text-brand-400 hover:text-brand-300 hover:underline">bistrolocal.threeportal.com</a>
+                        <span class="text-gray-500 text-xs">•</span>
+                        <span class="status-badge status-active scale-90 origin-left">Active</span>
+                    </div>
+                </div>
+            </div>
+            <button class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-surface-hover transition-colors" onclick="closeTenantDetail()">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-8">
+            
+            <!-- Quick Actions -->
+            <div class="flex gap-3 pb-6 border-b border-surface-border">
+                <button class="flex-1 btn-primary py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2" onclick="openImpersonateModal('Bistro Local')">
+                    <i class="fa-solid fa-user-secret"></i> Impersonate
+                </button>
+                <button class="flex-1 btn-secondary py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-pause text-amber-400"></i> Suspend
+                </button>
+            </div>
+
+            <!-- Overview Grid -->
+            <div>
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Overview</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-surface p-4 rounded-xl border border-surface-border">
+                        <p class="text-xs text-gray-500 mb-1">Plan</p>
+                        <p class="text-sm font-medium text-white">Pro Plan <span class="text-green-400 text-xs ml-2">(Active)</span></p>
+                    </div>
+                    <div class="bg-surface p-4 rounded-xl border border-surface-border">
+                        <p class="text-xs text-gray-500 mb-1">Created Date</p>
+                        <p class="text-sm font-medium text-white">Oct 12, 2023</p>
+                    </div>
+                    <div class="bg-surface p-4 rounded-xl border border-surface-border">
+                        <p class="text-xs text-gray-500 mb-1">Primary Admin</p>
+                        <p class="text-sm font-medium text-white truncate">sarah@bistrolocal.com</p>
+                    </div>
+                    <div class="bg-surface p-4 rounded-xl border border-surface-border">
+                        <p class="text-xs text-gray-500 mb-1">Location</p>
+                        <p class="text-sm font-medium text-white">Austin, TX</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modules Config -->
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Enabled Modules</h3>
+                    <button class="text-xs text-brand-400 hover:text-brand-300">Edit</button>
+                </div>
+                <div class="bg-surface border border-surface-border rounded-xl divide-y divide-surface-border">
+                    <div class="p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-store w-5 text-center text-gray-400"></i>
+                            <div>
+                                <p class="text-sm font-medium text-white">Storefront</p>
+                                <p class="text-xs text-gray-500">Customer facing portal</p>
+                            </div>
+                        </div>
+                        <div class="w-10 h-5 bg-brand-500 rounded-full relative cursor-pointer">
+                            <div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-utensils w-5 text-center text-gray-400"></i>
+                            <div>
+                                <p class="text-sm font-medium text-white">Menu & Catalog</p>
+                                <p class="text-xs text-gray-500">Product management</p>
+                            </div>
+                        </div>
+                        <div class="w-10 h-5 bg-brand-500 rounded-full relative cursor-pointer">
+                            <div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-truck w-5 text-center text-gray-400"></i>
+                            <div>
+                                <p class="text-sm font-medium text-white">Delivery</p>
+                                <p class="text-xs text-gray-500">Logistics & zones</p>
+                            </div>
+                        </div>
+                        <div class="w-10 h-5 bg-surface-hover rounded-full relative cursor-pointer border border-surface-border">
+                            <div class="absolute left-1 top-1 w-3 h-3 bg-gray-400 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Billing Status -->
+            <div>
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Billing Status</h3>
+                <div class="bg-surface p-5 rounded-xl border border-surface-border relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
+                    
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div>
+                            <p class="text-lg font-bold text-white">$149.00 <span class="text-sm font-normal text-gray-400">/mo</span></p>
+                            <p class="text-xs text-gray-500 mt-1">Next invoice: Nov 12, 2023</p>
+                        </div>
+                        <span class="bg-green-500/10 text-green-400 text-xs px-2 py-1 rounded border border-green-500/20 font-medium">Payment Good</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-3 text-sm text-gray-300 relative z-10">
+                        <i class="fa-brands fa-cc-stripe text-xl text-[#635BFF]"></i>
+                        <span>Stripe Connect Active</span>
+                        <a href="#" class="ml-auto text-brand-400 hover:text-brand-300 text-xs">View Dashboard <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="pt-6 border-t border-surface-border">
+                <h3 class="text-sm font-semibold text-red-400 mb-4">Danger Zone</h3>
+                <div class="border border-red-500/30 rounded-xl p-4 bg-red-500/5 flex justify-between items-center">
+                    <div>
+                        <p class="text-sm font-medium text-white">Delete Tenant</p>
+                        <p class="text-xs text-gray-400 mt-1">Permanently remove this tenant and all data.</p>
+                    </div>
+                    <button class="bg-transparent border border-red-500/50 text-red-400 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        Delete
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- Overlay for Slide-over -->
+    <div id="slide-over-overlay" class="fixed inset-0 bg-black/50 z-[80] hidden" onclick="closeTenantDetail()"></div>
+
+    <!-- Impersonation Warning Modal -->
+    <div id="impersonate-modal" class="fixed inset-0 z-[110] hidden">
+        <div class="absolute inset-0 modal-overlay" onclick="document.getElementById('impersonate-modal').classList.add('hidden')"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-surface-card border border-surface-border rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative">
+                <div class="p-6 text-center">
+                    <div class="w-16 h-16 rounded-full bg-brand-500/10 flex items-center justify-center mx-auto mb-4 border border-brand-500/20">
+                        <i class="fa-solid fa-user-secret text-2xl text-brand-500"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white mb-2">Impersonate Admin</h2>
+                    <p class="text-sm text-gray-400 mb-6">You are about to log in as a Business Admin for <strong id="impersonate-target-name" class="text-white">Tenant Name</strong>.</p>
+                    
+                    <div class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 text-left mb-6">
+                        <h4 class="text-sm font-semibold text-amber-400 flex items-center gap-2 mb-2">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Audit Warning
+                        </h4>
+                        <p class="text-xs text-amber-200/70">
+                            All actions performed during this session will be logged under your platform credentials and marked as "impersonated". This action will trigger a notification to the tenant owner.
+                        </p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button class="flex-1 btn-secondary py-2.5 rounded-lg text-sm font-medium" onclick="document.getElementById('impersonate-modal').classList.add('hidden')">Cancel</button>
+                        <button class="flex-1 btn-primary py-2.5 rounded-lg text-sm font-medium">Proceed</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar Toggle for Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Dropdown Toggle
+        function toggleDropdown(id) {
+            // Close all other dropdowns first
+            const dropdowns = document.querySelectorAll('[id^="dropdown-"]');
+            dropdowns.forEach(d => {
+                if (d.id !== id) d.classList.add('hidden');
+            });
+            
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.relative')) {
+                const dropdowns = document.querySelectorAll('[id^="dropdown-"]');
+                dropdowns.forEach(d => d.classList.add('hidden'));
+                
+                const filterDropdown = document.getElementById('filter-dropdown');
+                if(filterDropdown && !e.target.closest('#filter-dropdown') && !e.target.closest('button[onclick*="filter-dropdown"]')) {
+                    filterDropdown.classList.add('hidden');
+                }
+            }
+        });
+
+        // Slide-over logic
+        function openTenantDetail(name) {
+            document.getElementById('detail-name').innerText = name;
+            
+            // Basic logic to change logo color based on name for demo purposes
+            const logo = document.getElementById('detail-logo');
+            logo.innerHTML = `<span class="text-2xl font-bold">${name.charAt(0)}</span>`;
+            
+            if(name === 'Bistro Local') {
+                logo.className = 'w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center border border-orange-500/30 text-orange-400';
+            } else if(name === 'Salon Elegance') {
+                logo.className = 'w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center border border-purple-500/30 text-purple-400';
+            } else {
+                logo.className = 'w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center border border-blue-500/30 text-blue-400';
+            }
+
+            const panel = document.getElementById('tenant-detail-panel');
+            const overlay = document.getElementById('slide-over-overlay');
+            
+            panel.classList.remove('translate-x-full');
+            overlay.classList.remove('hidden');
+        }
+
+        function closeTenantDetail() {
+            const panel = document.getElementById('tenant-detail-panel');
+            const overlay = document.getElementById('slide-over-overlay');
+            
+            panel.classList.add('translate-x-full');
+            overlay.classList.add('hidden');
+        }
+
+        // Impersonate Modal
+        function openImpersonateModal(name) {
+            document.getElementById('impersonate-target-name').innerText = name;
+            document.getElementById('impersonate-modal').classList.remove('hidden');
+            
+            // Close other panels if open
+            closeTenantDetail();
+            const dropdowns = document.querySelectorAll('[id^="dropdown-"]');
+            dropdowns.forEach(d => d.classList.add('hidden'));
+        }
+    </script>
+</body>
+</html>

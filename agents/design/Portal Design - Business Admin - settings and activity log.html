@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Admin Portal - Settings & Activity Log</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#10B981',
+                        primaryHover: '#059669',
+                        surface: '#FFFFFF',
+                        background: '#F8F9FA',
+                        textMain: '#111827',
+                        textMuted: '#6B7280',
+                        border: '#E5E7EB',
+                        error: '#EF4444',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        cardBg: '#FFFFFF',
+                        sidebarBg: '#111827',
+                        sidebarText: '#9CA3AF',
+                        sidebarTextActive: '#FFFFFF',
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'soft': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                        '3xl': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F9FA; color: #111827; }
+        ::-webkit-scrollbar { display: none; }
+        
+        .nav-item {
+            color: #9CA3AF;
+            transition: all 0.2s;
+            border-radius: 0.5rem;
+        }
+        .nav-item:hover {
+            color: #FFFFFF;
+            background-color: rgba(255,255,255,0.05);
+        }
+        .nav-item.active {
+            color: #FFFFFF;
+            background-color: rgba(255,255,255,0.1);
+            font-weight: 500;
+            border-left: 3px solid #10B981;
+        }
+        .nav-icon-container {
+            width: 24px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .glass-card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-radius: 1rem;
+        }
+
+        .settings-nav-item {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            color: #4B5563;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .settings-nav-item:hover {
+            background-color: #F3F4F6;
+            color: #111827;
+        }
+        .settings-nav-item.active {
+            background-color: #ECFDF5;
+            color: #10B981;
+        }
+
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #10B981;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #10B981;
+        }
+    </style>
+</head>
+<body class="w-full min-h-screen m-0 overflow-x-hidden flex flex-col md:flex-row text-textMain">
+
+    <!-- Mobile Header & Hamburger -->
+    <div class="md:hidden w-full bg-sidebarBg border-b border-gray-800 p-4 flex justify-between items-center z-50 sticky top-0 shadow-sm">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">V</div>
+            <span class="font-bold text-lg text-white">Veshoe Admin</span>
+        </div>
+        <button id="mobile-menu-btn" class="text-gray-400 hover:text-white">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="hidden md:flex flex-col w-64 bg-sidebarBg h-screen sticky top-0 z-40 transition-all duration-300">
+        <!-- Logo -->
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-lg bg-primary">
+                V
+            </div>
+            <span class="font-bold text-xl tracking-tight text-white">Veshoe</span>
+            <button class="ml-auto text-gray-400 hover:text-white lg:hidden" id="close-sidebar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Search -->
+        <div class="px-4 mb-6">
+            <div class="relative">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                <input type="text" placeholder="Search" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:ring-1 focus:ring-primary focus:outline-none transition-shadow placeholder-gray-500">
+            </div>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                Dashboard
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                Catalog & Services
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                Orders & Bookings
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                Customers & Staff
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+                Content & Locations
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                Analytics
+            </a>
+            
+            <div class="mt-8 pt-4 border-t border-gray-800 space-y-1">
+                <a href="#" class="nav-item active flex items-center gap-3 px-3 py-2.5 text-sm">
+                    <div class="nav-icon-container">
+                        <i class="fa-solid fa-gear"></i>
+                    </div>
+                    Settings & Activity Log
+                </a>
+            </div>
+            
+            <!-- Help Card -->
+            <div class="mt-6 mx-3 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+                <h4 class="text-white font-medium text-sm mb-1">Need Help?</h4>
+                <p class="text-gray-400 text-xs mb-3">Check out our knowledge base or contact support.</p>
+                <button class="w-full py-2 bg-transparent border border-gray-600 text-white rounded-lg text-xs hover:bg-gray-700 transition-colors flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-headset"></i> Get in Touch
+                </button>
+            </div>
+        </nav>
+
+        <!-- User Profile -->
+        <div class="p-4 mt-auto border-t border-gray-800">
+            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="User" class="w-8 h-8 rounded-full object-cover">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate">Olivia Williams</p>
+                    <p class="text-xs text-gray-500 truncate">Admin</p>
+                </div>
+                <i class="fa-solid fa-arrow-right-from-bracket text-gray-500 hover:text-white"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-background">
+        
+        <!-- Top Header -->
+        <header id="settings-header" class="h-auto md:h-20 bg-background flex flex-col md:flex-row items-start md:items-center justify-between px-6 lg:px-8 py-4 sticky top-0 z-30 border-b border-border/50 backdrop-blur-sm">
+            <div class="flex flex-col mb-4 md:mb-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-gear text-gray-400 text-lg"></i>
+                    <h1 class="text-2xl font-bold text-textMain tracking-tight">Settings & Configuration</h1>
+                </div>
+                <p class="text-sm text-textMuted mt-1">Manage your business profile, branding, integrations, and view activity logs.</p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                <button class="w-full sm:w-auto px-4 py-2 bg-white border border-border rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center justify-center gap-2 shadow-sm text-gray-700">
+                    Discard Changes
+                </button>
+                <button class="w-full sm:w-auto px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primaryHover flex items-center justify-center gap-2 shadow-sm transition-colors">
+                    Save Changes
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Body -->
+        <div class="flex-1 overflow-y-auto p-6 lg:p-8">
+            <div class="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
+                
+                <!-- Settings Navigation Sidebar -->
+                <div class="w-full lg:w-64 flex-shrink-0">
+                    <div class="glass-card p-4 sticky top-6">
+                        <nav class="space-y-1">
+                            <a href="#business-profile" class="settings-nav-item active">
+                                <i class="fa-solid fa-building w-5 text-center"></i>
+                                Business Profile
+                            </a>
+                            <a href="#branding-theme" class="settings-nav-item">
+                                <i class="fa-solid fa-palette w-5 text-center"></i>
+                                Branding & Theme
+                            </a>
+                            <a href="#payments" class="settings-nav-item">
+                                <i class="fa-solid fa-credit-card w-5 text-center"></i>
+                                Payments
+                            </a>
+                            <a href="#notifications" class="settings-nav-item">
+                                <i class="fa-solid fa-bell w-5 text-center"></i>
+                                Notifications
+                            </a>
+                            <a href="#users-roles" class="settings-nav-item">
+                                <i class="fa-solid fa-users-gear w-5 text-center"></i>
+                                Users & Roles
+                            </a>
+                            <a href="#integrations" class="settings-nav-item">
+                                <i class="fa-solid fa-plug w-5 text-center"></i>
+                                Integrations
+                            </a>
+                            <div class="my-2 border-t border-gray-100"></div>
+                            <a href="#activity-log" class="settings-nav-item">
+                                <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
+                                Activity Log
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Settings Content Area -->
+                <div class="flex-1 space-y-8">
+                    
+                    <!-- Business Profile Section -->
+                    <section id="business-profile" class="glass-card p-6 md:p-8">
+                        <div class="mb-6">
+                            <h2 class="text-xl font-bold text-gray-900">Business Profile</h2>
+                            <p class="text-sm text-gray-500 mt-1">Update your company's basic information and contact details.</p>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                                    <input type="text" value="Veshoe Downtown" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                                    <select class="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                                        <option>Retail & Fashion</option>
+                                        <option>Food & Beverage</option>
+                                        <option>Health & Beauty</option>
+                                        <option>Services</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Business Description</label>
+                                <textarea rows="3" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">Premium footwear and accessories for the modern urbanite.</textarea>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Support Email</label>
+                                    <input type="email" value="support@veshoe.com" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Support Phone</label>
+                                    <input type="tel" value="+1 (555) 123-4567" class="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Branding & Theme Section -->
+                    <section id="branding-theme" class="glass-card p-6 md:p-8">
+                        <div class="mb-6">
+                            <h2 class="text-xl font-bold text-gray-900">Branding & Theme</h2>
+                            <p class="text-sm text-gray-500 mt-1">Customize how your storefront looks to your customers.</p>
+                        </div>
+
+                        <div class="space-y-8">
+                            <!-- Logo Upload -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Store Logo</label>
+                                <div class="flex items-center gap-6">
+                                    <div class="w-24 h-24 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                                        <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/53241f13ff-817319ce600ab3493418.png" alt="Minimalist modern letter V logo mark in black and white" />
+                                    </div>
+                                    <div>
+                                        <div class="flex gap-3 mb-2">
+                                            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Change Logo</button>
+                                            <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50">Remove</button>
+                                        </div>
+                                        <p class="text-xs text-gray-500">Recommended size: 512x512px. Max 2MB (PNG, JPG).</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Color Palette -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Color Palette</label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="p-4 border border-gray-200 rounded-xl">
+                                        <div class="flex justify-between items-center mb-3">
+                                            <span class="text-sm font-medium">Primary Color</span>
+                                            <span class="text-xs text-gray-500 font-mono">#10B981</span>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-lg bg-primary shadow-inner"></div>
+                                            <input type="color" value="#10B981" class="h-10 w-full rounded cursor-pointer border-0 p-0">
+                                        </div>
+                                    </div>
+                                    <div class="p-4 border border-gray-200 rounded-xl">
+                                        <div class="flex justify-between items-center mb-3">
+                                            <span class="text-sm font-medium">Surface Color</span>
+                                            <span class="text-xs text-gray-500 font-mono">#FFFFFF</span>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-lg bg-white border border-gray-200 shadow-inner"></div>
+                                            <input type="color" value="#FFFFFF" class="h-10 w-full rounded cursor-pointer border-0 p-0">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Typography -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Typography Preset</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div class="border-2 border-primary bg-primary/5 rounded-xl p-4 cursor-pointer relative">
+                                        <div class="absolute top-3 right-3 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                                            <i class="fa-solid fa-check text-white text-[10px]"></i>
+                                        </div>
+                                        <p class="font-sans font-bold text-lg mb-1">Modern Sans</p>
+                                        <p class="font-sans text-sm text-gray-600">Inter / Roboto</p>
+                                    </div>
+                                    <div class="border border-gray-200 hover:border-gray-300 rounded-xl p-4 cursor-pointer transition-colors">
+                                        <p class="font-serif font-bold text-lg mb-1">Elegant Serif</p>
+                                        <p class="font-sans text-sm text-gray-600">Playfair / Lora</p>
+                                    </div>
+                                    <div class="border border-gray-200 hover:border-gray-300 rounded-xl p-4 cursor-pointer transition-colors">
+                                        <p class="font-mono font-bold text-lg mb-1">Tech Mono</p>
+                                        <p class="font-mono text-sm text-gray-600">Space Mono / IBM</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Live Preview -->
+                            <div class="mt-6 border border-gray-200 rounded-xl overflow-hidden">
+                                <div class="bg-gray-100 px-4 py-2 border-b border-gray-200 flex items-center justify-between">
+                                    <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Live Storefront Preview</span>
+                                    <div class="flex gap-2">
+                                        <button class="p-1 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-desktop"></i></button>
+                                        <button class="p-1 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-mobile-screen"></i></button>
+                                    </div>
+                                </div>
+                                <div class="p-6 bg-white min-h-[300px] flex flex-col items-center justify-center text-center">
+                                     <img class="w-16 h-16 mb-4 object-contain" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/b956d55a56-803c7d6e6b7ee26abe0f.png" alt="Minimalist modern letter V logo mark in black and white" />
+                                     <h3 class="text-2xl font-bold mb-2 font-sans text-gray-900">Welcome to Veshoe</h3>
+                                     <button class="mt-4 px-6 py-2 bg-primary text-white rounded-lg font-medium">Shop Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Payments Section -->
+                    <section id="payments" class="glass-card p-6 md:p-8">
+                        <div class="mb-6">
+                            <h2 class="text-xl font-bold text-gray-900">Payment Processors</h2>
+                            <p class="text-sm text-gray-500 mt-1">Connect your payment gateways to accept online transactions.</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Stripe -->
+                            <div class="border border-gray-200 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 text-2xl">
+                                        <i class="fa-brands fa-stripe"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900 flex items-center gap-2">Stripe <span class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">Connected</span></h4>
+                                        <p class="text-sm text-gray-500">Accept credit cards, Apple Pay, and Google Pay.</p>
+                                    </div>
+                                </div>
+                                <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 whitespace-nowrap">Manage Settings</button>
+                            </div>
+
+                            <!-- Square -->
+                            <div class="border border-gray-200 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-800 text-xl font-bold">
+                                        <i class="fa-solid fa-square"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">Square</h4>
+                                        <p class="text-sm text-gray-500">Connect your Square POS for unified inventory and sales.</p>
+                                    </div>
+                                </div>
+                                <button class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 whitespace-nowrap">Connect Account</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Notifications Section -->
+                    <section id="notifications" class="glass-card p-6 md:p-8">
+                         <div class="mb-6">
+                            <h2 class="text-xl font-bold text-gray-900">Notification Preferences</h2>
+                            <p class="text-sm text-gray-500 mt-1">Manage alerts for new orders, bookings, and system updates.</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                <div>
+                                    <h4 class="font-medium text-gray-900 text-sm">New Order Alerts</h4>
+                                    <p class="text-xs text-gray-500 mt-0.5">Receive an email when a new order is placed.</p>
+                                </div>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" name="toggle" id="toggle1" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 right-0"/>
+                                    <label for="toggle1" class="toggle-label block overflow-hidden h-5 rounded-full bg-primary cursor-pointer"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                <div>
+                                    <h4 class="font-medium text-gray-900 text-sm">Booking Confirmations</h4>
+                                    <p class="text-xs text-gray-500 mt-0.5">Alerts for new service bookings and cancellations.</p>
+                                </div>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" name="toggle" id="toggle2" checked class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 right-0"/>
+                                    <label for="toggle2" class="toggle-label block overflow-hidden h-5 rounded-full bg-primary cursor-pointer"></label>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                <div>
+                                    <h4 class="font-medium text-gray-900 text-sm">Daily Summary Report</h4>
+                                    <p class="text-xs text-gray-500 mt-0.5">A daily email summarizing sales and activity.</p>
+                                </div>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" name="toggle" id="toggle3" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 border-gray-300"/>
+                                    <label for="toggle3" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Activity Log Section -->
+                    <section id="activity-log" class="glass-card p-6 md:p-8">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900">Activity Log</h2>
+                                <p class="text-sm text-gray-500 mt-1">Audit trail of sensitive actions and system events.</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <div class="relative">
+                                    <i class="fa-solid fa-filter absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                                    <select class="pl-8 pr-8 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none">
+                                        <option>All Events</option>
+                                        <option>Settings Changed</option>
+                                        <option>User Logins</option>
+                                        <option>Data Exports</option>
+                                    </select>
+                                </div>
+                                <button class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                                    <i class="fa-solid fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-500 border-y border-gray-200">
+                                        <th class="px-4 py-3 font-medium">Date & Time</th>
+                                        <th class="px-4 py-3 font-medium">User</th>
+                                        <th class="px-4 py-3 font-medium">Action</th>
+                                        <th class="px-4 py-3 font-medium">Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-4 py-3 text-gray-500 whitespace-nowrap">Nov 14, 2024 10:23 AM</td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-2">
+                                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" class="w-6 h-6 rounded-full" alt="User">
+                                                <span class="font-medium text-gray-900">Olivia W.</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium">Settings Update</span></td>
+                                        <td class="px-4 py-3 text-gray-600 truncate max-w-xs">Updated primary brand color to #10B981</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-4 py-3 text-gray-500 whitespace-nowrap">Nov 13, 2024 04:15 PM</td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-2">
+                                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" class="w-6 h-6 rounded-full" alt="User">
+                                                <span class="font-medium text-gray-900">Marcus T.</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3"><span class="px-2 py-1 bg-purple-50 text-purple-700 rounded text-xs font-medium">Data Export</span></td>
+                                        <td class="px-4 py-3 text-gray-600 truncate max-w-xs">Exported Customer list (CSV)</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-4 py-3 text-gray-500 whitespace-nowrap">Nov 13, 2024 09:00 AM</td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">S</div>
+                                                <span class="font-medium text-gray-900">System</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3"><span class="px-2 py-1 bg-green-50 text-green-700 rounded text-xs font-medium">Integration Sync</span></td>
+                                        <td class="px-4 py-3 text-gray-600 truncate max-w-xs">Successfully synced 45 products from Square POS</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-4 py-3 text-gray-500 whitespace-nowrap">Nov 12, 2024 02:30 PM</td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-2">
+                                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" class="w-6 h-6 rounded-full" alt="User">
+                                                <span class="font-medium text-gray-900">Olivia W.</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3"><span class="px-2 py-1 bg-red-50 text-red-700 rounded text-xs font-medium">User Role Change</span></td>
+                                        <td class="px-4 py-3 text-gray-600 truncate max-w-xs">Changed Sarah J. from Staff to Manager</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
+                            <span class="text-xs text-gray-500">Showing 1-4 of 128 entries</span>
+                            <div class="flex gap-1">
+                                <button class="px-2 py-1 border border-gray-200 rounded text-xs text-gray-500 hover:bg-gray-50 disabled:opacity-50">Prev</button>
+                                <button class="px-2 py-1 border border-gray-200 bg-primary text-white rounded text-xs">1</button>
+                                <button class="px-2 py-1 border border-gray-200 rounded text-xs text-gray-500 hover:bg-gray-50">2</button>
+                                <button class="px-2 py-1 border border-gray-200 rounded text-xs text-gray-500 hover:bg-gray-50">3</button>
+                                <button class="px-2 py-1 border border-gray-200 rounded text-xs text-gray-500 hover:bg-gray-50">Next</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Footer area within main content -->
+            <footer class="mt-8 pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500 max-w-7xl mx-auto w-full">
+                <p>&copy; 2024 Veshoe Business Portal. All rights reserved.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="hover:text-gray-900">Support</a>
+                    <a href="#" class="hover:text-gray-900">Documentation</a>
+                    <a href="#" class="hover:text-gray-900">Terms</a>
+                </div>
+            </footer>
+
+        </div>
+    </main>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('absolute', 'w-full', 'max-w-xs', 'h-screen');
+        });
+
+        document.getElementById('close-sidebar').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.add('hidden');
+            sidebar.classList.remove('absolute', 'w-full', 'max-w-xs', 'h-screen');
+        });
+
+        // Simple smooth scroll for settings nav
+        document.querySelectorAll('.settings-nav-item').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                // Remove active class from all
+                document.querySelectorAll('.settings-nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Add active class to clicked
+                this.classList.add('active');
+
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if(targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

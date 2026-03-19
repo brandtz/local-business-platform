@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Admin Portal - Catalog & Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#FF4B3A',
+                        primaryHover: '#E03E2F',
+                        surface: '#1E2336',
+                        background: '#131624',
+                        textMain: '#FFFFFF',
+                        textMuted: '#9CA3AF',
+                        border: '#2D3748',
+                        error: '#EF4444',
+                        success: '#10B981',
+                        accent: '#3B82F6',
+                        cardBg: '#1A1E2D',
+                        cardBorder: 'rgba(255, 255, 255, 0.05)',
+                        glow: 'rgba(59, 130, 246, 0.5)'
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px -5px rgba(59, 130, 246, 0.3)',
+                        'card': '0 4px 20px -2px rgba(0, 0, 0, 0.5)',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #131624; color: #FFFFFF; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2D3748; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4A5568; }
+        .glass-panel {
+            background: rgba(30, 35, 54, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glow-text { text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(255, 75, 58, 0.1) 0%, transparent 100%);
+            border-left: 3px solid #FF4B3A;
+            color: #FFFFFF;
+        }
+        .tab-active { border-bottom: 2px solid #FF4B3A; color: #FFFFFF; }
+        .drag-handle { cursor: grab; }
+        .drag-handle:active { cursor: grabbing; }
+    </style>
+</head>
+<body class="w-full min-h-screen m-0 overflow-x-hidden flex flex-col md:flex-row">
+
+    <!-- Mobile Header & Hamburger -->
+    <div class="md:hidden w-full bg-surface border-b border-border p-4 flex justify-between items-center z-50 sticky top-0">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">V</div>
+            <span class="font-bold text-lg">Veshoe Admin</span>
+        </div>
+        <button id="mobile-menu-btn" class="text-textMuted hover:text-white">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="hidden md:flex flex-col w-64 bg-surface border-r border-border h-screen sticky top-0 z-40 transition-all duration-300">
+        <!-- Logo -->
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-glow">V</div>
+            <span class="font-extrabold text-xl tracking-tight text-white glow-text">Veshoe</span>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+            <p class="px-4 text-xs font-semibold text-textMuted uppercase tracking-wider mb-4">Main Menu</p>
+            
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-textMuted hover:text-white hover:bg-white/5 transition-colors">
+                <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                Dashboard
+            </a>
+            
+            <a href="#" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors">
+                <i class="fa-solid fa-box-open w-5 text-center text-primary"></i>
+                Catalog & Services
+            </a>
+            
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-textMuted hover:text-white hover:bg-white/5 transition-colors">
+                <i class="fa-solid fa-cart-shopping w-5 text-center"></i>
+                Orders & Bookings
+                <span class="ml-auto bg-primary/20 text-primary text-xs py-0.5 px-2 rounded-full">3</span>
+            </a>
+            
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-textMuted hover:text-white hover:bg-white/5 transition-colors">
+                <i class="fa-solid fa-users w-5 text-center"></i>
+                Customers & Staff
+            </a>
+            
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-textMuted hover:text-white hover:bg-white/5 transition-colors">
+                <i class="fa-solid fa-layer-group w-5 text-center"></i>
+                Content & Locations
+            </a>
+            
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-textMuted hover:text-white hover:bg-white/5 transition-colors">
+                <i class="fa-solid fa-chart-line w-5 text-center"></i>
+                Analytics
+            </a>
+            
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-textMuted hover:text-white hover:bg-white/5 transition-colors">
+                <i class="fa-solid fa-gear w-5 text-center"></i>
+                Settings & Activity
+            </a>
+        </nav>
+
+        <!-- User Profile -->
+        <div class="p-4 border-t border-border">
+            <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 cursor-pointer transition-colors">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="User" class="w-10 h-10 rounded-full border border-border">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate">Danyal Minson</p>
+                    <p class="text-xs text-textMuted truncate">Store Manager</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-textMuted text-xs"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        
+        <!-- Top Header -->
+        <header class="h-20 bg-surface/50 backdrop-blur-md border-b border-border flex items-center justify-between px-6 lg:px-10 sticky top-0 z-30">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-semibold text-white">Catalog & Services</h1>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button class="px-4 py-2 bg-surface border border-border rounded-lg text-sm font-medium text-white hover:bg-white/5 transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-file-import"></i>
+                    <span class="hidden sm:inline">Import CSV</span>
+                </button>
+                <button id="add-new-btn" class="px-4 py-2 bg-primary hover:bg-primaryHover text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-primary/30 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden sm:inline">Add New</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-6 lg:p-10 flex flex-col gap-6">
+            
+            <!-- Tabs -->
+            <div class="flex border-b border-border gap-6">
+                <button class="pb-3 text-sm font-medium tab-active transition-colors">Products</button>
+                <button class="pb-3 text-sm font-medium text-textMuted hover:text-white transition-colors">Categories</button>
+                <button class="pb-3 text-sm font-medium text-textMuted hover:text-white transition-colors">Modifiers</button>
+                <button class="pb-3 text-sm font-medium text-textMuted hover:text-white transition-colors">Services</button>
+            </div>
+
+            <!-- Toolbar (Search, Filter, Actions) -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex flex-1 w-full sm:w-auto gap-3">
+                    <div class="relative flex-1 max-w-md">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-textMuted"></i>
+                        <input type="text" placeholder="Search products..." class="w-full bg-cardBg border border-border rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-primary transition-colors">
+                    </div>
+                    <button class="px-3 py-2 bg-cardBg border border-border rounded-lg text-textMuted hover:text-white transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-filter"></i>
+                        <span class="hidden sm:inline text-sm">Filters</span>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <span class="text-sm text-textMuted">2 items selected</span>
+                    <div class="flex bg-cardBg border border-border rounded-lg overflow-hidden">
+                        <button class="px-3 py-2 text-textMuted hover:text-white hover:bg-white/5 transition-colors border-r border-border" title="Bulk Edit">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="px-3 py-2 text-error hover:bg-error/10 transition-colors" title="Delete Selected">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DataTable -->
+            <div class="glass-panel rounded-2xl border border-border overflow-hidden flex-1 flex flex-col">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[800px]">
+                        <thead>
+                            <tr class="bg-surface border-b border-border text-xs uppercase text-textMuted font-semibold">
+                                <th class="py-3 px-4 w-12 text-center">
+                                    <input type="checkbox" class="rounded bg-cardBg border-border text-primary focus:ring-primary/50">
+                                </th>
+                                <th class="py-3 px-4 w-12"></th>
+                                <th class="py-3 px-4">Item</th>
+                                <th class="py-3 px-4">Category</th>
+                                <th class="py-3 px-4">Price</th>
+                                <th class="py-3 px-4">Inventory</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <!-- Row 1 -->
+                            <tr class="border-b border-border/50 hover:bg-white/5 transition-colors group">
+                                <td class="py-3 px-4 text-center">
+                                    <input type="checkbox" checked class="rounded bg-cardBg border-border text-primary focus:ring-primary/50">
+                                </td>
+                                <td class="py-3 px-4 text-textMuted drag-handle hover:text-white">
+                                    <i class="fa-solid fa-grip-vertical"></i>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded bg-cardBg border border-border overflow-hidden shrink-0">
+                                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/4018f44cb9-1a21bb8b862881775a63.png" alt="Premium leather running shoe product shot on dark background" />
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-white">AeroGlide Runner Pro</p>
+                                            <p class="text-xs text-textMuted">SKU: AG-RP-001</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-textMuted">Footwear</td>
+                                <td class="py-3 px-4 font-medium">$149.99</td>
+                                <td class="py-3 px-4">
+                                    <span class="text-white">142</span> <span class="text-textMuted text-xs">in stock</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">Active</span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-textMuted hover:text-white p-1 transition-colors open-panel-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Row 2 -->
+                            <tr class="border-b border-border/50 hover:bg-white/5 transition-colors group">
+                                <td class="py-3 px-4 text-center">
+                                    <input type="checkbox" checked class="rounded bg-cardBg border-border text-primary focus:ring-primary/50">
+                                </td>
+                                <td class="py-3 px-4 text-textMuted drag-handle hover:text-white">
+                                    <i class="fa-solid fa-grip-vertical"></i>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded bg-cardBg border border-border overflow-hidden shrink-0">
+                                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/4cb39ec2d6-dd3b83fd5f4173d07605.png" alt="Minimalist classic white sneaker product shot on dark background" />
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-white">Classic Canvas Low</p>
+                                            <p class="text-xs text-textMuted">SKU: CC-LW-042</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-textMuted">Footwear</td>
+                                <td class="py-3 px-4 font-medium">$89.00</td>
+                                <td class="py-3 px-4">
+                                    <span class="text-error">12</span> <span class="text-textMuted text-xs">low stock</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">Active</span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-textMuted hover:text-white p-1 transition-colors open-panel-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                </td>
+                            </tr>
+
+                            <!-- Row 3 -->
+                            <tr class="border-b border-border/50 hover:bg-white/5 transition-colors group">
+                                <td class="py-3 px-4 text-center">
+                                    <input type="checkbox" class="rounded bg-cardBg border-border text-primary focus:ring-primary/50">
+                                </td>
+                                <td class="py-3 px-4 text-textMuted drag-handle hover:text-white">
+                                    <i class="fa-solid fa-grip-vertical"></i>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded bg-cardBg border border-border overflow-hidden shrink-0 flex items-center justify-center bg-surface">
+                                            <i class="fa-solid fa-image text-textMuted"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-white">Premium Leather Care Kit</p>
+                                            <p class="text-xs text-textMuted">SKU: AC-LC-001</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-textMuted">Accessories</td>
+                                <td class="py-3 px-4 font-medium">$34.50</td>
+                                <td class="py-3 px-4">
+                                    <span class="text-white">56</span> <span class="text-textMuted text-xs">in stock</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">Draft</span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-textMuted hover:text-white p-1 transition-colors open-panel-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="bg-surface border-t border-border p-4 flex items-center justify-between mt-auto">
+                    <span class="text-sm text-textMuted">Showing 1 to 10 of 45 entries</span>
+                    <div class="flex gap-1">
+                        <button class="w-8 h-8 flex items-center justify-center rounded border border-border text-textMuted hover:bg-white/5 disabled:opacity-50" disabled><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded bg-primary text-white text-sm font-medium">1</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded border border-border text-textMuted hover:bg-white/5 hover:text-white text-sm font-medium transition-colors">2</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded border border-border text-textMuted hover:bg-white/5 hover:text-white text-sm font-medium transition-colors">3</button>
+                        <span class="w-8 h-8 flex items-center justify-center text-textMuted">...</span>
+                        <button class="w-8 h-8 flex items-center justify-center rounded border border-border text-textMuted hover:bg-white/5 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Overlay for Side Panel -->
+        <div id="panel-overlay" class="absolute inset-0 bg-black/50 backdrop-blur-sm z-40 hidden transition-opacity opacity-0"></div>
+
+        <!-- CRUD Side Panel -->
+        <div id="crud-panel" class="absolute top-0 right-0 h-full w-full max-w-md bg-surface border-l border-border shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+            
+            <!-- Panel Header -->
+            <div class="h-20 border-b border-border flex items-center justify-between px-6 shrink-0 bg-surface">
+                <h2 class="text-lg font-semibold text-white">Edit Product</h2>
+                <button id="close-panel-btn" class="w-8 h-8 rounded-full flex items-center justify-center text-textMuted hover:text-white hover:bg-white/5 transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Panel Content (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                
+                <!-- Status Toggle -->
+                <div class="flex items-center justify-between bg-cardBg p-4 rounded-xl border border-border">
+                    <div>
+                        <p class="font-medium text-white text-sm">Product Status</p>
+                        <p class="text-xs text-textMuted">Visible on storefront</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" value="" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+
+                <!-- Basic Info -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-textMuted uppercase tracking-wider">Basic Information</h3>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1.5">Product Name</label>
+                        <input type="text" value="AeroGlide Runner Pro" class="w-full bg-cardBg border border-border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary transition-colors">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1.5">SKU</label>
+                            <input type="text" value="AG-RP-001" class="w-full bg-cardBg border border-border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1.5">Category</label>
+                            <select class="w-full bg-cardBg border border-border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary transition-colors appearance-none">
+                                <option>Footwear</option>
+                                <option>Apparel</option>
+                                <option>Accessories</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-1.5">Description</label>
+                        <textarea rows="4" class="w-full bg-cardBg border border-border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary transition-colors resize-none">Premium lightweight running shoe designed for maximum comfort and speed. Features breathable mesh upper and responsive foam midsole.</textarea>
+                    </div>
+                </div>
+
+                <!-- Pricing & Inventory -->
+                <div class="space-y-4 pt-4 border-t border-border">
+                    <h3 class="text-sm font-semibold text-textMuted uppercase tracking-wider">Pricing & Inventory</h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1.5">Price ($)</label>
+                            <input type="number" value="149.99" class="w-full bg-cardBg border border-border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1.5">Compare at Price</label>
+                            <input type="number" value="179.99" class="w-full bg-cardBg border border-border rounded-lg px-4 py-2.5 text-sm text-textMuted focus:outline-none focus:border-primary transition-colors">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1.5">Inventory Quantity</label>
+                            <input type="number" value="142" class="w-full bg-cardBg border border-border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1.5">Low Stock Alert</label>
+                            <input type="number" value="20" class="w-full bg-cardBg border border-border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary transition-colors">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media Gallery -->
+                <div class="space-y-4 pt-4 border-t border-border">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold text-textMuted uppercase tracking-wider">Media</h3>
+                        <button class="text-xs text-primary hover:text-primaryHover font-medium">Add Media</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="aspect-square rounded-lg border-2 border-primary overflow-hidden relative group">
+                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/4018f44cb9-1a21bb8b862881775a63.png" alt="Premium leather running shoe product shot on dark background" />
+                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <button class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
+                            </div>
+                            <span class="absolute top-1 left-1 bg-primary text-white text-[10px] px-1.5 py-0.5 rounded font-medium">Main</span>
+                        </div>
+                        <div class="aspect-square rounded-lg border border-border overflow-hidden relative group">
+                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/cce5edccc2-f8fb000043f514848e80.png" alt="Side view of running shoe on dark background" />
+                            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <button class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
+                            </div>
+                        </div>
+                        <div class="aspect-square rounded-lg border border-dashed border-border hover:border-textMuted bg-cardBg flex flex-col items-center justify-center cursor-pointer transition-colors">
+                            <i class="fa-solid fa-cloud-arrow-up text-textMuted mb-1"></i>
+                            <span class="text-[10px] text-textMuted">Upload</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Panel Footer Actions -->
+            <div class="p-4 border-t border-border bg-surface shrink-0 flex gap-3">
+                <button id="cancel-panel-btn" class="flex-1 px-4 py-2.5 bg-cardBg border border-border hover:bg-white/5 text-white text-sm font-medium rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button class="flex-1 px-4 py-2.5 bg-primary hover:bg-primaryHover text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-primary/30">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('hidden')) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('absolute', 'w-full', 'max-w-xs', 'h-screen');
+            } else {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('absolute', 'w-full', 'max-w-xs', 'h-screen');
+            }
+        });
+
+        // Side Panel Logic
+        const panel = document.getElementById('crud-panel');
+        const overlay = document.getElementById('panel-overlay');
+        const openBtns = document.querySelectorAll('.open-panel-btn, #add-new-btn');
+        const closeBtn = document.getElementById('close-panel-btn');
+        const cancelBtn = document.getElementById('cancel-panel-btn');
+
+        function openPanel() {
+            overlay.classList.remove('hidden');
+            // Small delay to allow display:block to apply before changing opacity
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                panel.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function closePanel() {
+            panel.classList.add('translate-x-full');
+            overlay.classList.add('opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300); // match transition duration
+        }
+
+        openBtns.forEach(btn => btn.addEventListener('click', openPanel));
+        closeBtn.addEventListener('click', closePanel);
+        cancelBtn.addEventListener('click', closePanel);
+        overlay.addEventListener('click', closePanel);
+    </script>
+</body>
+</html>

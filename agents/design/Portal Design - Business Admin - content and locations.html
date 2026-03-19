@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Admin Portal - Content & Locations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#10B981', // Green from context
+                        primaryHover: '#059669',
+                        surface: '#FFFFFF',
+                        background: '#F3F4F6',
+                        textMain: '#111827',
+                        textMuted: '#6B7280',
+                        border: '#E5E7EB',
+                        error: '#EF4444',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        cardBg: '#FFFFFF',
+                        sidebarBg: '#1A1C23', // Dark sidebar from inspiration
+                        sidebarText: '#9CA3AF',
+                        sidebarTextActive: '#FFFFFF',
+                    },
+                    boxShadow: {
+                        'card': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                        '3xl': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; color: #111827; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+        
+        /* Sidebar styling matching inspiration */
+        .nav-item {
+            color: #9CA3AF;
+            transition: all 0.2s;
+            border-radius: 0.5rem;
+        }
+        .nav-item:hover {
+            color: #FFFFFF;
+            background-color: rgba(255,255,255,0.05);
+        }
+        .nav-item.active {
+            color: #FFFFFF;
+            background-color: rgba(255,255,255,0.1);
+            font-weight: 500;
+        }
+        .nav-icon-container {
+            width: 24px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .tab-btn {
+            position: relative;
+            padding-bottom: 1rem;
+            color: #6B7280;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .tab-btn:hover {
+            color: #111827;
+        }
+        .tab-btn.active {
+            color: #111827;
+            font-weight: 600;
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #10B981;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .glass-card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+            border-radius: 1rem;
+        }
+
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #10B981;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #10B981;
+        }
+    </style>
+</head>
+<body class="w-full min-h-screen m-0 overflow-x-hidden flex flex-col md:flex-row text-textMain">
+
+    <!-- Mobile Header & Hamburger -->
+    <div class="md:hidden w-full bg-sidebarBg border-b border-gray-800 p-4 flex justify-between items-center z-50 sticky top-0 shadow-sm">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">V</div>
+            <span class="font-bold text-lg text-white">Veshoe Admin</span>
+        </div>
+        <button id="mobile-menu-btn" class="text-gray-400 hover:text-white">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation (Dark Mode inspired by image) -->
+    <aside id="sidebar" class="hidden md:flex flex-col w-64 bg-sidebarBg h-screen sticky top-0 z-40 transition-all duration-300">
+        <!-- Logo -->
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-lg">
+                <i class="fa-solid fa-layer-group text-primary"></i>
+            </div>
+            <span class="font-bold text-xl tracking-tight text-white">Mate</span>
+            <button class="ml-auto text-gray-400 hover:text-white">
+                <i class="fa-solid fa-arrow-left-long"></i>
+            </button>
+        </div>
+
+        <!-- Search -->
+        <div class="px-4 mb-6">
+            <div class="relative">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                <input type="text" placeholder="Search" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:ring-1 focus:ring-primary focus:outline-none transition-shadow placeholder-gray-500">
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <span class="text-xs text-gray-500 border border-gray-700 rounded px-1">⌘</span>
+                    <span class="text-xs text-gray-500 border border-gray-700 rounded px-1">F</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-border-all"></i>
+                </div>
+                Dashboard
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                Catalog & Services
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                Orders & Bookings
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                Customers & Staff
+            </a>
+            
+            <a href="#" class="nav-item active flex items-center gap-3 px-3 py-2 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+                Content & Locations
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 text-sm">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                Analytics
+            </a>
+            
+            <div class="mt-8 pt-4 border-t border-gray-800 space-y-1">
+                <a href="#" class="nav-item flex items-center justify-between px-3 py-2 text-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="nav-icon-container">
+                            <i class="fa-solid fa-bell"></i>
+                        </div>
+                        Notifications
+                    </div>
+                    <span class="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">7</span>
+                </a>
+                <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 text-sm">
+                    <div class="nav-icon-container">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </div>
+                    Help & Support
+                </a>
+                <a href="#" class="nav-item flex items-center gap-3 px-3 py-2 text-sm">
+                    <div class="nav-icon-container">
+                        <i class="fa-solid fa-gear"></i>
+                    </div>
+                    Settings
+                </a>
+            </div>
+        </nav>
+
+        <!-- User Profile -->
+        <div class="p-4 mt-auto border-t border-gray-800">
+            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="User" class="w-8 h-8 rounded-full object-cover">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate">Olivia Williams</p>
+                </div>
+                <i class="fa-solid fa-ellipsis text-gray-500"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-background">
+        
+        <!-- Top Header -->
+        <header class="h-16 bg-surface border-b border-border flex items-center justify-between px-6 lg:px-8 sticky top-0 z-30">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-bold text-textMain">Content & Locations</h1>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <select class="appearance-none bg-white border border-border rounded-lg pl-4 pr-10 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        <option>All Locations</option>
+                        <option>Downtown Store</option>
+                        <option>Uptown Branch</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                </div>
+                <button class="px-4 py-1.5 bg-white border border-border rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2">
+                    <i class="fa-solid fa-eye text-gray-500"></i> Preview
+                </button>
+                <button class="px-4 py-1.5 bg-primary hover:bg-primaryHover text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+                    Publish Changes
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Body -->
+        <div class="flex-1 overflow-y-auto p-6 lg:p-8 flex flex-col gap-6">
+            
+            <!-- Main Tabs -->
+            <div class="flex border-b border-border gap-8 mb-2">
+                <button class="tab-btn active text-sm" id="tab-content" onclick="switchTab('content')">
+                    Pages & Content
+                </button>
+                <button class="tab-btn text-sm" id="tab-announcements" onclick="switchTab('announcements')">
+                    Announcements
+                </button>
+                <button class="tab-btn text-sm" id="tab-locations" onclick="switchTab('locations')">
+                    Locations & Settings
+                </button>
+            </div>
+
+            <!-- ================= CONTENT VIEW ================= -->
+            <div id="view-content" class="flex flex-col gap-6">
+                
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-textMain">Storefront Pages</h2>
+                    <button class="px-3 py-1.5 bg-white border border-border rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2">
+                        <i class="fa-solid fa-plus text-gray-500"></i> New Page
+                    </button>
+                </div>
+
+                <!-- Pages Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Page Card 1 -->
+                    <div class="glass-card overflow-hidden flex flex-col">
+                        <div class="h-32 bg-gray-100 relative group">
+                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/e2f9e40fa9-c85005c94f861f9da9d5.png" alt="modern minimalist storefront homepage hero image preview UI" />
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <button class="px-3 py-1.5 bg-white rounded-md text-sm font-medium shadow-sm hover:bg-gray-50">Edit</button>
+                                <button class="px-3 py-1.5 bg-white/20 text-white rounded-md text-sm font-medium backdrop-blur-sm hover:bg-white/30">Preview</button>
+                            </div>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-textMain">Home Page</h3>
+                                <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium">Published</span>
+                            </div>
+                            <p class="text-sm text-textMuted mb-4 line-clamp-2">Main landing page with hero banner, featured products, and latest news.</p>
+                            <div class="mt-auto flex items-center justify-between text-xs text-gray-500 border-t border-gray-100 pt-3">
+                                <span>Last edited: 2 days ago</span>
+                                <div class="flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span> Live
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Page Card 2 -->
+                    <div class="glass-card overflow-hidden flex flex-col">
+                        <div class="h-32 bg-gray-100 relative group">
+                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/dbafc15903-35f5a6ac6bc2decc8a45.png" alt="about us page layout preview professional team" />
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <button class="px-3 py-1.5 bg-white rounded-md text-sm font-medium shadow-sm hover:bg-gray-50">Edit</button>
+                                <button class="px-3 py-1.5 bg-white/20 text-white rounded-md text-sm font-medium backdrop-blur-sm hover:bg-white/30">Preview</button>
+                            </div>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-textMain">About Us</h3>
+                                <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium">Published</span>
+                            </div>
+                            <p class="text-sm text-textMuted mb-4 line-clamp-2">Company history, mission statement, and team member profiles.</p>
+                            <div class="mt-auto flex items-center justify-between text-xs text-gray-500 border-t border-gray-100 pt-3">
+                                <span>Last edited: 1 week ago</span>
+                                <div class="flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span> Live
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Page Card 3 -->
+                    <div class="glass-card overflow-hidden flex flex-col border-dashed border-2 hover:border-primary transition-colors cursor-pointer bg-gray-50/50">
+                        <div class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+                            <div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xl mb-3">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
+                            <h3 class="font-semibold text-textMain">Create New Page</h3>
+                            <p class="text-sm text-textMuted mt-1">Add a custom page with rich text and media.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Content Editor Section (Mockup) -->
+                <div class="mt-6 glass-card p-0 overflow-hidden">
+                    <div class="border-b border-border p-4 flex justify-between items-center bg-gray-50/50">
+                        <h3 class="font-semibold text-textMain">Quick Edit: Return Policy</h3>
+                        <div class="flex gap-2">
+                            <button class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md">Cancel</button>
+                            <button class="px-3 py-1.5 text-sm font-medium bg-gray-900 text-white hover:bg-black rounded-md">Save Draft</button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Page Title</label>
+                            <input type="text" value="Return & Refund Policy" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none">
+                        </div>
+                        
+                        <!-- Rich Text Toolbar Mock -->
+                        <div class="border border-gray-300 rounded-t-lg bg-gray-50 p-2 flex gap-1 flex-wrap">
+                            <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 text-gray-700"><i class="fa-solid fa-bold"></i></button>
+                            <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 text-gray-700"><i class="fa-solid fa-italic"></i></button>
+                            <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 text-gray-700"><i class="fa-solid fa-underline"></i></button>
+                            <div class="w-px h-6 bg-gray-300 my-auto mx-1"></div>
+                            <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 text-gray-700"><i class="fa-solid fa-list-ul"></i></button>
+                            <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 text-gray-700"><i class="fa-solid fa-list-ol"></i></button>
+                            <div class="w-px h-6 bg-gray-300 my-auto mx-1"></div>
+                            <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 text-gray-700"><i class="fa-solid fa-link"></i></button>
+                            <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 text-gray-700"><i class="fa-solid fa-image"></i></button>
+                        </div>
+                        <div class="border border-t-0 border-gray-300 rounded-b-lg p-4 min-h-[200px] text-sm text-gray-700 focus:outline-none" contenteditable="true">
+                            <h2 class="text-lg font-bold mb-2">30-Day Return Policy</h2>
+                            <p class="mb-3">We want you to be completely satisfied with your purchase. If you are not entirely happy, you can return your item within 30 days of receipt.</p>
+                            <ul class="list-disc pl-5 mb-3">
+                                <li>Items must be unused and in original packaging.</li>
+                                <li>Receipt or proof of purchase is required.</li>
+                                <li>Sale items are final and cannot be refunded.</li>
+                            </ul>
+                            <p>To initiate a return, please contact our support team or visit one of our physical locations.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================= ANNOUNCEMENTS VIEW ================= -->
+            <div id="view-announcements" class="hidden flex-col gap-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-textMain">Store Announcements</h2>
+                    <button class="px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primaryHover flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> New Announcement
+                    </button>
+                </div>
+
+                <div class="glass-card overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50/50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 font-medium text-gray-500">Title / Message</th>
+                                <th class="px-6 py-3 font-medium text-gray-500">Placement</th>
+                                <th class="px-6 py-3 font-medium text-gray-500">Status</th>
+                                <th class="px-6 py-3 font-medium text-gray-500">Dates</th>
+                                <th class="px-6 py-3 font-medium text-gray-500 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <p class="font-medium text-gray-900">Holiday Sale 20% Off</p>
+                                    <p class="text-xs text-gray-500 truncate w-48">Use code HOLIDAY20 at checkout for all items.</p>
+                                </td>
+                                <td class="px-6 py-4 text-gray-600">Global Banner</td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">Active</span>
+                                </td>
+                                <td class="px-6 py-4 text-gray-500 text-xs">
+                                    Nov 20 - Dec 25
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <button class="text-gray-400 hover:text-gray-900 mx-1"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="text-gray-400 hover:text-red-600 mx-1"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <p class="font-medium text-gray-900">New Location Opening</p>
+                                    <p class="text-xs text-gray-500 truncate w-48">Visit our new Uptown branch starting next week!</p>
+                                </td>
+                                <td class="px-6 py-4 text-gray-600">Homepage Modal</td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-medium">Draft</span>
+                                </td>
+                                <td class="px-6 py-4 text-gray-500 text-xs">
+                                    Not scheduled
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <button class="text-gray-400 hover:text-gray-900 mx-1"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="text-gray-400 hover:text-red-600 mx-1"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ================= LOCATIONS VIEW ================= -->
+            <div id="view-locations" class="hidden flex-col gap-6">
+                
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-textMain">Business Locations</h2>
+                    <button class="px-3 py-1.5 bg-white border border-border rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2">
+                        <i class="fa-solid fa-plus text-gray-500"></i> Add Location
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Location List (Sidebar style) -->
+                    <div class="lg:col-span-1 flex flex-col gap-3">
+                        <!-- Active Location -->
+                        <div class="glass-card p-4 border-l-4 border-l-primary cursor-pointer shadow-sm">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="font-semibold text-textMain">Downtown Store</h3>
+                                <span class="w-2 h-2 rounded-full bg-green-500 mt-1.5"></span>
+                            </div>
+                            <p class="text-xs text-textMuted mb-2">123 Main St, Suite 100<br>New York, NY 10001</p>
+                            <div class="flex gap-2">
+                                <span class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-medium border border-blue-100">Pickup</span>
+                                <span class="px-2 py-0.5 bg-purple-50 text-purple-600 rounded text-[10px] font-medium border border-purple-100">Delivery</span>
+                            </div>
+                        </div>
+
+                        <!-- Inactive/Other Location -->
+                        <div class="glass-card p-4 border border-transparent hover:border-gray-200 cursor-pointer bg-gray-50/50">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="font-medium text-gray-700">Uptown Branch</h3>
+                                <span class="w-2 h-2 rounded-full bg-green-500 mt-1.5"></span>
+                            </div>
+                            <p class="text-xs text-textMuted mb-2">456 North Ave<br>New York, NY 10002</p>
+                            <div class="flex gap-2">
+                                <span class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-medium border border-blue-100">Pickup</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Details Form -->
+                    <div class="lg:col-span-2 glass-card p-6">
+                        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+                            <h3 class="font-semibold text-lg">Downtown Store Settings</h3>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-500">Location Active</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Form Sections -->
+                        <div class="space-y-6">
+                            
+                            <!-- Basic Info -->
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900 mb-3">Basic Information</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">Location Name</label>
+                                        <input type="text" value="Downtown Store" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">Phone Number</label>
+                                        <input type="text" value="(555) 123-4567" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary outline-none">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-medium text-gray-500 mb-1">Address</label>
+                                        <input type="text" value="123 Main St, Suite 100" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary outline-none mb-2">
+                                        <div class="grid grid-cols-3 gap-2">
+                                            <input type="text" value="New York" class="col-span-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary outline-none">
+                                            <input type="text" value="NY" class="col-span-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary outline-none">
+                                            <input type="text" value="10001" class="col-span-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary outline-none">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-gray-100">
+
+                            <!-- Operating Hours -->
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900 mb-3">Operating Hours</h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between py-1">
+                                        <div class="flex items-center gap-3 w-32">
+                                            <input type="checkbox" checked class="rounded border-gray-300 text-primary focus:ring-primary">
+                                            <span class="text-sm text-gray-700">Monday</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 flex-1 max-w-xs">
+                                            <input type="time" value="09:00" class="border border-gray-300 rounded px-2 py-1 text-sm w-full">
+                                            <span class="text-gray-500 text-sm">to</span>
+                                            <input type="time" value="18:00" class="border border-gray-300 rounded px-2 py-1 text-sm w-full">
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-1">
+                                        <div class="flex items-center gap-3 w-32">
+                                            <input type="checkbox" checked class="rounded border-gray-300 text-primary focus:ring-primary">
+                                            <span class="text-sm text-gray-700">Tuesday</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 flex-1 max-w-xs">
+                                            <input type="time" value="09:00" class="border border-gray-300 rounded px-2 py-1 text-sm w-full">
+                                            <span class="text-gray-500 text-sm">to</span>
+                                            <input type="time" value="18:00" class="border border-gray-300 rounded px-2 py-1 text-sm w-full">
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-1">
+                                        <div class="flex items-center gap-3 w-32">
+                                            <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                            <span class="text-sm text-gray-500">Sunday</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 flex-1 max-w-xs opacity-50 pointer-events-none">
+                                            <input type="time" class="border border-gray-300 rounded px-2 py-1 text-sm w-full">
+                                            <span class="text-gray-500 text-sm">to</span>
+                                            <input type="time" class="border border-gray-300 rounded px-2 py-1 text-sm w-full">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-gray-100">
+
+                            <!-- Services & Fulfillment -->
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900 mb-3">Fulfillment & Services</h4>
+                                <div class="space-y-3">
+                                    <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                                        <div class="flex items-center h-5">
+                                            <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary">
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">In-Store Pickup</p>
+                                            <p class="text-xs text-gray-500">Allow customers to order online and pick up at this location.</p>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                                        <div class="flex items-center h-5">
+                                            <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary">
+                                        </div>
+                                        <div class="w-full">
+                                            <p class="text-sm font-medium text-gray-900">Local Delivery</p>
+                                            <p class="text-xs text-gray-500 mb-2">Offer delivery within a specific radius.</p>
+                                            <div class="flex items-center gap-2 mt-2">
+                                                <span class="text-xs text-gray-500">Radius (miles):</span>
+                                                <input type="number" value="5" class="w-16 border border-gray-300 rounded px-2 py-1 text-xs">
+                                                <span class="text-xs text-gray-500 ml-2">Fee:</span>
+                                                <input type="text" value="$5.00" class="w-20 border border-gray-300 rounded px-2 py-1 text-xs">
+                                            </div>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                                        <div class="flex items-center h-5">
+                                            <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary">
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">Bookable Services</p>
+                                            <p class="text-xs text-gray-500">Enable booking calendar for services at this location.</p>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-4">
+                                <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Discard Changes</button>
+                                <button class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black">Save Location</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('hidden')) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('absolute', 'w-full', 'max-w-xs', 'h-screen');
+            } else {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('absolute', 'w-full', 'max-w-xs', 'h-screen');
+            }
+        });
+
+        // Tab Switching
+        function switchTab(tab) {
+            // Reset all tabs
+            ['content', 'announcements', 'locations'].forEach(t => {
+                document.getElementById('tab-' + t).classList.remove('active');
+                const view = document.getElementById('view-' + t);
+                view.classList.add('hidden');
+                view.classList.remove('flex');
+            });
+            
+            // Activate selected tab
+            document.getElementById('tab-' + tab).classList.add('active');
+            const activeView = document.getElementById('view-' + tab);
+            activeView.classList.remove('hidden');
+            activeView.classList.add('flex');
+        }
+    </script>
+</body>
+</html>

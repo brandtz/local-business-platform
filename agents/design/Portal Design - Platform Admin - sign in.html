@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Admin Portal - Sign In</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                            800: '#9f1239',
+                            900: '#881337',
+                            950: '#4c0519',
+                        },
+                        surface: {
+                            DEFAULT: '#0f1115',
+                            card: '#16181d',
+                            hover: '#1e2128',
+                            border: '#2a2d35'
+                        },
+                        primary: '#f43f5e', // Adapting from image 1/2 orange/red accent
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f1115; color: #f8fafc; }
+        ::-webkit-scrollbar { display: none; }
+        
+        .glass-panel {
+            background: rgba(22, 24, 29, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .glow-effect {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(244, 63, 94, 0.15) 0%, rgba(15, 17, 21, 0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .input-field {
+            background-color: #1a1d24;
+            border: 1px solid #2a2d35;
+            color: #f8fafc;
+            transition: all 0.2s ease;
+        }
+        .input-field:focus {
+            border-color: #f43f5e;
+            box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.2);
+            outline: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .btn-sso {
+            background-color: #1a1d24;
+            border: 1px solid #2a2d35;
+            color: #e2e8f0;
+            transition: all 0.2s ease;
+        }
+        .btn-sso:hover {
+            background-color: #2a2d35;
+            border-color: #3f4450;
+        }
+    </style>
+</head>
+<body class="w-full min-h-screen m-0 overflow-x-hidden flex flex-col relative">
+
+    <!-- Ambient Background Glow -->
+    <div class="glow-effect"></div>
+    
+    <!-- Top Nav / Branding -->
+    <header id="auth-header" class="w-full p-6 flex justify-between items-center z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                <i class="fa-solid fa-layer-group text-white text-xl"></i>
+            </div>
+            <span class="font-bold text-xl tracking-tight text-white">Three<span class="text-brand-400">Portal</span></span>
+        </div>
+        <div class="hidden sm:flex items-center gap-6 text-sm">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">Documentation</a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">System Status</a>
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                All Systems Operational
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 z-10 relative w-full max-w-7xl mx-auto">
+        
+        <!-- Auth Container -->
+        <div class="w-full max-w-md">
+            
+            <!-- Header Text -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-white mb-3">Platform Administration</h1>
+                <p class="text-gray-400 text-sm">Sign in to manage tenants, infrastructure, and platform settings. Restricted access.</p>
+            </div>
+
+            <!-- Login Card -->
+            <div id="login-card" class="glass-panel rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+                <!-- Top border accent -->
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-400 via-brand-500 to-brand-600"></div>
+                
+                <form class="space-y-5" onsubmit="event.preventDefault(); showMfaStep();">
+                    
+                    <!-- SSO Provider Options -->
+                    <div class="space-y-3 mb-6">
+                        <button type="button" class="btn-sso w-full py-3 px-4 rounded-xl flex items-center justify-center gap-3 font-medium text-sm">
+                            <i class="fa-brands fa-microsoft text-[#00a4ef] text-lg"></i>
+                            Continue with Microsoft Entra ID
+                        </button>
+                        <button type="button" class="btn-sso w-full py-3 px-4 rounded-xl flex items-center justify-center gap-3 font-medium text-sm">
+                            <i class="fa-brands fa-google text-white text-lg"></i>
+                            Continue with Google Workspace
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-4 my-6">
+                        <div class="h-px bg-surface-border flex-1"></div>
+                        <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Or use admin credentials</span>
+                        <div class="h-px bg-surface-border flex-1"></div>
+                    </div>
+
+                    <!-- Email Input -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300 mb-1.5">Admin Email</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-regular fa-envelope text-gray-500"></i>
+                            </div>
+                            <input type="email" id="email" class="input-field w-full rounded-xl pl-10 pr-4 py-3 text-sm" placeholder="admin@threeportal.com" required>
+                        </div>
+                    </div>
+
+                    <!-- Password Input -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
+                            <a href="#" class="text-xs text-brand-400 hover:text-brand-300 transition-colors">Forgot password?</a>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-lock text-gray-500"></i>
+                            </div>
+                            <input type="password" id="password" class="input-field w-full rounded-xl pl-10 pr-10 py-3 text-sm" placeholder="••••••••" required>
+                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-300">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-primary w-full py-3 rounded-xl font-medium text-sm mt-4 flex items-center justify-center gap-2">
+                        Sign In <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- MFA Card (Hidden initially) -->
+            <div id="mfa-card" class="glass-panel rounded-2xl p-8 shadow-2xl relative overflow-hidden hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-400 via-brand-500 to-brand-600"></div>
+                
+                <button onclick="hideMfaStep()" class="text-gray-400 hover:text-white mb-6 flex items-center gap-2 text-sm transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i> Back to login
+                </button>
+
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-surface-border rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-700">
+                        <i class="fa-solid fa-shield-halved text-brand-400 text-2xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white mb-2">Two-Factor Authentication</h2>
+                    <p class="text-sm text-gray-400">Enter the 6-digit code from your authenticator app.</p>
+                </div>
+
+                <form class="space-y-6" onsubmit="event.preventDefault(); window.location.href='#';">
+                    <div class="flex justify-between gap-2">
+                        <input type="text" maxlength="1" class="w-12 h-14 text-center text-xl font-bold input-field rounded-lg" required>
+                        <input type="text" maxlength="1" class="w-12 h-14 text-center text-xl font-bold input-field rounded-lg" required>
+                        <input type="text" maxlength="1" class="w-12 h-14 text-center text-xl font-bold input-field rounded-lg" required>
+                        <input type="text" maxlength="1" class="w-12 h-14 text-center text-xl font-bold input-field rounded-lg" required>
+                        <input type="text" maxlength="1" class="w-12 h-14 text-center text-xl font-bold input-field rounded-lg" required>
+                        <input type="text" maxlength="1" class="w-12 h-14 text-center text-xl font-bold input-field rounded-lg" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2">
+                        Verify Identity
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <a href="#" class="text-sm text-brand-400 hover:text-brand-300">Use a recovery code instead</a>
+                </div>
+            </div>
+
+            <!-- Security Warning -->
+            <div class="mt-8 p-4 rounded-xl bg-surface-card border border-surface-border flex gap-3 items-start">
+                <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5"></i>
+                <div class="text-xs text-gray-400 leading-relaxed">
+                    <strong class="text-gray-300 block mb-1">Unauthorized Access Prohibited</strong>
+                    This system is restricted to authorized platform administrators only. All activities are logged and monitored. By signing in, you agree to the Platform Security Policy and Acceptable Use Policy.
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="auth-footer" class="w-full p-6 text-center text-xs text-gray-500 z-10">
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-6 mb-2">
+            <a href="#" class="hover:text-gray-300 transition-colors">Privacy Policy</a>
+            <span class="hidden sm:inline text-gray-700">•</span>
+            <a href="#" class="hover:text-gray-300 transition-colors">Terms of Service</a>
+            <span class="hidden sm:inline text-gray-700">•</span>
+            <a href="#" class="hover:text-gray-300 transition-colors">Security Policy</a>
+        </div>
+        <p>&copy; 2024 Three Portal System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function showMfaStep() {
+            document.getElementById('login-card').classList.add('hidden');
+            document.getElementById('mfa-card').classList.remove('hidden');
+            
+            // Auto focus first input
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('#mfa-card input');
+                if(inputs.length > 0) inputs[0].focus();
+            }, 100);
+        }
+
+        function hideMfaStep() {
+            document.getElementById('mfa-card').classList.add('hidden');
+            document.getElementById('login-card').classList.remove('hidden');
+        }
+
+        // Auto advance MFA inputs
+        const mfaInputs = document.querySelectorAll('#mfa-card input');
+        mfaInputs.forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1 && index < mfaInputs.length - 1) {
+                    mfaInputs[index + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                    mfaInputs[index - 1].focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

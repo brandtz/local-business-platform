@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal - Cart & Checkout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"M PLUS 1p"', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#116C50',
+                        primaryHover: '#0E5A42',
+                        surface: '#FFFFFF',
+                        background: '#F9FAFB',
+                        textMain: '#111827',
+                        textMuted: '#6B7280',
+                        border: '#E5E7EB',
+                        error: '#EF4444',
+                        success: '#10B981',
+                        accent: '#F3F4F6'
+                    },
+                    boxShadow: {
+                        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                        'hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: '"M PLUS 1p"', sans-serif; }
+        ::-webkit-scrollbar { display: none; }
+        /* Custom radio button styles */
+        input[type="radio"]:checked + div { border-color: #116C50; background-color: #F0FDF4; }
+        input[type="radio"]:checked + div .radio-inner { background-color: #116C50; }
+    </style>
+</head>
+<body class="bg-background min-h-screen w-full text-textMain flex flex-col m-0 p-0 overflow-x-hidden">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-primary text-white text-sm py-2 px-4 text-center font-medium flex justify-center items-center gap-4">
+        <span>🎉 Spring Sale! Get 20% off all services with code SPRING20</span>
+        <button class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Main Header -->
+    <header id="header" class="w-full bg-surface border-b border-border sticky top-0 z-50 shadow-sm">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center gap-8">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-2 cursor-pointer">
+                        <span class="font-extrabold text-2xl tracking-tight text-primary">Shopz</span>
+                    </div>
+
+                    <!-- Desktop Nav -->
+                    <nav class="hidden lg:flex items-center gap-8 ml-8">
+                        <a href="#" class="text-textMuted hover:text-textMain font-medium transition-colors">Home</a>
+                        <a href="#" class="text-textMuted hover:text-textMain font-medium transition-colors">Menu & Services</a>
+                        <a href="#" class="text-primary font-bold border-b-2 border-primary pb-1">Cart & Checkout</a>
+                        <a href="#" class="text-textMuted hover:text-textMain font-medium transition-colors">Account</a>
+                    </nav>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-6">
+                    <button class="text-textMuted hover:text-textMain transition-colors">
+                        <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                    </button>
+                    <button class="text-textMuted hover:text-textMain transition-colors relative">
+                        <i class="fa-regular fa-bell text-lg"></i>
+                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+                    </button>
+                    <button class="text-textMuted hover:text-textMain transition-colors">
+                        <i class="fa-regular fa-heart text-lg"></i>
+                    </button>
+                    <button class="text-textMuted hover:text-textMain transition-colors relative">
+                        <i class="fa-solid fa-cart-shopping text-lg"></i>
+                        <span class="absolute -top-2 -right-2 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">2</span>
+                    </button>
+                    
+                    <div class="w-8 h-8 rounded-full overflow-hidden border border-border cursor-pointer">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg" alt="User Avatar" class="w-full h-full object-cover">
+                    </div>
+
+                    <button class="lg:hidden text-textMain text-2xl ml-2">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="flex-grow w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Title & Stepper -->
+        <div class="mb-10 text-center">
+            <h1 class="text-3xl font-bold text-textMain mb-6">Checkout</h1>
+            
+            <!-- In-page Stepper -->
+            <div class="flex items-center justify-center max-w-3xl mx-auto">
+                <div class="flex items-center w-full">
+                    <div class="flex flex-col items-center relative z-10">
+                        <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-md">1</div>
+                        <span class="text-xs font-bold text-primary mt-2">Cart</span>
+                    </div>
+                    <div class="flex-grow h-1 bg-primary -mx-2 relative z-0"></div>
+                    <div class="flex flex-col items-center relative z-10">
+                        <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-md">2</div>
+                        <span class="text-xs font-bold text-primary mt-2">Fulfillment</span>
+                    </div>
+                    <div class="flex-grow h-1 bg-border -mx-2 relative z-0"></div>
+                    <div class="flex flex-col items-center relative z-10">
+                        <div class="w-10 h-10 rounded-full bg-surface border-2 border-border text-textMuted flex items-center justify-center font-bold text-sm">3</div>
+                        <span class="text-xs font-medium text-textMuted mt-2">Payment</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Left Column: Cart & Fulfillment -->
+            <div class="w-full lg:w-2/3 space-y-8">
+                
+                <!-- Section 1: Cart Review -->
+                <div id="cart-section" class="bg-surface rounded-2xl border border-border p-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-6 border-b border-border pb-4">
+                        <h2 class="text-xl font-bold text-textMain flex items-center gap-2">
+                            <i class="fa-solid fa-cart-shopping text-primary"></i> Order Summary
+                        </h2>
+                        <button class="text-sm font-medium text-primary hover:underline">Edit Cart</button>
+                    </div>
+
+                    <!-- Cart Items -->
+                    <div class="space-y-6">
+                        <!-- Item 1 -->
+                        <div class="flex flex-col sm:flex-row gap-4 border-b border-border pb-6">
+                            <div class="w-full sm:w-24 h-24 bg-accent rounded-xl overflow-hidden flex-shrink-0 p-2">
+                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/4adf8bc7cc-21abd6d4b40071892c02.png" alt="Product" class="w-full h-full object-contain mix-blend-multiply">
+                            </div>
+                            <div class="flex-grow flex flex-col justify-between">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-bold text-textMain text-lg">Premium Wireless Headphones</h3>
+                                        <p class="text-sm text-textMuted mt-1">Color: Matte Black</p>
+                                        <div class="mt-2 space-y-1">
+                                            <span class="inline-flex items-center text-xs text-textMuted bg-accent px-2 py-1 rounded">
+                                                <i class="fa-solid fa-plus text-[10px] mr-1"></i> 2-Year Warranty (+$15.00)
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button class="text-textMuted hover:text-error transition-colors"><i class="fa-regular fa-trash-can"></i></button>
+                                </div>
+                                <div class="flex justify-between items-end mt-4">
+                                    <div class="flex items-center border border-border rounded-lg bg-surface">
+                                        <button class="w-8 h-8 flex items-center justify-center text-textMuted hover:text-textMain"><i class="fa-solid fa-minus text-xs"></i></button>
+                                        <span class="w-8 text-center font-medium text-textMain text-sm">1</span>
+                                        <button class="w-8 h-8 flex items-center justify-center text-textMuted hover:text-textMain"><i class="fa-solid fa-plus text-xs"></i></button>
+                                    </div>
+                                    <span class="font-bold text-lg text-textMain">$137.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <div class="w-full sm:w-24 h-24 bg-accent rounded-xl overflow-hidden flex-shrink-0 p-2">
+                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/2976587a20-606ae587e7f32917b221.png" alt="Product" class="w-full h-full object-contain mix-blend-multiply">
+                            </div>
+                            <div class="flex-grow flex flex-col justify-between">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-bold text-textMain text-lg">Smart Coffee Maker</h3>
+                                        <p class="text-sm text-textMuted mt-1">Standard Edition</p>
+                                    </div>
+                                    <button class="text-textMuted hover:text-error transition-colors"><i class="fa-regular fa-trash-can"></i></button>
+                                </div>
+                                <div class="flex justify-between items-end mt-4">
+                                    <div class="flex items-center border border-border rounded-lg bg-surface">
+                                        <button class="w-8 h-8 flex items-center justify-center text-textMuted hover:text-textMain"><i class="fa-solid fa-minus text-xs"></i></button>
+                                        <span class="w-8 text-center font-medium text-textMain text-sm">1</span>
+                                        <button class="w-8 h-8 flex items-center justify-center text-textMuted hover:text-textMain"><i class="fa-solid fa-plus text-xs"></i></button>
+                                    </div>
+                                    <span class="font-bold text-lg text-textMain">$89.99</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Notes -->
+                    <div class="mt-6 pt-6 border-t border-border">
+                        <label class="block text-sm font-medium text-textMain mb-2">Order Notes (Optional)</label>
+                        <textarea class="w-full border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none h-20 placeholder-textMuted" placeholder="Add any special instructions..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Section 2: Fulfillment & Contact -->
+                <div id="fulfillment-section" class="bg-surface rounded-2xl border border-border p-6 shadow-sm">
+                    <h2 class="text-xl font-bold text-textMain mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-truck-fast text-primary"></i> Fulfillment Method
+                    </h2>
+                    
+                    <!-- Method Selector -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="fulfillment" class="sr-only" checked>
+                            <div class="border-2 border-border rounded-xl p-4 flex items-start gap-4 hover:border-primary/50 transition-colors">
+                                <div class="w-5 h-5 rounded-full border-2 border-border flex items-center justify-center mt-0.5 flex-shrink-0">
+                                    <div class="w-2.5 h-2.5 rounded-full radio-inner"></div>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-textMain">Delivery</h4>
+                                    <p class="text-sm text-textMuted mt-1">Get it delivered to your door</p>
+                                    <span class="inline-block mt-2 text-xs font-bold bg-accent px-2 py-1 rounded text-textMain">2-3 Business Days</span>
+                                </div>
+                            </div>
+                        </label>
+                        
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="fulfillment" class="sr-only">
+                            <div class="border-2 border-border rounded-xl p-4 flex items-start gap-4 hover:border-primary/50 transition-colors">
+                                <div class="w-5 h-5 rounded-full border-2 border-border flex items-center justify-center mt-0.5 flex-shrink-0">
+                                    <div class="w-2.5 h-2.5 rounded-full radio-inner"></div>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-textMain">In-Store Pickup</h4>
+                                    <p class="text-sm text-textMuted mt-1">Pick up at local store</p>
+                                    <span class="inline-block mt-2 text-xs font-bold bg-success/10 text-success px-2 py-1 rounded">Free</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Shipping Address Form -->
+                    <div class="space-y-6">
+                        <h3 class="font-bold text-textMain border-b border-border pb-2">Shipping Address</h3>
+                        
+                        <!-- Saved Addresses (if any) -->
+                        <div class="mb-4">
+                            <select class="w-full border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none bg-surface">
+                                <option>Home (123 Main St, Apt 4B, New York, NY 10001)</option>
+                                <option>Office (456 Business Blvd, Floor 12, New York, NY 10002)</option>
+                                <option>Add New Address...</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-textMain mb-1">First Name</label>
+                                <input type="text" value="Jane" class="w-full border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-textMain mb-1">Last Name</label>
+                                <input type="text" value="Foster" class="w-full border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-textMain mb-1">Street Address</label>
+                            <input type="text" value="123 Main St, Apt 4B" class="w-full border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-textMain mb-1">City</label>
+                                <input type="text" value="New York" class="w-full border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-textMain mb-1">State</label>
+                                <select class="w-full border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none bg-surface">
+                                    <option>NY</option>
+                                    <option>CA</option>
+                                    <option>TX</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-textMain mb-1">ZIP Code</label>
+                                <input type="text" value="10001" class="w-full border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                            <div>
+                                <label class="block text-sm font-medium text-textMain mb-1">Email Address</label>
+                                <input type="email" value="jfoster@example.com" class="w-full border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-textMain mb-1">Phone Number</label>
+                                <input type="tel" value="(555) 123-4567" class="w-full border border-border rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Step Action -->
+                <div class="flex justify-end">
+                    <button class="px-8 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primaryHover transition-colors shadow-md flex items-center gap-2">
+                        Continue to Payment <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Order Summary & Payment (Sticky) -->
+            <div class="w-full lg:w-1/3">
+                <div class="sticky top-24 space-y-6">
+                    
+                    <!-- Order Summary Card -->
+                    <div class="bg-surface rounded-2xl border border-border p-6 shadow-sm">
+                        <h3 class="font-bold text-lg text-textMain mb-4">Payment Summary</h3>
+                        
+                        <!-- Promo Code -->
+                        <div class="mb-6">
+                            <div class="flex gap-2">
+                                <input type="text" placeholder="Promo code" class="w-full border border-border rounded-lg p-2 text-sm focus:ring-2 focus:ring-primary outline-none">
+                                <button class="px-4 py-2 bg-textMain text-white text-sm font-bold rounded-lg hover:bg-gray-800 transition-colors">Apply</button>
+                            </div>
+                            <!-- Loyalty Redemption -->
+                            <div class="mt-3 flex items-center justify-between p-3 bg-accent rounded-lg">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-star text-yellow-500"></i>
+                                    <span class="text-sm font-medium text-textMain">Use 500 Points ($5 off)</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" value="" class="sr-only peer">
+                                    <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Breakdown -->
+                        <div class="space-y-3 text-sm text-textMain border-b border-border pb-4 mb-4">
+                            <div class="flex justify-between">
+                                <span class="text-textMuted">Subtotal (2 items)</span>
+                                <span class="font-medium">$226.99</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-textMuted">Shipping</span>
+                                <span class="font-medium">$12.50</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-textMuted">Estimated Tax</span>
+                                <span class="font-medium">$18.16</span>
+                            </div>
+                            <!-- Tipping (if applicable) -->
+                            <div class="pt-2">
+                                <span class="block text-textMuted mb-2">Add a tip?</span>
+                                <div class="flex gap-2">
+                                    <button class="flex-1 py-1 border border-border rounded bg-surface hover:border-primary text-xs font-medium">15%</button>
+                                    <button class="flex-1 py-1 border-2 border-primary rounded bg-primary/5 text-primary text-xs font-bold">20%</button>
+                                    <button class="flex-1 py-1 border border-border rounded bg-surface hover:border-primary text-xs font-medium">25%</button>
+                                    <button class="flex-1 py-1 border border-border rounded bg-surface hover:border-primary text-xs font-medium">Custom</button>
+                                </div>
+                                <div class="flex justify-between mt-2">
+                                    <span class="text-textMuted">Tip Amount</span>
+                                    <span class="font-medium">$45.40</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total -->
+                        <div class="flex justify-between items-end mb-6">
+                            <span class="text-lg font-bold text-textMain">Total</span>
+                            <span class="text-2xl font-extrabold text-primary">$303.05</span>
+                        </div>
+
+                        <!-- Note: The actual place order button is currently replaced by the 'Continue to Payment' button in the left column for the stepper flow. If this was the final step, it would look like this: -->
+                        <button class="w-full py-4 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i class="fa-solid fa-lock"></i> Place Order
+                        </button>
+                        <p class="text-xs text-center text-textMuted mt-3">Complete fulfillment details to proceed.</p>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="flex justify-center gap-4 text-textMuted opacity-60">
+                        <i class="fa-brands fa-cc-visa text-2xl"></i>
+                        <i class="fa-brands fa-cc-mastercard text-2xl"></i>
+                        <i class="fa-brands fa-cc-amex text-2xl"></i>
+                        <i class="fa-brands fa-cc-discover text-2xl"></i>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Hidden Payment Section (Would show on step 3) -->
+        <div id="payment-section" class="hidden mt-8 bg-surface rounded-2xl border border-border p-6 shadow-sm max-w-3xl">
+            <h2 class="text-xl font-bold text-textMain mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-credit-card text-primary"></i> Payment Details
+            </h2>
+            
+            <div class="bg-accent p-4 rounded-lg mb-6 flex items-center gap-3 text-sm text-textMain">
+                <i class="fa-solid fa-lock text-success"></i>
+                <span>Payments are secure and encrypted. We do not store your full card details.</span>
+            </div>
+
+            <!-- Mock Stripe/Square UI -->
+            <div class="space-y-4 border border-border rounded-xl p-4 bg-white">
+                <div>
+                    <label class="block text-sm font-medium text-textMain mb-1">Card Information</label>
+                    <div class="relative">
+                        <input type="text" placeholder="Card number" class="w-full border border-border rounded-t-lg p-3 pl-10 text-sm focus:ring-0 focus:border-primary outline-none">
+                        <i class="fa-regular fa-credit-card absolute left-3 top-3.5 text-textMuted"></i>
+                    </div>
+                    <div class="flex">
+                        <input type="text" placeholder="MM / YY" class="w-1/2 border-x border-b border-border rounded-bl-lg p-3 text-sm focus:ring-0 focus:border-primary outline-none">
+                        <input type="text" placeholder="CVC" class="w-1/2 border-r border-b border-border rounded-br-lg p-3 text-sm focus:ring-0 focus:border-primary outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-textMain mb-1">Name on Card</label>
+                    <input type="text" placeholder="Full name" class="w-full border border-border rounded-lg p-3 text-sm focus:ring-0 focus:border-primary outline-none">
+                </div>
+            </div>
+
+            <!-- Error State Example (Hidden by default) -->
+            <div class="hidden mt-4 bg-error/10 border border-error/20 p-3 rounded-lg flex items-start gap-3 text-sm text-error">
+                <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
+                <div>
+                    <p class="font-bold">Payment failed</p>
+                    <p>Your card was declined. Please check your details and try again, or use a different payment method.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Section -->
+    <footer id="footer" class="w-full bg-[#1A1A1A] text-white pt-16 pb-8 px-4 sm:px-6 lg:px-8 mt-auto">
+        <div class="max-w-[1440px] mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <!-- Brand Col -->
+                <div class="space-y-4">
+                    <span class="font-extrabold text-2xl tracking-tight text-white">Shopz</span>
+                    <p class="text-gray-400 text-sm leading-relaxed max-w-xs">
+                        Online brand clothing founded in 2006 in Japan. Heavenly focuses on selling only quality and branded items, limited edition collections by best fashion designer.
+                    </p>
+                </div>
+
+                <!-- Links Col 1 -->
+                <div>
+                    <h4 class="font-bold text-sm mb-6 text-white uppercase tracking-wider">About Us</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Information</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Store Locator</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Bulk Purchase</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Alteration Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Gift Delivery Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Live Station</a></li>
+                    </ul>
+                </div>
+
+                <!-- Links Col 2 -->
+                <div>
+                    <h4 class="font-bold text-sm mb-6 text-white uppercase tracking-wider">Help</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Online Shopping Guide</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Return Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Accessibility</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Social Col -->
+                <div>
+                    <h4 class="font-bold text-sm mb-6 text-white uppercase tracking-wider">Social Media</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-3"><i class="fa-brands fa-twitter w-4"></i> Twitter</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-3"><i class="fa-brands fa-facebook-f w-4"></i> Facebook</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-3"><i class="fa-brands fa-instagram w-4"></i> Instagram</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors flex items-center gap-3"><i class="fa-brands fa-youtube w-4"></i> Youtube</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+                <p>@Shopz 2023. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms and Conditions</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

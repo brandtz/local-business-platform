@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Admin Portal - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                            800: '#9f1239',
+                            900: '#881337',
+                            950: '#4c0519',
+                        },
+                        surface: {
+                            DEFAULT: '#0f1115',
+                            card: '#16181d',
+                            hover: '#1e2128',
+                            border: '#2a2d35'
+                        },
+                        primary: '#f43f5e',
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(244, 63, 94, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f1115; color: #f8fafc; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f1115; }
+        ::-webkit-scrollbar-thumb { background: #2a2d35; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f4450; }
+        
+        .glass-panel {
+            background: rgba(22, 24, 29, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .stat-card {
+            background: linear-gradient(145deg, #16181d 0%, #1a1d24 100%);
+            border: 1px solid #2a2d35;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            border-color: #3f4450;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background-color: #1a1d24;
+            border: 1px solid #2a2d35;
+            color: #e2e8f0;
+            transition: all 0.2s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #2a2d35;
+            border-color: #3f4450;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(244, 63, 94, 0.1) 0%, transparent 100%);
+            border-left: 3px solid #f43f5e;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .status-healthy { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .status-warning { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .status-error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+    </style>
+</head>
+<body class="w-full min-h-screen flex m-0">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 w-64 glass-panel border-r border-surface-border z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col h-screen">
+        <!-- Logo -->
+        <div class="p-6 flex items-center justify-between border-b border-surface-border">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid fa-layer-group text-white text-sm"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-white">Three<span class="text-brand-400">Portal</span></span>
+            </div>
+            <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-4">
+            <div class="px-4 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Platform Admin</div>
+            <ul class="space-y-1">
+                <li>
+                    <a href="#" class="nav-item active flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-users w-5 text-center"></i>
+                        Tenants
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-globe w-5 text-center"></i>
+                        Domains
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-rocket w-5 text-center"></i>
+                        Publishing
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-server w-5 text-center"></i>
+                        Operations
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-chart-line w-5 text-center"></i>
+                        Audit & Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-surface-hover transition-colors">
+                        <i class="fa-solid fa-gear w-5 text-center"></i>
+                        Config & Integrations
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- User Info -->
+        <div class="p-4 border-t border-surface-border">
+            <div class="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-surface-hover cursor-pointer transition-colors">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Admin" class="w-10 h-10 rounded-full border border-surface-border">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate">System Admin</p>
+                    <p class="text-xs text-gray-400 truncate">admin@threeportal.com</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-gray-500 text-xs"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-h-screen overflow-hidden w-full">
+        
+        <!-- Header -->
+        <header class="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 glass-panel border-b border-surface-border sticky top-0 z-30">
+            <div class="flex items-center gap-4">
+                <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <h1 class="text-xl font-semibold text-white">Platform Dashboard</h1>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="relative hidden md:block">
+                    <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm"></i>
+                    <input type="text" placeholder="Search tenants, domains..." class="bg-surface-card border border-surface-border rounded-lg pl-9 pr-4 py-1.5 text-sm text-white focus:outline-none focus:border-brand-500 w-64 transition-colors">
+                </div>
+                
+                <button class="relative p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-surface-hover">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-500 rounded-full border border-surface"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+            
+            <!-- Welcome & Quick Actions -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
+                <div>
+                    <h2 class="text-2xl font-bold text-white mb-1">System Overview</h2>
+                    <p class="text-sm text-gray-400">Monitor platform health, tenant activity, and system metrics.</p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                        <i class="fa-solid fa-globe text-gray-400"></i> Review Domains (3)
+                    </button>
+                    <button class="btn-primary px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Create Tenant
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Metrics Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Active Tenants -->
+                <div class="stat-card rounded-xl p-5 relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm text-gray-400 font-medium">Active Tenants</p>
+                            <h3 class="text-2xl font-bold text-white mt-1">1,284</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-green-400 flex items-center gap-1"><i class="fa-solid fa-arrow-up text-xs"></i> 12%</span>
+                        <span class="text-gray-500 ml-2">vs last month</span>
+                    </div>
+                </div>
+
+                <!-- GMV -->
+                <div class="stat-card rounded-xl p-5 relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm text-gray-400 font-medium">Total GMV (30d)</p>
+                            <h3 class="text-2xl font-bold text-white mt-1">$4.2M</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center border border-green-500/20 text-green-400">
+                            <i class="fa-solid fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-green-400 flex items-center gap-1"><i class="fa-solid fa-arrow-up text-xs"></i> 8.4%</span>
+                        <span class="text-gray-500 ml-2">vs last month</span>
+                    </div>
+                </div>
+
+                <!-- Failed Payments -->
+                <div class="stat-card rounded-xl p-5 relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm text-gray-400 font-medium">Failed Payments (24h)</p>
+                            <h3 class="text-2xl font-bold text-white mt-1">42</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center border border-brand-500/20 text-brand-400">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-brand-400 flex items-center gap-1"><i class="fa-solid fa-arrow-up text-xs"></i> 5%</span>
+                        <span class="text-gray-500 ml-2">requires attention</span>
+                    </div>
+                </div>
+
+                <!-- Job Backlog -->
+                <div class="stat-card rounded-xl p-5 relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm text-gray-400 font-medium">Job Backlog</p>
+                            <h3 class="text-2xl font-bold text-white mt-1">156</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-400 flex items-center gap-1">Normal load</span>
+                        <span class="text-gray-500 ml-2">avg 2.4s processing</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Main Chart -->
+                <div class="lg:col-span-2 glass-panel rounded-xl p-5 border border-surface-border">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-white">Platform Traffic & GMV</h3>
+                        <select class="bg-surface-card border border-surface-border rounded-lg px-3 py-1 text-sm text-gray-300 focus:outline-none">
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                            <option>This Year</option>
+                        </select>
+                    </div>
+                    <div id="mainChart" class="w-full h-[300px]"></div>
+                </div>
+
+                <!-- Platform Health -->
+                <div class="glass-panel rounded-xl p-5 border border-surface-border flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-white">System Health</h3>
+                        <span class="status-badge status-healthy flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div> Operational</span>
+                    </div>
+                    
+                    <div class="space-y-4 flex-1">
+                        <!-- API Servers -->
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-300">API Servers</span>
+                                <span class="text-gray-400">45% Load</span>
+                            </div>
+                            <div class="w-full bg-surface-card rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: 45%"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Database -->
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-300">Database Cluster</span>
+                                <span class="text-gray-400">62% Load</span>
+                            </div>
+                            <div class="w-full bg-surface-card rounded-full h-2">
+                                <div class="bg-amber-500 h-2 rounded-full" style="width: 62%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Storage -->
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-300">Storage (S3)</span>
+                                <span class="text-gray-400">28% Used</span>
+                            </div>
+                            <div class="w-full bg-surface-card rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 28%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Worker Nodes -->
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-300">Worker Nodes</span>
+                                <span class="text-gray-400">85% Load</span>
+                            </div>
+                            <div class="w-full bg-surface-card rounded-full h-2">
+                                <div class="bg-brand-500 h-2 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Grid: Alerts & Recent Activity -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- Latest Alerts -->
+                <div class="glass-panel rounded-xl border border-surface-border overflow-hidden flex flex-col">
+                    <div class="p-5 border-b border-surface-border flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-white">Active Alerts</h3>
+                        <a href="#" class="text-sm text-brand-400 hover:text-brand-300">View All</a>
+                    </div>
+                    <div class="flex-1 overflow-y-auto max-h-[300px]">
+                        <ul class="divide-y divide-surface-border">
+                            <li class="p-4 hover:bg-surface-hover transition-colors flex gap-4">
+                                <div class="mt-1">
+                                    <i class="fa-solid fa-circle-exclamation text-brand-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-white">High Payment Failure Rate</p>
+                                    <p class="text-xs text-gray-400 mt-1">Tenant 'Burger Joint' experiencing 15% failure rate on Stripe gateway.</p>
+                                    <p class="text-xs text-gray-500 mt-2">10 mins ago</p>
+                                </div>
+                            </li>
+                            <li class="p-4 hover:bg-surface-hover transition-colors flex gap-4">
+                                <div class="mt-1">
+                                    <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-white">Domain Verification Pending</p>
+                                    <p class="text-xs text-gray-400 mt-1">3 new tenants require manual DNS verification review.</p>
+                                    <p class="text-xs text-gray-500 mt-2">45 mins ago</p>
+                                </div>
+                            </li>
+                            <li class="p-4 hover:bg-surface-hover transition-colors flex gap-4">
+                                <div class="mt-1">
+                                    <i class="fa-solid fa-info-circle text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-white">Database Backup Complete</p>
+                                    <p class="text-xs text-gray-400 mt-1">Automated snapshot created successfully for main cluster.</p>
+                                    <p class="text-xs text-gray-500 mt-2">2 hours ago</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Recent Tenant Activity -->
+                <div class="glass-panel rounded-xl border border-surface-border overflow-hidden flex flex-col">
+                    <div class="p-5 border-b border-surface-border flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-white">Recent Deployments</h3>
+                        <button class="btn-secondary px-3 py-1.5 rounded text-xs font-medium">View Deployments</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-surface-card text-gray-400 text-xs uppercase">
+                                <tr>
+                                    <th class="px-4 py-3 font-medium">Tenant</th>
+                                    <th class="px-4 py-3 font-medium">Status</th>
+                                    <th class="px-4 py-3 font-medium">Time</th>
+                                    <th class="px-4 py-3 font-medium">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-surface-border text-gray-300">
+                                <tr class="hover:bg-surface-hover transition-colors">
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center text-purple-400 text-xs">S</div>
+                                            <span class="font-medium text-white">Salon Elegance</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3"><span class="status-badge status-healthy">Deployed</span></td>
+                                    <td class="px-4 py-3 text-gray-500">Just now</td>
+                                    <td class="px-4 py-3"><a href="#" class="text-brand-400 hover:text-brand-300"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
+                                </tr>
+                                <tr class="hover:bg-surface-hover transition-colors">
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 rounded bg-orange-500/20 flex items-center justify-center text-orange-400 text-xs">F</div>
+                                            <span class="font-medium text-white">FitLife Gym</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3"><span class="status-badge status-warning">Pending</span></td>
+                                    <td class="px-4 py-3 text-gray-500">12 mins ago</td>
+                                    <td class="px-4 py-3"><a href="#" class="text-brand-400 hover:text-brand-300"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
+                                </tr>
+                                <tr class="hover:bg-surface-hover transition-colors">
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs">T</div>
+                                            <span class="font-medium text-white">Tech Repair Hub</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3"><span class="status-badge status-healthy">Deployed</span></td>
+                                    <td class="px-4 py-3 text-gray-500">1 hr ago</td>
+                                    <td class="px-4 py-3"><a href="#" class="text-brand-400 hover:text-brand-300"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
+                                </tr>
+                                <tr class="hover:bg-surface-hover transition-colors">
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 rounded bg-red-500/20 flex items-center justify-center text-red-400 text-xs">B</div>
+                                            <span class="font-medium text-white">Bistro Local</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3"><span class="status-badge status-error">Failed</span></td>
+                                    <td class="px-4 py-3 text-gray-500">3 hrs ago</td>
+                                    <td class="px-4 py-3"><a href="#" class="text-brand-400 hover:text-brand-300"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Sidebar Toggle for Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Plotly Chart Initialization
+        window.addEventListener('load', function() {
+            try {
+                const dates = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                
+                const trace1 = {
+                    x: dates,
+                    y: [120, 150, 180, 140, 210, 250, 220],
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'GMV ($k)',
+                    line: {color: '#f43f5e', width: 3},
+                    marker: {size: 6}
+                };
+                
+                const trace2 = {
+                    x: dates,
+                    y: [800, 950, 1100, 900, 1200, 1500, 1300],
+                    type: 'bar',
+                    name: 'Traffic (k)',
+                    marker: {color: 'rgba(59, 130, 246, 0.2)'},
+                    yaxis: 'y2'
+                };
+
+                const layout = {
+                    plot_bgcolor: 'transparent',
+                    paper_bgcolor: 'transparent',
+                    margin: {t: 10, r: 40, b: 30, l: 40},
+                    xaxis: {
+                        showgrid: false,
+                        tickfont: {color: '#94a3b8'}
+                    },
+                    yaxis: {
+                        showgrid: true,
+                        gridcolor: '#2a2d35',
+                        tickfont: {color: '#94a3b8'},
+                        title: {text: 'GMV', font: {color: '#f43f5e'}}
+                    },
+                    yaxis2: {
+                        overlaying: 'y',
+                        side: 'right',
+                        showgrid: false,
+                        tickfont: {color: '#94a3b8'},
+                        title: {text: 'Traffic', font: {color: '#3b82f6'}}
+                    },
+                    legend: {
+                        orientation: 'h',
+                        y: 1.1,
+                        font: {color: '#cbd5e1'}
+                    },
+                    showlegend: true
+                };
+
+                const config = {responsive: true, displayModeBar: false};
+
+                Plotly.newPlot('mainChart', [trace2, trace1], layout, config);
+            } catch(e) {
+                console.error("Chart rendering error:", e);
+                document.getElementById('mainChart').innerHTML = '<div class="flex items-center justify-center h-full text-gray-500">Chart data unavailable</div>';
+            }
+        });
+    </script>
+</body>
+</html>

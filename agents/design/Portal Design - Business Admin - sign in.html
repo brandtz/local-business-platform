@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Admin Portal - Sign In</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#FF4B3A',
+                        primaryHover: '#E03E2F',
+                        surface: '#FFFFFF',
+                        background: '#F9FAFB',
+                        textMain: '#111827',
+                        textMuted: '#6B7280',
+                        border: '#E5E7EB',
+                        error: '#EF4444',
+                        success: '#10B981',
+                        accent: '#F3F4F6',
+                    },
+                    boxShadow: {
+                        'card': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { display: none; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen w-full text-textMain flex items-center justify-center p-4 m-0 overflow-x-hidden">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-6xl mx-auto flex flex-col md:flex-row bg-surface rounded-2xl shadow-card overflow-hidden min-h-[800px]">
+        
+        <!-- Left Side: Branding / Image -->
+        <div class="hidden md:flex md:w-1/2 bg-primary/5 flex-col justify-between p-12 relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="flex items-center gap-2 mb-12">
+                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                        V
+                    </div>
+                    <span class="font-extrabold text-2xl tracking-tight text-textMain">Veshoe Admin</span>
+                </div>
+                
+                <h1 class="text-4xl font-bold text-textMain mb-4 leading-tight">
+                    Manage your business<br>with precision.
+                </h1>
+                <p class="text-textMuted text-lg max-w-md">
+                    Access your operational dashboard, manage inventory, staff, and customer bookings all in one place.
+                </p>
+            </div>
+            
+            <div class="relative z-10 mt-auto">
+                <div class="bg-surface/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50">
+                    <div class="flex items-center gap-4 mb-4">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" alt="Testimonial Avatar" class="w-12 h-12 rounded-full border-2 border-primary/20">
+                        <div>
+                            <p class="font-bold text-textMain">Sarah Jenkins</p>
+                            <p class="text-sm text-textMuted">Store Manager, Veshoe NY</p>
+                        </div>
+                    </div>
+                    <p class="text-textMuted italic">"The new admin portal has streamlined our daily operations. Managing inventory across multiple locations is now effortless."</p>
+                </div>
+            </div>
+
+            <!-- Decorative Elements -->
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+            <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-cyan/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <!-- Right Side: Login Form -->
+        <div class="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-surface relative">
+            <div class="max-w-md w-full mx-auto">
+                
+                <!-- Mobile Logo (Hidden on Desktop) -->
+                <div class="flex md:hidden items-center gap-2 mb-8">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                        V
+                    </div>
+                    <span class="font-extrabold text-xl tracking-tight text-textMain">Veshoe Admin</span>
+                </div>
+
+                <div class="mb-10 text-center md:text-left">
+                    <h2 class="text-3xl font-bold text-textMain mb-2">Welcome back</h2>
+                    <p class="text-textMuted">Sign in to your business account</p>
+                </div>
+
+                <!-- Error Message Banner (Example State) -->
+                <!-- <div class="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-xl mb-6 flex items-start gap-3">
+                    <i class="fa-solid fa-circle-exclamation mt-1"></i>
+                    <div class="text-sm">
+                        <p class="font-bold">Authentication failed</p>
+                        <p>Invalid email or password. Please try again or reset your password.</p>
+                    </div>
+                </div> -->
+
+                <form class="space-y-6">
+                    <!-- Email Input -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-textMain mb-2">Work Email</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fa-regular fa-envelope text-textMuted"></i>
+                            </div>
+                            <input type="email" id="email" name="email" class="block w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-textMain sm:text-sm" placeholder="name@company.com" required>
+                        </div>
+                    </div>
+
+                    <!-- Password Input -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="password" class="block text-sm font-medium text-textMain">Password</label>
+                            <a href="#" class="text-sm font-medium text-primary hover:text-primaryHover transition-colors">Forgot password?</a>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-lock text-textMuted"></i>
+                            </div>
+                            <input type="password" id="password" name="password" class="block w-full pl-11 pr-12 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-textMain sm:text-sm" placeholder="••••••••" required>
+                            <button type="button" class="absolute inset-y-0 right-0 pr-4 flex items-center text-textMuted hover:text-textMain">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me & Role Selection -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-border rounded cursor-pointer">
+                            <label for="remember-me" class="ml-2 block text-sm text-textMuted cursor-pointer">
+                                Remember me
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-primary hover:bg-primaryHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+                        Sign in to Dashboard
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="mt-8">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-border"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-surface text-textMuted">Or continue with</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 grid grid-cols-2 gap-4">
+                        <button class="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-border rounded-xl bg-surface hover:bg-background transition-colors text-sm font-medium text-textMain">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" class="w-4 h-4">
+                            Google
+                        </button>
+                        <button class="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-border rounded-xl bg-surface hover:bg-background transition-colors text-sm font-medium text-textMain">
+                            <i class="fa-brands fa-microsoft text-[#00a4ef]"></i>
+                            Microsoft
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Invitation Notice -->
+                <div class="mt-10 pt-6 border-t border-border text-center">
+                    <p class="text-sm text-textMuted">
+                        Invited by your team? <br class="md:hidden">
+                        <a href="#" class="font-bold text-primary hover:text-primaryHover transition-colors">Accept invitation here</a>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Links -->
+    <div class="fixed bottom-4 left-0 w-full text-center px-4">
+        <div class="flex justify-center gap-6 text-xs text-textMuted">
+            <a href="#" class="hover:text-textMain transition-colors">Privacy Policy</a>
+            <a href="#" class="hover:text-textMain transition-colors">Terms of Service</a>
+            <a href="#" class="hover:text-textMain transition-colors">Help Center</a>
+        </div>
+    </div>
+
+</body>
+</html>

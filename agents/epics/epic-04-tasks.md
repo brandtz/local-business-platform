@@ -1,5 +1,7 @@
 # Epic 4 Technical Task Plan
 
+> **UX Design References:** See `agents/design/screen-reference-index.md` for the full screen-to-brief mapping. When implementing any browser-visible component, read the corresponding HTML reference file for layout structure and interaction patterns. All screens across all 3 portals are available as HTML visual guides in `agents/design/`. Colors are ignored — use semantic design tokens from `@platform/ui`.
+
 ## E4-S1 Shared Design Tokens and Layout System
 
 Technical Tasks:
@@ -34,6 +36,8 @@ Handoff Focus:
 
 ## E4-S3 Storefront Navigation and Template Regions
 
+UX References: `Portal Design - Customer Portal store front home.html` (CP-01), `Portal Design - Customer Portal menu and services.html` (CP-02/07)
+
 Technical Tasks:
 - E4-S3-T1: define storefront layout regions and navigation schema driven by template configuration
 - E4-S3-T2: implement route-aware region composition for catalog, services, and content surfaces
@@ -49,6 +53,8 @@ Handoff Focus:
 - layout region schema, navigation config contract, and module-filtering rules
 
 ## E4-S4 Customer Account Shell
+
+UX References: `Portal Design - Customer Portal - account.html` (CP-11 through CP-18), `Portal Design - Customer Portal - signin register reset.html` (CP-20)
 
 Technical Tasks:
 - E4-S4-T1: define shared customer account route map and navigation model

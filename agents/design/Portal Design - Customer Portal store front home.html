@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal - Storefront Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"M PLUS 1p"', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#5991FE',
+                        primaryHover: '#4A7DE5',
+                        surface: '#FFFFFF',
+                        background: '#F4F7FE',
+                        textMain: '#000000',
+                        textMuted: '#5B6E95',
+                        border: '#E2E8F0',
+                        error: '#FF2828',
+                        success: '#10B981',
+                        accent: '#E6F0FF'
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(89, 145, 254, 0.1), 0 2px 4px -1px rgba(89, 145, 254, 0.06)',
+                        'hover': '0 10px 15px -3px rgba(89, 145, 254, 0.15), 0 4px 6px -2px rgba(89, 145, 254, 0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: '"M PLUS 1p"', sans-serif; }
+        ::-webkit-scrollbar { display: none; }
+        .hero-gradient { background: linear-gradient(135deg, #5991FE 0%, #3B71E1 100%); }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    </style>
+</head>
+<body class="bg-background min-h-screen w-full text-textMain flex flex-col m-0 p-0 overflow-x-hidden">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-primary text-white text-sm py-2 px-4 text-center font-medium flex justify-center items-center gap-4">
+        <span>🎉 Spring Sale! Get 20% off all services with code SPRING20</span>
+        <button class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Main Header -->
+    <header id="header" class="w-full bg-surface border-b border-border sticky top-0 z-50 shadow-sm">
+        <div class="max-w-[1440px] mx-auto">
+            <!-- Top Info Row -->
+            <div class="hidden md:flex justify-between items-center py-2 px-6 lg:px-12 border-b border-border/50 text-sm text-textMuted">
+                <div class="flex items-center gap-6">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-phone text-primary"></i> +1-202-555-0104</span>
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-envelope text-primary"></i> support@localmart.com</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 cursor-pointer hover:text-primary">
+                        <img src="https://flagcdn.com/w20/us.png" alt="US" class="w-4 h-3"> English <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </div>
+                    <div class="flex items-center gap-2 cursor-pointer hover:text-primary">
+                        USD <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Nav Row -->
+            <div class="flex justify-between items-center py-4 px-6 lg:px-12">
+                <div class="flex items-center gap-8">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-3 cursor-pointer">
+                        <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xl shadow-md">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <span class="font-bold text-2xl tracking-tight text-textMain">LocalMart</span>
+                    </div>
+
+                    <!-- Desktop Nav -->
+                    <nav class="hidden lg:flex items-center gap-6">
+                        <a href="#" class="text-primary font-bold border-b-2 border-primary pb-1">Home</a>
+                        <a href="#" class="text-textMuted hover:text-primary font-medium transition-colors">Menu & Services</a>
+                        <a href="#" class="text-textMuted hover:text-primary font-medium transition-colors">Categories <i class="fa-solid fa-chevron-down text-xs ml-1"></i></a>
+                        <a href="#" class="text-textMuted hover:text-primary font-medium transition-colors">About Us</a>
+                    </nav>
+                </div>
+
+                <!-- Search & Actions -->
+                <div class="flex items-center gap-4 lg:gap-6">
+                    <!-- Search Bar -->
+                    <div class="hidden md:flex relative w-64 lg:w-96">
+                        <input type="text" placeholder="Search for items, services..." class="w-full pl-4 pr-10 py-2.5 bg-background border border-border rounded-full focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm transition-all">
+                        <button class="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-primary">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center gap-4">
+                        <button class="relative p-2 text-textMain hover:text-primary transition-colors">
+                            <i class="fa-regular fa-heart text-xl"></i>
+                            <span class="absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+                        </button>
+                        
+                        <div class="flex items-center gap-2 cursor-pointer group">
+                            <div class="relative p-2 text-textMain group-hover:text-primary transition-colors">
+                                <i class="fa-solid fa-cart-shopping text-xl"></i>
+                                <span class="absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">2</span>
+                            </div>
+                            <div class="hidden sm:block text-sm">
+                                <p class="text-textMuted text-xs">My Cart</p>
+                                <p class="font-bold text-textMain group-hover:text-primary">$45.00</p>
+                            </div>
+                        </div>
+
+                        <div class="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-primary cursor-pointer hover:bg-primary hover:text-white transition-colors">
+                            <i class="fa-regular fa-user text-lg"></i>
+                        </div>
+
+                        <button class="lg:hidden text-textMain text-2xl ml-2">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="flex-grow w-full">
+        <!-- Hero Section -->
+        <section id="hero-section" class="w-full px-4 sm:px-6 lg:px-12 py-6 max-w-[1440px] mx-auto">
+            <div class="w-full rounded-3xl hero-gradient overflow-hidden relative min-h-[400px] lg:min-h-[500px] flex items-center">
+                <!-- Decorative Elements -->
+                <div class="absolute top-10 left-10 text-white/10 text-6xl"><i class="fa-solid fa-plus"></i></div>
+                <div class="absolute bottom-20 right-1/3 text-white/10 text-8xl"><i class="fa-solid fa-circle"></i></div>
+                <div class="absolute top-1/4 right-20 text-white/10 text-7xl"><i class="fa-solid fa-square"></i></div>
+
+                <div class="relative z-10 w-full flex flex-col lg:flex-row items-center justify-between px-8 lg:px-16 py-12 gap-8">
+                    <!-- Text Content -->
+                    <div class="w-full lg:w-1/2 text-white">
+                        <span class="inline-block py-1 px-3 rounded-full bg-white/20 text-sm font-semibold mb-6 backdrop-blur-sm border border-white/30 uppercase tracking-wider">
+                            Welcome to LocalMart
+                        </span>
+                        <h1 class="text-4xl lg:text-6xl font-extrabold mb-6 leading-tight">
+                            Your Local Favorites,<br/>Delivered Fast.
+                        </h1>
+                        <p class="text-white/90 text-lg lg:text-xl mb-8 max-w-lg font-medium">
+                            Discover the best local products and services in your area. Shop fresh, shop local, support your community.
+                        </p>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <button class="bg-white text-primary hover:bg-background font-bold py-3 px-8 rounded-full transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
+                                Browse Menu <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                            <button class="bg-transparent border-2 border-white text-white hover:bg-white/10 font-bold py-3 px-8 rounded-full transition-all flex items-center gap-2">
+                                Book Services <i class="fa-regular fa-calendar-check"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Image Content -->
+                    <div class="w-full lg:w-1/2 flex justify-center lg:justify-end relative">
+                        <div class="absolute w-72 h-72 bg-white/20 rounded-full blur-3xl top-1/2 -translate-y-1/2"></div>
+                        <img class="w-full max-w-[500px] h-auto object-contain relative z-10 drop-shadow-2xl" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/6b17489d62-9fa171c0e4b4fef8f7a6.png" alt="3d illustration of a vibrant shopping basket full of fresh groceries and local goods floating with abstract shapes, modern clean style, blue and white theme" />
+                        
+                        <!-- Floating Badge -->
+                        <div class="absolute top-10 right-10 bg-white text-textMain p-4 rounded-2xl shadow-xl z-20 animate-bounce hidden md:block">
+                            <p class="text-xs text-textMuted font-bold uppercase">Special Offer</p>
+                            <p class="text-2xl font-extrabold text-primary">20% OFF</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Info / Trust Bar -->
+        <section id="trust-bar" class="w-full px-4 sm:px-6 lg:px-12 py-8 max-w-[1440px] mx-auto border-b border-border">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-surface shadow-sm border border-border/50 hover:border-primary/30 transition-colors">
+                    <div class="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-primary text-xl flex-shrink-0">
+                        <i class="fa-solid fa-truck-fast"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-textMain text-sm sm:text-base">Fast Delivery</h3>
+                        <p class="text-textMuted text-xs sm:text-sm">Within 2 hours</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-surface shadow-sm border border-border/50 hover:border-primary/30 transition-colors">
+                    <div class="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-primary text-xl flex-shrink-0">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-textMain text-sm sm:text-base">Secure Payment</h3>
+                        <p class="text-textMuted text-xs sm:text-sm">100% secure checkout</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-surface shadow-sm border border-border/50 hover:border-primary/30 transition-colors">
+                    <div class="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-primary text-xl flex-shrink-0">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-textMain text-sm sm:text-base">Local Vendors</h3>
+                        <p class="text-textMuted text-xs sm:text-sm">Support your community</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-surface shadow-sm border border-border/50 hover:border-primary/30 transition-colors">
+                    <div class="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-primary text-xl flex-shrink-0">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-textMain text-sm sm:text-base">24/7 Support</h3>
+                        <p class="text-textMuted text-xs sm:text-sm">Dedicated team</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Categories -->
+        <section id="categories-section" class="w-full px-4 sm:px-6 lg:px-12 py-12 max-w-[1440px] mx-auto">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-2xl lg:text-3xl font-bold text-textMain mb-2">Shop by Category</h2>
+                    <p class="text-textMuted">Find exactly what you're looking for</p>
+                </div>
+                <a href="#" class="text-primary font-bold hover:text-primaryHover flex items-center gap-2 hidden sm:flex">
+                    View All Categories <i class="fa-solid fa-arrow-right text-sm"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+                <!-- Category 1 -->
+                <a href="#" class="group flex flex-col items-center justify-center p-6 bg-surface rounded-2xl shadow-card hover:shadow-hover border border-border/50 transition-all hover:-translate-y-1">
+                    <div class="w-20 h-20 rounded-full bg-accent flex items-center justify-center mb-4 group-hover:bg-primary transition-colors">
+                        <i class="fa-solid fa-basket-shopping text-3xl text-primary group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="font-bold text-textMain text-center group-hover:text-primary transition-colors">Groceries</h3>
+                    <p class="text-xs text-textMuted mt-1">120+ Items</p>
+                </a>
+                <!-- Category 2 -->
+                <a href="#" class="group flex flex-col items-center justify-center p-6 bg-surface rounded-2xl shadow-card hover:shadow-hover border border-border/50 transition-all hover:-translate-y-1">
+                    <div class="w-20 h-20 rounded-full bg-accent flex items-center justify-center mb-4 group-hover:bg-primary transition-colors">
+                        <i class="fa-solid fa-utensils text-3xl text-primary group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="font-bold text-textMain text-center group-hover:text-primary transition-colors">Restaurants</h3>
+                    <p class="text-xs text-textMuted mt-1">45+ Places</p>
+                </a>
+                <!-- Category 3 -->
+                <a href="#" class="group flex flex-col items-center justify-center p-6 bg-surface rounded-2xl shadow-card hover:shadow-hover border border-border/50 transition-all hover:-translate-y-1">
+                    <div class="w-20 h-20 rounded-full bg-accent flex items-center justify-center mb-4 group-hover:bg-primary transition-colors">
+                        <i class="fa-solid fa-scissors text-3xl text-primary group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="font-bold text-textMain text-center group-hover:text-primary transition-colors">Salons</h3>
+                    <p class="text-xs text-textMuted mt-1">30+ Services</p>
+                </a>
+                <!-- Category 4 -->
+                <a href="#" class="group flex flex-col items-center justify-center p-6 bg-surface rounded-2xl shadow-card hover:shadow-hover border border-border/50 transition-all hover:-translate-y-1">
+                    <div class="w-20 h-20 rounded-full bg-accent flex items-center justify-center mb-4 group-hover:bg-primary transition-colors">
+                        <i class="fa-solid fa-dumbbell text-3xl text-primary group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="font-bold text-textMain text-center group-hover:text-primary transition-colors">Fitness</h3>
+                    <p class="text-xs text-textMuted mt-1">15+ Classes</p>
+                </a>
+                <!-- Category 5 -->
+                <a href="#" class="group flex flex-col items-center justify-center p-6 bg-surface rounded-2xl shadow-card hover:shadow-hover border border-border/50 transition-all hover:-translate-y-1">
+                    <div class="w-20 h-20 rounded-full bg-accent flex items-center justify-center mb-4 group-hover:bg-primary transition-colors">
+                        <i class="fa-solid fa-shirt text-3xl text-primary group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="font-bold text-textMain text-center group-hover:text-primary transition-colors">Clothing</h3>
+                    <p class="text-xs text-textMuted mt-1">85+ Items</p>
+                </a>
+                <!-- Category 6 -->
+                <a href="#" class="group flex flex-col items-center justify-center p-6 bg-surface rounded-2xl shadow-card hover:shadow-hover border border-border/50 transition-all hover:-translate-y-1">
+                    <div class="w-20 h-20 rounded-full bg-accent flex items-center justify-center mb-4 group-hover:bg-primary transition-colors">
+                        <i class="fa-solid fa-plug text-3xl text-primary group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="font-bold text-textMain text-center group-hover:text-primary transition-colors">Electronics</h3>
+                    <p class="text-xs text-textMuted mt-1">50+ Items</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Flash Deals / Featured Items -->
+        <section id="featured-items" class="w-full px-4 sm:px-6 lg:px-12 py-12 bg-surface max-w-[1440px] mx-auto rounded-3xl mb-12 shadow-sm border border-border/50">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-2xl lg:text-3xl font-bold text-textMain">Flash Deals</h2>
+                    <div class="flex items-center gap-2 bg-error/10 text-error px-3 py-1 rounded-full text-sm font-bold">
+                        <i class="fa-regular fa-clock"></i> Ends in: 16d : 21h : 57m
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="w-10 h-10 rounded-full border border-border flex items-center justify-center text-textMuted hover:bg-primary hover:text-white hover:border-primary transition-all">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full border border-border flex items-center justify-center text-textMuted hover:bg-primary hover:text-white hover:border-primary transition-all">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                <!-- Product Card 1 -->
+                <div class="bg-white rounded-2xl p-4 border border-border hover:shadow-hover transition-all group relative">
+                    <div class="absolute top-4 left-4 z-10">
+                        <span class="bg-primary text-white text-xs font-bold px-2 py-1 rounded">20% OFF</span>
+                    </div>
+                    <div class="absolute top-4 right-4 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-textMuted hover:text-primary"><i class="fa-regular fa-heart"></i></button>
+                        <button class="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-textMuted hover:text-primary"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <div class="h-48 w-full mb-4 bg-background rounded-xl p-4 flex items-center justify-center overflow-hidden">
+                        <img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/4adf8bc7cc-21abd6d4b40071892c02.png" alt="modern smartphone front and back view, clean background, product photography" />
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex text-warning text-xs">
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star-half-stroke text-yellow-400"></i>
+                            <span class="text-textMuted ml-1">(45)</span>
+                        </div>
+                        <h3 class="font-bold text-textMain text-sm line-clamp-2 hover:text-primary cursor-pointer">Premium Smart Mobile Phone 4G LTE Prepaid</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-primary text-lg">$220.00</span>
+                            <span class="text-textMuted text-sm line-through">$275.00</span>
+                        </div>
+                        <button class="w-full py-2 border border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-colors mt-2">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Card 2 -->
+                <div class="bg-white rounded-2xl p-4 border border-border hover:shadow-hover transition-all group relative">
+                    <div class="absolute top-4 left-4 z-10">
+                        <span class="bg-error text-white text-xs font-bold px-2 py-1 rounded">SOLD OUT</span>
+                    </div>
+                    <div class="h-48 w-full mb-4 bg-background rounded-xl p-4 flex items-center justify-center overflow-hidden opacity-60">
+                        <img class="w-full h-full object-contain mix-blend-multiply" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/0a26b2c322-cc41898447631701e941.png" alt="wireless earbuds with charging case, clean background, product photography" />
+                    </div>
+                    <div class="space-y-2 opacity-60">
+                        <div class="flex text-warning text-xs">
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-regular fa-star text-yellow-400"></i>
+                            <span class="text-textMuted ml-1">(12)</span>
+                        </div>
+                        <h3 class="font-bold text-textMain text-sm line-clamp-2">Bose Sport Earbuds - Wireless Earphones</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-textMain text-lg">$149.00</span>
+                        </div>
+                        <button class="w-full py-2 bg-border text-textMuted font-bold rounded-xl cursor-not-allowed mt-2">
+                            Out of Stock
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Card 3 -->
+                <div class="bg-white rounded-2xl p-4 border border-border hover:shadow-hover transition-all group relative">
+                    <div class="absolute top-4 right-4 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-textMuted hover:text-primary"><i class="fa-regular fa-heart"></i></button>
+                        <button class="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-textMuted hover:text-primary"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <div class="h-48 w-full mb-4 bg-background rounded-xl p-4 flex items-center justify-center overflow-hidden">
+                        <img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/90ad70a0ec-a1c404af1f4944f149b5.png" alt="fresh organic vegetables in a basket, clean background, food photography" />
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex text-warning text-xs">
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <span class="text-textMuted ml-1">(89)</span>
+                        </div>
+                        <h3 class="font-bold text-textMain text-sm line-clamp-2 hover:text-primary cursor-pointer">Organic Farm Fresh Veggie Basket</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-primary text-lg">$35.00</span>
+                        </div>
+                        <button class="w-full py-2 border border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-colors mt-2">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Card 4 -->
+                <div class="bg-white rounded-2xl p-4 border border-border hover:shadow-hover transition-all group relative">
+                    <div class="absolute top-4 left-4 z-10">
+                        <span class="bg-error text-white text-xs font-bold px-2 py-1 rounded">HOT</span>
+                    </div>
+                    <div class="absolute top-4 right-4 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-textMuted hover:text-primary"><i class="fa-regular fa-heart"></i></button>
+                        <button class="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-textMuted hover:text-primary"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <div class="h-48 w-full mb-4 bg-background rounded-xl p-4 flex items-center justify-center overflow-hidden">
+                        <img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/35322b7fd8-97e7dfa4deb8ed77e340.png" alt="4k smart tv monitor, sleek design, clean background" />
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex text-warning text-xs">
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star-half-stroke text-yellow-400"></i>
+                            <span class="text-textMuted ml-1">(210)</span>
+                        </div>
+                        <h3 class="font-bold text-textMain text-sm line-clamp-2 hover:text-primary cursor-pointer">4K UHD LED Smart TV with Built-in WiFi</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-primary text-lg">$399.00</span>
+                        </div>
+                        <button class="w-full py-2 border border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-colors mt-2">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Card 5 (Hidden on smaller screens) -->
+                <div class="hidden xl:block bg-white rounded-2xl p-4 border border-border hover:shadow-hover transition-all group relative">
+                    <div class="absolute top-4 left-4 z-10">
+                        <span class="bg-primary text-white text-xs font-bold px-2 py-1 rounded">15% OFF</span>
+                    </div>
+                    <div class="absolute top-4 right-4 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-textMuted hover:text-primary"><i class="fa-regular fa-heart"></i></button>
+                        <button class="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-textMuted hover:text-primary"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <div class="h-48 w-full mb-4 bg-background rounded-xl p-4 flex items-center justify-center overflow-hidden">
+                        <img class="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-300" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/2976587a20-606ae587e7f32917b221.png" alt="modern coffee maker machine, sleek black and silver, clean background" />
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex text-warning text-xs">
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-solid fa-star text-yellow-400"></i>
+                            <i class="fa-regular fa-star text-yellow-400"></i>
+                            <span class="text-textMuted ml-1">(34)</span>
+                        </div>
+                        <h3 class="font-bold text-textMain text-sm line-clamp-2 hover:text-primary cursor-pointer">Premium Espresso Maker Machine</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-primary text-lg">$120.00</span>
+                            <span class="text-textMuted text-sm line-through">$145.00</span>
+                        </div>
+                        <button class="w-full py-2 border border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-colors mt-2">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Services Section -->
+        <section id="services-section" class="w-full px-4 sm:px-6 lg:px-12 py-12 max-w-[1440px] mx-auto">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl lg:text-3xl font-bold text-textMain mb-2">Book Local Services</h2>
+                    <p class="text-textMuted">Professional services at your convenience</p>
+                </div>
+                <a href="#" class="text-primary font-bold hover:text-primaryHover flex items-center gap-2">
+                    View All Services <i class="fa-solid fa-arrow-right text-sm"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Service Card 1 -->
+                <div class="bg-surface rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-hover transition-all group flex flex-col h-full">
+                    <div class="h-48 relative overflow-hidden">
+                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/c12edd7eb7-57badf137f38c9bab3b8.png" alt="professional hair salon interior, modern clean aesthetic, warm lighting" />
+                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold shadow-sm">
+                            <i class="fa-solid fa-star text-yellow-400 mr-1"></i> 4.8
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-xl text-textMain group-hover:text-primary transition-colors">Premium Hair Styling</h3>
+                            <span class="font-extrabold text-primary text-lg">From $45</span>
+                        </div>
+                        <p class="text-textMuted text-sm mb-4 line-clamp-2">Professional haircut, styling, and consultation by our senior stylists. Includes wash and blow-dry.</p>
+                        
+                        <div class="mt-auto space-y-4">
+                            <div class="flex items-center gap-4 text-sm text-textMuted">
+                                <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> 60 Min</span>
+                                <span class="flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> Style Studio</span>
+                            </div>
+                            <button class="w-full bg-primary/10 text-primary hover:bg-primary hover:text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                                Book Appointment <i class="fa-regular fa-calendar"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Card 2 -->
+                <div class="bg-surface rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-hover transition-all group flex flex-col h-full">
+                    <div class="h-48 relative overflow-hidden">
+                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/f36586a243-4f69bd24597f29c0c844.png" alt="personal trainer helping client in modern gym, bright lighting, fitness" />
+                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold shadow-sm">
+                            <i class="fa-solid fa-star text-yellow-400 mr-1"></i> 5.0
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-xl text-textMain group-hover:text-primary transition-colors">1-on-1 Personal Training</h3>
+                            <span class="font-extrabold text-primary text-lg">$60/hr</span>
+                        </div>
+                        <p class="text-textMuted text-sm mb-4 line-clamp-2">Customized workout plans and dedicated personal training sessions to help you reach your fitness goals.</p>
+                        
+                        <div class="mt-auto space-y-4">
+                            <div class="flex items-center gap-4 text-sm text-textMuted">
+                                <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> 60 Min</span>
+                                <span class="flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> FitLife Gym</span>
+                            </div>
+                            <button class="w-full bg-primary/10 text-primary hover:bg-primary hover:text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                                Book Session <i class="fa-regular fa-calendar"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Card 3 -->
+                <div class="bg-surface rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-hover transition-all group flex flex-col h-full">
+                    <div class="h-48 relative overflow-hidden">
+                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/b114f72e5d-35358d5bd2f33d8396ec.png" alt="professional house cleaning service, clean modern home interior" />
+                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold shadow-sm">
+                            <i class="fa-solid fa-star text-yellow-400 mr-1"></i> 4.7
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-xl text-textMain group-hover:text-primary transition-colors">Deep House Cleaning</h3>
+                            <span class="font-extrabold text-primary text-lg">From $120</span>
+                        </div>
+                        <p class="text-textMuted text-sm mb-4 line-clamp-2">Comprehensive deep cleaning service for your entire home. Eco-friendly products used.</p>
+                        
+                        <div class="mt-auto space-y-4">
+                            <div class="flex items-center gap-4 text-sm text-textMuted">
+                                <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> 3-4 Hours</span>
+                                <span class="flex items-center gap-1"><i class="fa-solid fa-house"></i> At Home</span>
+                            </div>
+                            <button class="w-full bg-primary/10 text-primary hover:bg-primary hover:text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                                Book Service <i class="fa-regular fa-calendar"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Promotional Banner -->
+        <section id="promo-banner" class="w-full px-4 sm:px-6 lg:px-12 py-8 max-w-[1440px] mx-auto">
+            <div class="w-full bg-textMain rounded-3xl overflow-hidden flex flex-col md:flex-row items-center relative shadow-xl">
+                <div class="absolute right-0 top-0 w-1/2 h-full bg-primary opacity-20 transform skew-x-12 translate-x-10"></div>
+                
+                <div class="w-full md:w-1/2 p-8 lg:p-12 z-10 text-white">
+                    <span class="bg-primary px-3 py-1 rounded text-xs font-bold uppercase tracking-wider mb-4 inline-block">App Exclusive</span>
+                    <h2 class="text-3xl lg:text-4xl font-extrabold mb-4">Download the LocalMart App</h2>
+                    <p class="text-white/80 mb-8 max-w-md">Get exclusive deals, track your orders in real-time, and manage your bookings effortlessly on the go.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <button class="bg-white text-textMain hover:bg-background px-6 py-3 rounded-xl font-bold flex items-center gap-3 transition-colors">
+                            <i class="fa-brands fa-apple text-2xl"></i>
+                            <div class="text-left leading-tight">
+                                <div class="text-[10px] text-textMuted font-normal">Download on the</div>
+                                <div>App Store</div>
+                            </div>
+                        </button>
+                        <button class="bg-white text-textMain hover:bg-background px-6 py-3 rounded-xl font-bold flex items-center gap-3 transition-colors">
+                            <i class="fa-brands fa-google-play text-2xl text-primary"></i>
+                            <div class="text-left leading-tight">
+                                <div class="text-[10px] text-textMuted font-normal">GET IT ON</div>
+                                <div>Google Play</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="w-full md:w-1/2 flex justify-center p-8 z-10">
+                    <img class="h-64 md:h-80 w-auto object-contain drop-shadow-2xl" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ccc9bc7f19-cdd57874a68005dfbedf.png" alt="two modern smartphones showing ecommerce app interface, floating 3d composition" />
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer id="footer" class="w-full bg-surface border-t border-border pt-16 pb-8 px-6 sm:px-8 mt-12">
+        <div class="max-w-[1440px] mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <!-- Brand Col -->
+                <div class="space-y-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xl">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <span class="font-bold text-2xl tracking-tight text-textMain">LocalMart</span>
+                    </div>
+                    <p class="text-textMuted text-sm leading-relaxed">
+                        Your one-stop platform for local commerce. Support local businesses, find great deals, and book services with ease.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-background flex items-center justify-center text-textMuted hover:bg-primary hover:text-white transition-all"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-background flex items-center justify-center text-textMuted hover:bg-primary hover:text-white transition-all"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-background flex items-center justify-center text-textMuted hover:bg-primary hover:text-white transition-all"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-background flex items-center justify-center text-textMuted hover:bg-primary hover:text-white transition-all"><i class="fa-brands fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+                <!-- Links Col 1 -->
+                <div>
+                    <h4 class="font-bold text-lg mb-6 text-textMain">Quick Links</h4>
+                    <ul class="space-y-4 text-sm">
+                        <li><a href="#" class="text-textMuted hover:text-primary transition-colors">Storefront Home</a></li>
+                        <li><a href="#" class="text-textMuted hover:text-primary transition-colors">Browse Menu & Catalog</a></li>
+                        <li><a href="#" class="text-textMuted hover:text-primary transition-colors">Book Services</a></li>
+                        <li><a href="#" class="text-textMuted hover:text-primary transition-colors">My Account</a></li>
+                        <li><a href="#" class="text-textMuted hover:text-primary transition-colors">Order Tracking</a></li>
+                    </ul>
+                </div>
+
+                <!-- Links Col 2 -->
+                <div>
+                    <h4 class="font-bold text-lg mb-6 text-textMain">Customer Support</h4>
+                    <ul class="space-y-4 text-sm">
+                        <li><a href="#" class="text-textMuted hover:text-primary transition-colors">Help Center & FAQ</a></li>
+                        <li><a href="#" class="text-textMuted hover:text-primary transition-colors">Returns & Refunds</a></li>
+                        <li><a href="#" class="text-textMuted hover:text-primary transition-colors">Shipping Information</a></li>
+                        <li><a href="#" class="text-textMuted hover:text-primary transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Col -->
+                <div>
+                    <h4 class="font-bold text-lg mb-6 text-textMain">Store Information</h4>
+                    <ul class="space-y-4 text-sm">
+                        <li class="flex items-start gap-3 text-textMuted">
+                            <i class="fa-solid fa-location-dot mt-1 text-primary"></i>
+                            <span>123 Local Business Ave,<br>Suite 100, Cityville, ST 12345</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-textMuted">
+                            <i class="fa-solid fa-phone text-primary"></i>
+                            <span>+1-202-555-0104</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-textMuted">
+                            <i class="fa-solid fa-envelope text-primary"></i>
+                            <span>support@localmart.com</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-textMuted">
+                            <i class="fa-regular fa-clock text-primary"></i>
+                            <span>Mon-Sat: 9:00 AM - 8:00 PM</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-textMuted">© 2024 LocalMart Inc. All rights reserved.</p>
+                <div class="flex items-center gap-4 text-2xl text-textMuted">
+                    <i class="fa-brands fa-cc-visa hover:text-primary transition-colors cursor-pointer"></i>
+                    <i class="fa-brands fa-cc-mastercard hover:text-primary transition-colors cursor-pointer"></i>
+                    <i class="fa-brands fa-cc-paypal hover:text-primary transition-colors cursor-pointer"></i>
+                    <i class="fa-brands fa-cc-apple-pay hover:text-primary transition-colors cursor-pointer"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

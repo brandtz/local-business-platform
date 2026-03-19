@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Admin Portal - Config & Integrations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16',
+                        },
+                        surface: {
+                            DEFAULT: '#f8fafc',
+                            card: '#ffffff',
+                            hover: '#f1f5f9',
+                            border: '#e2e8f0',
+                            dark: '#0f1115',
+                            darkCard: '#16181d',
+                            darkHover: '#1e2128',
+                            darkBorder: '#2a2d35'
+                        },
+                        primary: '#6366f1', // Indigo theme from AdPortal inspiration
+                        status: {
+                            success: '#22c55e',
+                            warning: '#f59e0b',
+                            error: '#ef4444',
+                            info: '#3b82f6',
+                            offline: '#94a3b8'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; overflow-x: hidden; }
+        .dark body { background-color: #0f1115; color: #f8fafc; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .dark .glass-panel {
+            background: rgba(22, 24, 29, 0.85);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dark .stat-card {
+            background: #16181d;
+            border-color: #2a2d35;
+            box-shadow: none;
+        }
+        .stat-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .dark .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 8px 16px;
+        }
+        .btn-primary:hover {
+            background: #4f46e5;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+        
+        .btn-secondary {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 8px 16px;
+        }
+        .dark .btn-secondary {
+            background-color: #1a1d24;
+            border-color: #2a2d35;
+            color: #e2e8f0;
+        }
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .dark .btn-secondary:hover {
+            background-color: #2a2d35;
+            border-color: #3f4450;
+        }
+        
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 8px 16px;
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+            border-radius: 8px;
+        }
+        .dark .nav-item.active {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge-success { background: #dcfce7; color: #16a34a; }
+        .dark .badge-success { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .badge-warning { background: #fef3c7; color: #d97706; }
+        .dark .badge-warning { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .badge-error { background: #fee2e2; color: #dc2626; }
+        .dark .badge-error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .badge-info { background: #dbeafe; color: #2563eb; }
+        .dark .badge-info { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+
+        .form-input {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .dark .form-input {
+            background: #1a1d24;
+            border-color: #2a2d35;
+            color: #f8fafc;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+        .dark .form-label {
+            color: #94a3b8;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .dark .toggle-slider {
+            background-color: #334155;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #6366f1;
+        }
+        input:focus + .toggle-slider {
+            box-shadow: 0 0 1px #6366f1;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .tab-btn {
+            padding: 10px 16px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #64748b;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .dark .tab-btn { color: #94a3b8; }
+        .tab-btn.active {
+            color: #6366f1;
+            border-bottom-color: #6366f1;
+        }
+        .dark .tab-btn.active {
+            color: #818cf8;
+            border-bottom-color: #818cf8;
+        }
+        .tab-btn:hover:not(.active) {
+            color: #334155;
+        }
+        .dark .tab-btn:hover:not(.active) {
+            color: #e2e8f0;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Toast Styles */
+        .toast {
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="w-full min-h-screen flex m-0">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 w-64 glass-panel border-r border-surface-border dark:border-surface-darkBorder z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col h-screen shrink-0">
+        <!-- Logo -->
+        <div class="p-6 flex items-center justify-between border-b border-surface-border dark:border-surface-darkBorder">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-layer-group text-white text-sm"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-slate-800 dark:text-white">Three<span class="text-primary">Portal</span></span>
+            </div>
+            <button class="lg:hidden text-slate-400 hover:text-slate-600 dark:text-gray-400 dark:hover:text-white" onclick="toggleSidebar()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-4 px-3">
+            <div class="px-3 mb-2 text-xs font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider">Platform Admin</div>
+            <ul class="space-y-1">
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-users w-5 text-center"></i>
+                        Tenants
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-globe w-5 text-center"></i>
+                        Domains
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-rocket w-5 text-center"></i>
+                        Publishing
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-server w-5 text-center"></i>
+                        Operations
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-chart-line w-5 text-center"></i>
+                        Audit & Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-item active flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors">
+                        <i class="fa-solid fa-gear w-5 text-center"></i>
+                        Config & Integrations
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- User Info -->
+        <div class="p-4 border-t border-surface-border dark:border-surface-darkBorder">
+            <div class="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-surface-darkHover cursor-pointer transition-colors">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Admin" class="w-10 h-10 rounded-full border border-surface-border dark:border-surface-darkBorder object-cover">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-slate-900 dark:text-white truncate">System Admin</p>
+                    <p class="text-xs text-slate-500 dark:text-gray-400 truncate">admin@threeportal.com</p>
+                </div>
+                <button onclick="document.documentElement.classList.toggle('dark')" class="text-slate-400 hover:text-primary dark:hover:text-primary">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-h-screen overflow-hidden w-full relative bg-slate-50 dark:bg-[#0f1115]">
+        
+        <!-- Header -->
+        <header id="header" class="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 glass-panel border-b border-surface-border dark:border-surface-darkBorder sticky top-0 z-30 shrink-0">
+            <div class="flex items-center gap-4">
+                <button class="lg:hidden text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <h1 class="text-xl font-semibold text-slate-900 dark:text-white">Configuration & Integrations</h1>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button class="relative p-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-surface-darkHover">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#0f1115]"></span>
+                </button>
+                <button class="btn-primary text-sm shadow-sm" onclick="showSaveToast()">
+                    <i class="fa-solid fa-save mr-2"></i> Save Changes
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative" id="main-content">
+            
+            <div class="max-w-7xl mx-auto">
+                
+                <!-- Tabs -->
+                <div class="flex border-b border-surface-border dark:border-surface-darkBorder mb-6 overflow-x-auto no-scrollbar">
+                    <button class="tab-btn active whitespace-nowrap" onclick="switchTab('global')">Global Settings</button>
+                    <button class="tab-btn whitespace-nowrap" onclick="switchTab('templates')">Templates & Themes</button>
+                    <button class="tab-btn whitespace-nowrap" onclick="switchTab('payments')">Payment Providers</button>
+                    <button class="tab-btn whitespace-nowrap" onclick="switchTab('webhooks')">Webhooks</button>
+                    <button class="tab-btn whitespace-nowrap" onclick="switchTab('integrations')">Integrations</button>
+                </div>
+
+                <!-- GLOBAL SETTINGS TAB -->
+                <div id="tab-global" class="space-y-6">
+                    <!-- Feature Flags -->
+                    <section class="stat-card p-6">
+                        <div class="mb-6 border-b border-surface-border dark:border-surface-darkBorder pb-4">
+                            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Feature Flags</h2>
+                            <p class="text-sm text-slate-500 dark:text-gray-400 mt-1">Manage global platform features and early access rollouts.</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-surface-darkHover rounded-lg border border-surface-border dark:border-surface-darkBorder">
+                                <div>
+                                    <h4 class="text-sm font-medium text-slate-900 dark:text-white">New Storefront Checkout (v2)</h4>
+                                    <p class="text-xs text-slate-500 dark:text-gray-400 mt-1">Enable the redesigned checkout flow for all tenants.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-surface-darkHover rounded-lg border border-surface-border dark:border-surface-darkBorder">
+                                <div>
+                                    <h4 class="text-sm font-medium text-slate-900 dark:text-white">Advanced Loyalty Module</h4>
+                                    <p class="text-xs text-slate-500 dark:text-gray-400 mt-1">Beta access to points and tier-based loyalty programs.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-surface-darkHover rounded-lg border border-surface-border dark:border-surface-darkBorder">
+                                <div>
+                                    <h4 class="text-sm font-medium text-slate-900 dark:text-white">Multi-Location Inventory</h4>
+                                    <p class="text-xs text-slate-500 dark:text-gray-400 mt-1">Allow tenants to manage inventory across multiple physical locations.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Platform Defaults -->
+                    <section class="stat-card p-6">
+                        <div class="mb-6 border-b border-surface-border dark:border-surface-darkBorder pb-4">
+                            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Platform Defaults</h2>
+                            <p class="text-sm text-slate-500 dark:text-gray-400 mt-1">Configure default settings for new tenants.</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="form-label">Default Timezone</label>
+                                <select class="form-input">
+                                    <option>UTC (Coordinated Universal Time)</option>
+                                    <option>America/New_York</option>
+                                    <option>America/Los_Angeles</option>
+                                    <option>Europe/London</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Default Currency</label>
+                                <select class="form-input">
+                                    <option>USD ($)</option>
+                                    <option>EUR (€)</option>
+                                    <option>GBP (£)</option>
+                                    <option>CAD ($)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Support Email Address</label>
+                                <input type="email" class="form-input" value="support@threeportal.com">
+                            </div>
+                            <div>
+                                <label class="form-label">System Notification Sender</label>
+                                <input type="text" class="form-input" value="noreply@threeportal.com">
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- TEMPLATES TAB (Hidden by default) -->
+                <div id="tab-templates" class="hidden space-y-6">
+                    <section class="stat-card p-6">
+                        <div class="flex justify-between items-center mb-6 border-b border-surface-border dark:border-surface-darkBorder pb-4">
+                            <div>
+                                <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Storefront Templates</h2>
+                                <p class="text-sm text-slate-500 dark:text-gray-400 mt-1">Manage available layout presets for tenant storefronts.</p>
+                            </div>
+                            <button class="btn-secondary text-sm"><i class="fa-solid fa-plus mr-2"></i>New Template</button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Template Card 1 -->
+                            <div class="border border-surface-border dark:border-surface-darkBorder rounded-lg overflow-hidden group">
+                                <div class="h-40 bg-slate-100 dark:bg-surface-darkHover relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-cover bg-center opacity-80" style="background-image: url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=400')"></div>
+                                    <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
+                                    <div class="absolute top-2 right-2"><span class="badge badge-success">Default</span></div>
+                                </div>
+                                <div class="p-4 bg-white dark:bg-[#16181d]">
+                                    <h3 class="font-medium text-slate-900 dark:text-white">Modern Retail</h3>
+                                    <p class="text-xs text-slate-500 dark:text-gray-400 mt-1 mb-3">Clean, grid-based layout ideal for product catalogs.</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-slate-400">v2.1.0</span>
+                                        <div class="flex gap-2">
+                                            <button class="text-slate-400 hover:text-primary"><i class="fa-solid fa-pen"></i></button>
+                                            <button class="text-slate-400 hover:text-primary"><i class="fa-solid fa-code"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Template Card 2 -->
+                            <div class="border border-surface-border dark:border-surface-darkBorder rounded-lg overflow-hidden group">
+                                <div class="h-40 bg-slate-100 dark:bg-surface-darkHover relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-cover bg-center opacity-80" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=400')"></div>
+                                    <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
+                                    <div class="absolute top-2 right-2"><span class="badge badge-info">Active</span></div>
+                                </div>
+                                <div class="p-4 bg-white dark:bg-[#16181d]">
+                                    <h3 class="font-medium text-slate-900 dark:text-white">Restaurant Menu</h3>
+                                    <p class="text-xs text-slate-500 dark:text-gray-400 mt-1 mb-3">List-focused layout optimized for food ordering.</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-slate-400">v1.4.2</span>
+                                        <div class="flex gap-2">
+                                            <button class="text-slate-400 hover:text-primary"><i class="fa-solid fa-pen"></i></button>
+                                            <button class="text-slate-400 hover:text-primary"><i class="fa-solid fa-code"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Template Card 3 -->
+                            <div class="border border-surface-border dark:border-surface-darkBorder rounded-lg overflow-hidden group">
+                                <div class="h-40 bg-slate-100 dark:bg-surface-darkHover relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-cover bg-center opacity-80" style="background-image: url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=400')"></div>
+                                    <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
+                                    <div class="absolute top-2 right-2"><span class="badge badge-warning">Draft</span></div>
+                                </div>
+                                <div class="p-4 bg-white dark:bg-[#16181d]">
+                                    <h3 class="font-medium text-slate-900 dark:text-white">Service Booking</h3>
+                                    <p class="text-xs text-slate-500 dark:text-gray-400 mt-1 mb-3">Calendar-first layout for salons and fitness.</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-slate-400">v0.9.0-beta</span>
+                                        <div class="flex gap-2">
+                                            <button class="text-slate-400 hover:text-primary"><i class="fa-solid fa-pen"></i></button>
+                                            <button class="text-slate-400 hover:text-primary"><i class="fa-solid fa-code"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- PAYMENTS TAB (Hidden by default) -->
+                <div id="tab-payments" class="hidden space-y-6">
+                    <section class="stat-card p-6">
+                        <div class="flex justify-between items-center mb-6 border-b border-surface-border dark:border-surface-darkBorder pb-4">
+                            <div>
+                                <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Payment Providers</h2>
+                                <p class="text-sm text-slate-500 dark:text-gray-400 mt-1">Configure global payment gateways for tenant onboarding.</p>
+                            </div>
+                        </div>
+
+                        <!-- Stripe Config -->
+                        <div class="border border-surface-border dark:border-surface-darkBorder rounded-xl p-5 mb-6 bg-slate-50 dark:bg-surface-darkHover">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-white rounded-lg shadow-sm flex items-center justify-center border border-slate-200">
+                                        <i class="fa-brands fa-stripe text-indigo-600 text-3xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-slate-900 dark:text-white">Stripe Connect</h3>
+                                        <p class="text-xs text-slate-500">Primary gateway for card payments</p>
+                                    </div>
+                                </div>
+                                <span class="badge badge-success">Connected</span>
+                            </div>
+                            
+                            <div class="space-y-4 mt-6 border-t border-slate-200 dark:border-surface-darkBorder pt-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="form-label">Client ID</label>
+                                        <input type="text" class="form-input font-mono text-sm" value="ca_H3X888xxxxxxxxxxxxxxxxxxxxxxxxxx" readonly>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Publishable Key</label>
+                                        <input type="text" class="form-input font-mono text-sm" value="pk_live_PLACEHOLDER_REDACTED" readonly>
+                                    </div>
+                                    <div class="md:col-span-2 relative">
+                                        <label class="form-label">Secret Key</label>
+                                        <div class="relative">
+                                            <input type="password" class="form-input font-mono text-sm pr-10" value="sk_live_PLACEHOLDER_REDACTED" id="stripe-secret">
+                                            <button class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white" onclick="togglePassword('stripe-secret')">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end gap-2 mt-4">
+                                    <button class="btn-secondary text-sm">Test Connection</button>
+                                    <button class="btn-primary text-sm" onclick="showConfirmModal('Update Stripe Credentials', 'Are you sure you want to update the production Stripe credentials? This will affect all new tenant onboarding.')">Update Keys</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Square Config -->
+                        <div class="border border-surface-border dark:border-surface-darkBorder rounded-xl p-5 bg-white dark:bg-[#16181d]">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-black rounded-lg shadow-sm flex items-center justify-center">
+                                        <i class="fa-solid fa-square text-white text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-slate-900 dark:text-white">Square</h3>
+                                        <p class="text-xs text-slate-500">Alternative gateway for POS integration</p>
+                                    </div>
+                                </div>
+                                <button class="btn-secondary text-sm">Configure</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- WEBHOOKS TAB (Hidden by default) -->
+                <div id="tab-webhooks" class="hidden space-y-6">
+                    <section class="stat-card p-6">
+                        <div class="flex justify-between items-center mb-6 border-b border-surface-border dark:border-surface-darkBorder pb-4">
+                            <div>
+                                <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Webhook Endpoints</h2>
+                                <p class="text-sm text-slate-500 dark:text-gray-400 mt-1">Manage system-level webhooks for external integrations.</p>
+                            </div>
+                            <button class="btn-primary text-sm"><i class="fa-solid fa-plus mr-2"></i>Add Endpoint</button>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-surface-border dark:border-surface-darkBorder">
+                                        <th class="py-3 px-4 text-xs font-medium text-slate-500 dark:text-gray-400 uppercase tracking-wider">URL / Description</th>
+                                        <th class="py-3 px-4 text-xs font-medium text-slate-500 dark:text-gray-400 uppercase tracking-wider">Events</th>
+                                        <th class="py-3 px-4 text-xs font-medium text-slate-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                        <th class="py-3 px-4 text-xs font-medium text-slate-500 dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-surface-border dark:divide-surface-darkBorder">
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                                        <td class="py-4 px-4">
+                                            <p class="font-medium text-sm text-slate-900 dark:text-white">https://api.external-erp.com/v1/webhooks/threeportal</p>
+                                            <p class="text-xs text-slate-500 mt-1">Main ERP sync endpoint</p>
+                                        </td>
+                                        <td class="py-4 px-4">
+                                            <div class="flex flex-wrap gap-1">
+                                                <span class="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-gray-300">tenant.created</span>
+                                                <span class="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-gray-300">tenant.updated</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-4"><span class="badge badge-success">Active</span></td>
+                                        <td class="py-4 px-4 text-right">
+                                            <button class="text-slate-400 hover:text-primary mr-3"><i class="fa-solid fa-pen"></i></button>
+                                            <button class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                                        <td class="py-4 px-4">
+                                            <p class="font-medium text-sm text-slate-900 dark:text-white">https://hooks.slack.com/services/T0000/B0000/XXXX</p>
+                                            <p class="text-xs text-slate-500 mt-1">Platform alerts channel</p>
+                                        </td>
+                                        <td class="py-4 px-4">
+                                            <div class="flex flex-wrap gap-1">
+                                                <span class="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-gray-300">system.error</span>
+                                                <span class="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-gray-300">payment.failed</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-4"><span class="badge badge-success">Active</span></td>
+                                        <td class="py-4 px-4 text-right">
+                                            <button class="text-slate-400 hover:text-primary mr-3"><i class="fa-solid fa-pen"></i></button>
+                                            <button class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- INTEGRATIONS TAB (Hidden by default) -->
+                <div id="tab-integrations" class="hidden space-y-6">
+                    <section class="stat-card p-6">
+                        <div class="flex justify-between items-center mb-6 border-b border-surface-border dark:border-surface-darkBorder pb-4">
+                            <div>
+                                <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Third-Party Integrations</h2>
+                                <p class="text-sm text-slate-500 dark:text-gray-400 mt-1">Manage API keys and connections for external services.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- SendGrid -->
+                            <div class="border border-surface-border dark:border-surface-darkBorder rounded-xl p-5">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                                            <i class="fa-solid fa-envelope text-blue-500 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-slate-900 dark:text-white">SendGrid Email</h3>
+                                            <p class="text-xs text-slate-500">Transactional email delivery</p>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="mt-4">
+                                    <label class="form-label text-xs">API Key</label>
+                                    <input type="password" class="form-input text-sm font-mono" value="SG.PLACEHOLDER_REDACTED">
+                                </div>
+                            </div>
+
+                            <!-- Twilio -->
+                            <div class="border border-surface-border dark:border-surface-darkBorder rounded-xl p-5">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
+                                            <i class="fa-solid fa-comment-sms text-red-500 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-semibold text-slate-900 dark:text-white">Twilio SMS</h3>
+                                            <p class="text-xs text-slate-500">Order & booking notifications</p>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="mt-4 space-y-3">
+                                    <div>
+                                        <label class="form-label text-xs">Account SID</label>
+                                        <input type="text" class="form-input text-sm font-mono" value="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                                    </div>
+                                    <div>
+                                        <label class="form-label text-xs">Auth Token</label>
+                                        <input type="password" class="form-input text-sm font-mono" value="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 modal-overlay z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-[#16181d] rounded-xl shadow-2xl max-w-md w-full border border-surface-border dark:border-surface-darkBorder transform transition-all">
+            <div class="p-6">
+                <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4 text-red-600 dark:text-red-400">
+                    <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                </div>
+                <h3 id="modal-title" class="text-lg font-bold text-slate-900 dark:text-white mb-2">Confirm Action</h3>
+                <p id="modal-message" class="text-sm text-slate-500 dark:text-gray-400 mb-6">Are you sure you want to proceed? This action cannot be undone.</p>
+                <div class="flex justify-end gap-3">
+                    <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button class="btn-danger" onclick="confirmAction()">Proceed</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-white dark:bg-[#16181d] border border-surface-border dark:border-surface-darkBorder shadow-lg rounded-lg p-4 flex items-center gap-3 z-[100] toast">
+        <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <div>
+            <h4 class="text-sm font-semibold text-slate-900 dark:text-white">Settings Saved</h4>
+            <p class="text-xs text-slate-500 dark:text-gray-400">Your configuration changes have been applied.</p>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Tab Switching
+        function switchTab(tabId) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Hide all tabs
+            ['global', 'templates', 'payments', 'webhooks', 'integrations'].forEach(id => {
+                document.getElementById('tab-' + id).classList.add('hidden');
+            });
+            
+            // Show selected tab
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+        }
+
+        // Toggle Password Visibility
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = event.currentTarget.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Modal Logic
+        function showConfirmModal(title, message) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        }
+
+        function confirmAction() {
+            closeModal();
+            showSaveToast();
+        }
+
+        // Toast Logic
+        function showSaveToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

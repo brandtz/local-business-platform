@@ -1,9 +1,14 @@
 .DS_Store
+nul
 platform/node_modules/
 platform/.turbo/
 platform/coverage/
 platform/apps/**/dist/
 platform/packages/**/dist/
+# Prevent stale tsc output in source directories
+platform/packages/**/src/**/*.js
+platform/packages/**/src/**/*.d.ts
+platform/packages/**/src/**/*.js.map
 platform/playwright-report/
 platform/test-results/
 platform/.env

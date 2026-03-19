@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Admin Portal - Customers & Staff</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#10B981', // Green from inspiration
+                        primaryHover: '#059669',
+                        surface: '#FFFFFF',
+                        background: '#F3F4F6',
+                        textMain: '#111827',
+                        textMuted: '#6B7280',
+                        border: '#E5E7EB',
+                        error: '#EF4444',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        cardBg: '#FFFFFF',
+                        sidebarBg: '#FFFFFF',
+                    },
+                    boxShadow: {
+                        'card': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                        '3xl': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; color: #111827; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+        
+        .nav-item.active {
+            background-color: #ECFDF5;
+            color: #10B981;
+            font-weight: 600;
+        }
+        .nav-item.active i {
+            color: #10B981;
+        }
+        .nav-icon-container {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .nav-item.active .nav-icon-container {
+            background-color: #10B981;
+            color: white;
+        }
+        .nav-item.active .nav-icon-container i {
+            color: white;
+        }
+        
+        .tab-btn {
+            position: relative;
+            padding-bottom: 1rem;
+            color: #6B7280;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .tab-btn:hover {
+            color: #111827;
+        }
+        .tab-btn.active {
+            color: #111827;
+            font-weight: 600;
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #10B981;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .glass-card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+            border-radius: 1.5rem;
+        }
+    </style>
+</head>
+<body class="w-full min-h-screen m-0 overflow-x-hidden flex flex-col md:flex-row text-textMain">
+
+    <!-- Mobile Header & Hamburger -->
+    <div class="md:hidden w-full bg-surface border-b border-border p-4 flex justify-between items-center z-50 sticky top-0 shadow-sm">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">V</div>
+            <span class="font-bold text-lg text-textMain">Veshoe Admin</span>
+        </div>
+        <button id="mobile-menu-btn" class="text-textMuted hover:text-textMain">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="hidden md:flex flex-col w-64 bg-sidebarBg border-r border-border h-screen sticky top-0 z-40 transition-all duration-300 shadow-soft">
+        <!-- Logo -->
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">V</div>
+            <span class="font-bold text-xl tracking-tight text-textMain">Veshoe</span>
+        </div>
+
+        <!-- Search -->
+        <div class="px-6 mb-4">
+            <div class="relative">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-textMuted text-sm"></i>
+                <input type="text" placeholder="Search Anything" class="w-full bg-background border-none rounded-xl pl-9 pr-4 py-2.5 text-sm text-textMain focus:ring-2 focus:ring-primary/50 transition-shadow">
+            </div>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="flex-1 px-4 space-y-1.5 overflow-y-auto">
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-house text-sm"></i>
+                </div>
+                Dashboard
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-box-open text-sm"></i>
+                </div>
+                Catalog & Services
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-cart-shopping text-sm"></i>
+                </div>
+                Orders & Bookings
+            </a>
+            
+            <a href="#" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-users text-sm"></i>
+                </div>
+                Customers & Staff
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-layer-group text-sm"></i>
+                </div>
+                Content & Locations
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-chart-pie text-sm"></i>
+                </div>
+                Analytics
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors mt-8">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-gear text-sm"></i>
+                </div>
+                Settings & Activity
+            </a>
+        </nav>
+
+        <!-- User Profile -->
+        <div class="p-4 mt-auto">
+            <div class="flex items-center gap-3 p-3 rounded-2xl hover:bg-background cursor-pointer transition-colors border border-transparent hover:border-border">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="User" class="w-10 h-10 rounded-full object-cover">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-textMain truncate">Danyal Minson</p>
+                    <p class="text-xs text-textMuted truncate">Store Manager</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-background">
+        
+        <!-- Top Header -->
+        <header class="h-20 bg-surface/80 backdrop-blur-md border-b border-border flex items-center justify-between px-6 lg:px-10 sticky top-0 z-30">
+            <div class="flex items-center gap-4">
+                <h1 class="text-2xl font-bold text-textMain">Customers & Staff</h1>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button class="relative p-2 text-textMuted hover:text-textMain transition-colors">
+                    <i class="fa-regular fa-envelope text-lg"></i>
+                </button>
+                <button class="relative p-2 text-textMuted hover:text-textMain transition-colors">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+                </button>
+                <button class="px-5 py-2.5 bg-gray-800 hover:bg-gray-900 text-white text-sm font-medium rounded-xl transition-colors shadow-lg flex items-center gap-2 ml-2">
+                    <i class="fa-solid fa-crown text-yellow-400"></i>
+                    <span class="hidden sm:inline">Premium Access</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Body -->
+        <div class="flex-1 overflow-y-auto p-6 lg:p-8 flex flex-col gap-6">
+            
+            <!-- Main Tabs -->
+            <div class="flex border-b border-border gap-8 mb-2">
+                <button class="tab-btn active text-lg" id="tab-customers" onclick="switchTab('customers')">
+                    Customers
+                </button>
+                <button class="tab-btn text-lg" id="tab-staff" onclick="switchTab('staff')">
+                    Staff & Team
+                </button>
+            </div>
+
+            <!-- ================= CUSTOMERS VIEW ================= -->
+            <div id="view-customers" class="flex flex-col gap-6">
+                
+                <!-- Metrics / Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card p-5">
+                        <div class="flex justify-between items-start mb-4">
+                            <p class="text-sm text-textMuted font-medium">Total Customers</p>
+                            <button class="text-textMuted hover:text-textMain"><i class="fa-solid fa-ellipsis"></i></button>
+                        </div>
+                        <p class="text-3xl font-bold text-textMain mb-2">8,426</p>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-md font-medium"><i class="fa-solid fa-arrow-trend-up mr-1"></i>3.75%</span>
+                            <span class="text-textMuted">Than last week</span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex justify-between items-start mb-4">
+                            <p class="text-sm text-textMuted font-medium">Active This Month</p>
+                            <button class="text-textMuted hover:text-textMain"><i class="fa-solid fa-ellipsis"></i></button>
+                        </div>
+                        <p class="text-3xl font-bold text-textMain mb-2">1,245</p>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-md font-medium"><i class="fa-solid fa-arrow-trend-up mr-1"></i>1.20%</span>
+                            <span class="text-textMuted">Than last month</span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex justify-between items-start mb-4">
+                            <p class="text-sm text-textMuted font-medium">Loyalty Members</p>
+                            <button class="text-textMuted hover:text-textMain"><i class="fa-solid fa-ellipsis"></i></button>
+                        </div>
+                        <p class="text-3xl font-bold text-textMain mb-2">3,192</p>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-md font-medium"><i class="fa-solid fa-arrow-trend-up mr-1"></i>5.40%</span>
+                            <span class="text-textMuted">Than last week</span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="flex justify-between items-start mb-4">
+                            <p class="text-sm text-textMuted font-medium">Avg. Customer Value</p>
+                            <button class="text-textMuted hover:text-textMain"><i class="fa-solid fa-ellipsis"></i></button>
+                        </div>
+                        <p class="text-3xl font-bold text-textMain mb-2">$425.50</p>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-md font-medium"><i class="fa-solid fa-arrow-trend-down mr-1"></i>0.8%</span>
+                            <span class="text-textMuted">Than last week</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers Toolbar -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <h2 class="text-xl font-bold text-textMain">Customer Directory</h2>
+                    <div class="flex flex-1 w-full sm:w-auto gap-3 justify-end">
+                        <div class="relative max-w-xs w-full">
+                            <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-textMuted"></i>
+                            <input type="text" placeholder="Search customer..." class="w-full bg-white border border-border rounded-xl pl-10 pr-4 py-2 text-sm text-textMain focus:ring-2 focus:ring-primary/50 transition-shadow">
+                        </div>
+                        <button class="px-4 py-2 bg-white border border-border rounded-xl text-textMain font-medium hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-filter text-textMuted"></i>
+                            <span>Filter</span>
+                        </button>
+                        <button class="px-4 py-2 bg-white border border-border rounded-xl text-textMain font-medium hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-download text-textMuted"></i>
+                            <span>Export</span>
+                        </button>
+                        <button class="px-4 py-2 bg-primary hover:bg-primaryHover text-white rounded-xl text-sm font-medium transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Customer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Customers Table -->
+                <div class="glass-card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[1000px]">
+                            <thead>
+                                <tr class="border-b border-border text-xs text-textMuted font-medium">
+                                    <th class="py-4 px-6 w-12 text-center">
+                                        <input type="checkbox" class="rounded border-border text-primary focus:ring-primary/50">
+                                    </th>
+                                    <th class="py-4 px-6">Customer Name</th>
+                                    <th class="py-4 px-6">Contact</th>
+                                    <th class="py-4 px-6">Total Orders</th>
+                                    <th class="py-4 px-6">Total Spent</th>
+                                    <th class="py-4 px-6">Status</th>
+                                    <th class="py-4 px-6">Tags</th>
+                                    <th class="py-4 px-6 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <!-- Row 1 -->
+                                <tr class="border-b border-border hover:bg-gray-50 transition-colors cursor-pointer" onclick="openCustomerPanel()">
+                                    <td class="py-4 px-6 text-center" onclick="event.stopPropagation()">
+                                        <input type="checkbox" class="rounded border-border text-primary focus:ring-primary/50">
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" class="w-8 h-8 rounded-full object-cover">
+                                            <span class="font-semibold text-textMain">Eleanor Pena</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-textMuted">eleanor@example.com</td>
+                                    <td class="py-4 px-6">24</td>
+                                    <td class="py-4 px-6 font-medium text-textMain">$1,240.50</td>
+                                    <td class="py-4 px-6">
+                                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-medium">Active</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex gap-1">
+                                            <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-md text-xs">VIP</span>
+                                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs">Loyalty</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-center" onclick="event.stopPropagation()">
+                                        <button class="px-3 py-1.5 border border-border text-textMain rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors flex items-center gap-1 mx-auto">
+                                            <i class="fa-regular fa-pen-to-square"></i> Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                                <!-- Row 2 -->
+                                <tr class="border-b border-border hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <td class="py-4 px-6 text-center" onclick="event.stopPropagation()">
+                                        <input type="checkbox" class="rounded border-border text-primary focus:ring-primary/50">
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg" class="w-8 h-8 rounded-full object-cover">
+                                            <span class="font-semibold text-textMain">Albert Flores</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-textMuted">albert@example.com</td>
+                                    <td class="py-4 px-6">12</td>
+                                    <td class="py-4 px-6 font-medium text-textMain">$650.00</td>
+                                    <td class="py-4 px-6">
+                                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-medium">Active</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex gap-1">
+                                            <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs">New</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-center" onclick="event.stopPropagation()">
+                                        <button class="px-3 py-1.5 border border-border text-textMain rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors flex items-center gap-1 mx-auto">
+                                            <i class="fa-regular fa-pen-to-square"></i> Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="p-4 border-t border-border flex items-center justify-between bg-white">
+                        <div class="flex items-center gap-2">
+                            <button class="text-sm font-medium text-textMuted hover:text-textMain"><i class="fa-solid fa-chevron-left mr-1"></i> Previous</button>
+                            <div class="flex gap-1">
+                                <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-textMain font-medium shadow-sm">1</button>
+                                <button class="w-8 h-8 flex items-center justify-center rounded-lg text-textMuted hover:bg-gray-50 font-medium">2</button>
+                                <button class="w-8 h-8 flex items-center justify-center rounded-lg text-textMuted hover:bg-gray-50 font-medium">3</button>
+                                <span class="w-8 h-8 flex items-center justify-center text-textMuted">...</span>
+                                <button class="w-8 h-8 flex items-center justify-center rounded-lg text-textMuted hover:bg-gray-50 font-medium">20</button>
+                            </div>
+                            <button class="text-sm font-medium text-textMuted hover:text-textMain">Next <i class="fa-solid fa-chevron-right ml-1"></i></button>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm text-textMuted">Showing 1 to 10 of 200 entries</span>
+                            <button class="px-3 py-1.5 border border-border rounded-lg text-sm font-medium hover:bg-gray-50">Show All</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= STAFF VIEW ================= -->
+            <div id="view-staff" class="hidden flex-col gap-6">
+                
+                <!-- Staff Toolbar & Overview -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <h2 class="text-xl font-bold text-textMain">Team Management</h2>
+                    <div class="flex items-center gap-3">
+                        <button class="px-4 py-2 bg-white border border-border rounded-xl text-textMain font-medium hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-user-shield text-textMuted"></i>
+                            <span>Roles & Permissions</span>
+                        </button>
+                        <button class="px-4 py-2 bg-primary hover:bg-primaryHover text-white rounded-xl text-sm font-medium transition-colors flex items-center gap-2" onclick="openInviteModal()">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Invite Staff</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Staff Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Staff Card 1 -->
+                    <div class="glass-card p-6 flex flex-col items-center text-center relative">
+                        <button class="absolute top-4 right-4 text-textMuted hover:text-textMain"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" class="w-20 h-20 rounded-full object-cover mb-4 border-4 border-white shadow-sm">
+                        <h3 class="font-bold text-lg text-textMain">Danyal Minson</h3>
+                        <p class="text-sm text-primary font-medium mb-1">Store Manager</p>
+                        <p class="text-xs text-textMuted mb-4">danyal@veshoe.com</p>
+                        
+                        <div class="w-full grid grid-cols-2 gap-2 mb-4 border-t border-b border-border py-3">
+                            <div>
+                                <p class="text-xs text-textMuted">Status</p>
+                                <p class="text-sm font-medium text-green-600">Active</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-textMuted">Access Level</p>
+                                <p class="text-sm font-medium text-textMain">Admin</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-2 w-full">
+                            <button class="flex-1 py-2 bg-gray-50 border border-border rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">Schedule</button>
+                            <button class="flex-1 py-2 bg-gray-50 border border-border rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">Edit Profile</button>
+                        </div>
+                    </div>
+
+                    <!-- Staff Card 2 -->
+                    <div class="glass-card p-6 flex flex-col items-center text-center relative">
+                        <button class="absolute top-4 right-4 text-textMuted hover:text-textMain"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" class="w-20 h-20 rounded-full object-cover mb-4 border-4 border-white shadow-sm">
+                        <h3 class="font-bold text-lg text-textMain">Sarah Jenkins</h3>
+                        <p class="text-sm text-textMuted font-medium mb-1">Senior Stylist</p>
+                        <p class="text-xs text-textMuted mb-4">sarah@veshoe.com</p>
+                        
+                        <div class="w-full grid grid-cols-2 gap-2 mb-4 border-t border-b border-border py-3">
+                            <div>
+                                <p class="text-xs text-textMuted">Status</p>
+                                <p class="text-sm font-medium text-green-600">Active</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-textMuted">Access Level</p>
+                                <p class="text-sm font-medium text-textMain">Staff</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-2 w-full">
+                            <button class="flex-1 py-2 bg-gray-50 border border-border rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">Schedule</button>
+                            <button class="flex-1 py-2 bg-gray-50 border border-border rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">Edit Profile</button>
+                        </div>
+                    </div>
+
+                    <!-- Staff Card 3 -->
+                    <div class="glass-card p-6 flex flex-col items-center text-center relative">
+                        <button class="absolute top-4 right-4 text-textMuted hover:text-textMain"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" class="w-20 h-20 rounded-full object-cover mb-4 border-4 border-white shadow-sm">
+                        <h3 class="font-bold text-lg text-textMain">Mike Ross</h3>
+                        <p class="text-sm text-textMuted font-medium mb-1">Barber</p>
+                        <p class="text-xs text-textMuted mb-4">mike@veshoe.com</p>
+                        
+                        <div class="w-full grid grid-cols-2 gap-2 mb-4 border-t border-b border-border py-3">
+                            <div>
+                                <p class="text-xs text-textMuted">Status</p>
+                                <p class="text-sm font-medium text-yellow-600">On Leave</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-textMuted">Access Level</p>
+                                <p class="text-sm font-medium text-textMain">Staff</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-2 w-full">
+                            <button class="flex-1 py-2 bg-gray-50 border border-border rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">Schedule</button>
+                            <button class="flex-1 py-2 bg-gray-50 border border-border rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors">Edit Profile</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Invite Card -->
+                    <div class="glass-card p-6 flex flex-col items-center justify-center text-center border-dashed border-2 hover:border-primary cursor-pointer transition-colors" onclick="openInviteModal()">
+                        <div class="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl mb-4">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <h3 class="font-bold text-lg text-textMain">Invite New Staff</h3>
+                        <p class="text-sm text-textMuted mt-2">Add members to your team and assign roles.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= SIDE PANELS & MODALS ================= -->
+        
+        <!-- Overlay -->
+        <div id="panel-overlay" class="absolute inset-0 bg-textMain/20 backdrop-blur-sm z-40 hidden transition-opacity opacity-0"></div>
+
+        <!-- Customer Detail Panel -->
+        <div id="customer-panel" class="absolute top-0 right-0 h-full w-full max-w-lg bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col border-l border-border">
+            
+            <!-- Panel Header -->
+            <div class="h-20 border-b border-border flex items-center justify-between px-6 shrink-0 bg-white">
+                <h2 class="text-xl font-bold text-textMain">Customer Profile</h2>
+                <button onclick="closePanels()" class="w-8 h-8 rounded-full flex items-center justify-center text-textMuted hover:bg-background transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Panel Content -->
+            <div class="flex-1 overflow-y-auto bg-background p-6 space-y-6">
+                <!-- Profile Header -->
+                <div class="glass-card p-6 flex flex-col items-center text-center">
+                    <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-white shadow-sm">
+                    <h3 class="font-bold text-2xl text-textMain">Eleanor Pena</h3>
+                    <p class="text-sm text-textMuted mb-4">Customer since Jan 2023</p>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold">VIP</span>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">Loyalty Member</span>
+                    </div>
+                    <div class="flex gap-3 w-full mt-6">
+                        <button class="flex-1 py-2 bg-primary text-white rounded-xl text-sm font-medium shadow-md hover:bg-primaryHover">Message</button>
+                        <button class="flex-1 py-2 bg-white border border-border text-textMain rounded-xl text-sm font-medium hover:bg-gray-50">Edit Details</button>
+                    </div>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="glass-card p-5">
+                    <h4 class="font-bold text-textMain mb-4">Contact Information</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-sm">
+                            <i class="fa-regular fa-envelope text-textMuted w-5 text-center"></i>
+                            <span class="text-textMain">eleanor@example.com</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                            <i class="fa-solid fa-phone text-textMuted w-5 text-center"></i>
+                            <span class="text-textMain">+1 (555) 987-6543</span>
+                        </div>
+                        <div class="flex items-start gap-3 text-sm">
+                            <i class="fa-solid fa-location-dot text-textMuted w-5 text-center mt-0.5"></i>
+                            <span class="text-textMain">123 Main St, Apt 4B<br>New York, NY 10001</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass-card p-4 text-center">
+                        <p class="text-xs text-textMuted font-medium mb-1">Total Orders</p>
+                        <p class="text-2xl font-bold text-textMain">24</p>
+                    </div>
+                    <div class="glass-card p-4 text-center">
+                        <p class="text-xs text-textMuted font-medium mb-1">Total Spent</p>
+                        <p class="text-2xl font-bold text-textMain">$1,240.50</p>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="glass-card p-5">
+                    <h4 class="font-bold text-textMain mb-4">Recent Orders</h4>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-border pb-3">
+                            <div>
+                                <p class="font-medium text-sm text-textMain">#ORD-8829</p>
+                                <p class="text-xs text-textMuted">Oct 24, 2023</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-medium text-sm text-textMain">$142.50</p>
+                                <span class="text-[10px] px-2 py-0.5 bg-green-100 text-green-700 rounded">Completed</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-border pb-3">
+                            <div>
+                                <p class="font-medium text-sm text-textMain">#ORD-8710</p>
+                                <p class="text-xs text-textMuted">Sep 15, 2023</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-medium text-sm text-textMain">$85.00</p>
+                                <span class="text-[10px] px-2 py-0.5 bg-green-100 text-green-700 rounded">Completed</span>
+                            </div>
+                        </div>
+                        <button class="w-full py-2 text-sm font-medium text-primary hover:text-primaryHover">View All History</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invite Staff Modal -->
+        <div id="invite-modal" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl shadow-2xl z-50 hidden flex-col">
+            <div class="p-6 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-xl text-textMain">Invite Staff Member</h3>
+                <button onclick="closePanels()" class="text-textMuted hover:text-textMain"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-textMain mb-1">Email Address</label>
+                    <input type="email" placeholder="staff@example.com" class="w-full bg-white border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-textMain mb-1">Role</label>
+                    <select class="w-full bg-white border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary/50">
+                        <option>Staff (Basic Access)</option>
+                        <option>Manager (Full Access)</option>
+                        <option>Admin (System Access)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-textMain mb-1">Location Assignment</label>
+                    <select class="w-full bg-white border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary/50">
+                        <option>Downtown Store</option>
+                        <option>Uptown Branch</option>
+                        <option>All Locations</option>
+                    </select>
+                </div>
+            </div>
+            <div class="p-6 border-t border-border bg-gray-50 rounded-b-2xl flex justify-end gap-3">
+                <button onclick="closePanels()" class="px-4 py-2 bg-white border border-border rounded-xl text-sm font-medium text-textMain hover:bg-gray-50">Cancel</button>
+                <button class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primaryHover shadow-md">Send Invitation</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('hidden')) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('absolute', 'w-full', 'max-w-xs', 'h-screen');
+            } else {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('absolute', 'w-full', 'max-w-xs', 'h-screen');
+            }
+        });
+
+        // Tab Switching
+        function switchTab(tab) {
+            document.getElementById('tab-customers').classList.remove('active');
+            document.getElementById('tab-staff').classList.remove('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+            
+            document.getElementById('view-customers').classList.add('hidden');
+            document.getElementById('view-customers').classList.remove('flex');
+            document.getElementById('view-staff').classList.add('hidden');
+            document.getElementById('view-staff').classList.remove('flex');
+            
+            document.getElementById('view-' + tab).classList.remove('hidden');
+            document.getElementById('view-' + tab).classList.add('flex');
+        }
+
+        // Panel Logic
+        const overlay = document.getElementById('panel-overlay');
+        const customerPanel = document.getElementById('customer-panel');
+        const inviteModal = document.getElementById('invite-modal');
+
+        function openCustomerPanel() {
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                customerPanel.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function openInviteModal() {
+            overlay.classList.remove('hidden');
+            inviteModal.classList.remove('hidden');
+            inviteModal.classList.add('flex');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+            }, 10);
+        }
+
+        function closePanels() {
+            customerPanel.classList.add('translate-x-full');
+            inviteModal.classList.add('hidden');
+            inviteModal.classList.remove('flex');
+            overlay.classList.add('opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+
+        overlay.addEventListener('click', closePanels);
+    </script>
+</body>
+</html>

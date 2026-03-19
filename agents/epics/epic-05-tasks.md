@@ -1,6 +1,10 @@
 # Epic 5 Technical Task Plan
 
+> **UX Design References:** See `agents/design/screen-reference-index.md` for the full screen-to-brief mapping. All 8 Business Admin portal screens are in `agents/design/Portal Design - Business Admin *.html`. When building admin UI views, read the corresponding HTML file for layout, component arrangement, and interaction patterns. Colors are ignored — use semantic design tokens.
+
 ## E5-S1 Tenant Admin Shell and Navigation
+
+UX References: `Portal Design - Business Admin dashboard.html` (BA-01), all BA sidebar nav patterns
 
 Technical Tasks:
 - E5-S1-T1: define tenant-admin route map, information architecture, and role-aware navigation sections
@@ -18,6 +22,8 @@ Handoff Focus:
 
 ## E5-S2 Business Profile and Brand Configuration
 
+UX References: `Portal Design - Business Admin - settings and activity log.html` (BA-02 Business Profile + Branding sections)
+
 Technical Tasks:
 - E5-S2-T1: implement tenant profile schema-backed forms for business identity and contact data
 - E5-S2-T2: implement brand asset upload and theme configuration inputs
@@ -34,6 +40,8 @@ Handoff Focus:
 
 ## E5-S3 Locations, Hours, and Operating Rules
 
+UX References: `Portal Design - Business Admin - content and locations.html` (BA-03 Locations tab)
+
 Technical Tasks:
 - E5-S3-T1: implement location CRUD with address, timezone, and contact fields
 - E5-S3-T2: implement hours, blackout windows, and fulfillment-mode configuration
@@ -49,6 +57,8 @@ Handoff Focus:
 - normalized operating rules contract and location identifier semantics
 
 ## E5-S4 Tenant User and Staff Administration
+
+UX References: `Portal Design - Business Admin - customers and staff.html` (BA-07 Staff tab, BA-17 invite modal), `Portal Design - Business Admin - settings and activity log.html` (Users section)
 
 Technical Tasks:
 - E5-S4-T1: implement tenant-user invitation, role update, and deactivation paths
@@ -81,6 +91,8 @@ Handoff Focus:
 - validation rules, propagation mechanism, and live-versus-staged settings behavior
 
 ## E5-S6 Tenant Activity and Audit Visibility
+
+UX References: `Portal Design - Business Admin - settings and activity log.html` (BA-18 Activity Log section)
 
 Technical Tasks:
 - E5-S6-T1: define tenant-visible audit event categories and filtering rules

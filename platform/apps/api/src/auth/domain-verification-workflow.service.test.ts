@@ -9,8 +9,7 @@ import { TenantCustomDomainPolicyService } from "./tenant-custom-domain-policy.s
 
 import {
 	DomainVerificationWorkflowService,
-	type DomainVerificationCheckAdapter,
-	type DomainVerificationCheckResult
+	type DomainVerificationCheckAdapter
 } from "./domain-verification-workflow.service";
 
 function makeEvidence(

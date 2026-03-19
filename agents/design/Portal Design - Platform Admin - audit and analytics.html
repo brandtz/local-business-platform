@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Admin Portal - Audit & Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16',
+                        },
+                        surface: {
+                            DEFAULT: '#f8fafc',
+                            card: '#ffffff',
+                            hover: '#f1f5f9',
+                            border: '#e2e8f0',
+                            dark: '#0f1115',
+                            darkCard: '#16181d',
+                            darkHover: '#1e2128',
+                            darkBorder: '#2a2d35'
+                        },
+                        primary: '#f97316', // Orange theme from inspiration
+                        status: {
+                            success: '#22c55e',
+                            warning: '#f59e0b',
+                            error: '#ef4444',
+                            info: '#3b82f6',
+                            offline: '#94a3b8'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; overflow-x: hidden; }
+        .dark body { background-color: #0f1115; color: #f8fafc; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .dark .glass-panel {
+            background: rgba(22, 24, 29, 0.85);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dark .stat-card {
+            background: #16181d;
+            border-color: #2a2d35;
+            box-shadow: none;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.05);
+        }
+        .dark .stat-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: #f97316;
+            color: white;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background: #ea580c;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+        }
+        
+        .btn-secondary {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .dark .btn-secondary {
+            background-color: #1a1d24;
+            border-color: #2a2d35;
+            color: #e2e8f0;
+        }
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .dark .btn-secondary:hover {
+            background-color: #2a2d35;
+            border-color: #3f4450;
+        }
+
+        .nav-item.active {
+            background: rgba(249, 115, 22, 0.1);
+            border-left: 3px solid #f97316;
+            color: #f97316;
+        }
+        .dark .nav-item.active {
+            background: linear-gradient(90deg, rgba(249, 115, 22, 0.1) 0%, transparent 100%);
+            color: white;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge-success { background: #dcfce7; color: #16a34a; }
+        .dark .badge-success { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .badge-warning { background: #fef3c7; color: #d97706; }
+        .dark .badge-warning { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .badge-error { background: #fee2e2; color: #dc2626; }
+        .dark .badge-error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .badge-info { background: #dbeafe; color: #2563eb; }
+        .dark .badge-info { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+
+        .data-table th {
+            background-color: #f8fafc;
+            color: #64748b;
+            font-weight: 500;
+            font-size: 0.75rem;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .dark .data-table th {
+            background-color: #1a1d24;
+            color: #94a3b8;
+            border-bottom-color: #2a2d35;
+        }
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            font-size: 0.875rem;
+        }
+        .dark .data-table td {
+            border-bottom-color: #2a2d35;
+            color: #e2e8f0;
+        }
+        .data-table tr:hover td { background-color: #f8fafc; }
+        .dark .data-table tr:hover td { background-color: #1e2128; }
+        .data-table tr:last-child td { border-bottom: none; }
+
+        .tab-btn {
+            padding: 8px 16px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #64748b;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .dark .tab-btn { color: #94a3b8; }
+        .tab-btn.active {
+            color: #1e293b;
+            border-bottom-color: #f97316;
+        }
+        .dark .tab-btn.active {
+            color: #f8fafc;
+        }
+        .tab-btn:hover:not(.active) {
+            color: #334155;
+        }
+        .dark .tab-btn:hover:not(.active) {
+            color: #e2e8f0;
+        }
+        
+        .filter-input {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+        .dark .filter-input {
+            background: #16181d;
+            border-color: #2a2d35;
+            color: #f8fafc;
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 1px #f97316;
+        }
+    </style>
+</head>
+<body class="w-full min-h-screen flex m-0">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 w-64 glass-panel border-r border-surface-border dark:border-surface-darkBorder z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col h-screen shrink-0">
+        <!-- Logo -->
+        <div class="p-6 flex items-center justify-between border-b border-surface-border dark:border-surface-darkBorder">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-orange-500/20">
+                    <i class="fa-solid fa-layer-group text-white text-sm"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-slate-800 dark:text-white">Three<span class="text-primary">Portal</span></span>
+            </div>
+            <button class="lg:hidden text-slate-400 hover:text-slate-600 dark:text-gray-400 dark:hover:text-white" onclick="toggleSidebar()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-4">
+            <div class="px-4 mb-2 text-xs font-semibold text-slate-500 dark:text-gray-500 uppercase tracking-wider">Platform Admin</div>
+            <ul class="space-y-1">
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-users w-5 text-center"></i>
+                        Tenants
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-globe w-5 text-center"></i>
+                        Domains
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-rocket w-5 text-center"></i>
+                        Publishing
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-server w-5 text-center"></i>
+                        Operations
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-item active flex items-center gap-3 px-6 py-3 text-sm font-medium transition-colors">
+                        <i class="fa-solid fa-chart-line w-5 text-center"></i>
+                        Audit & Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center gap-3 px-6 py-3 text-sm font-medium text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-surface-darkHover transition-colors">
+                        <i class="fa-solid fa-gear w-5 text-center"></i>
+                        Config & Integrations
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- User Info -->
+        <div class="p-4 border-t border-surface-border dark:border-surface-darkBorder">
+            <div class="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-surface-darkHover cursor-pointer transition-colors">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Admin" class="w-10 h-10 rounded-full border border-surface-border dark:border-surface-darkBorder object-cover">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-slate-900 dark:text-white truncate">System Admin</p>
+                    <p class="text-xs text-slate-500 dark:text-gray-400 truncate">admin@threeportal.com</p>
+                </div>
+                <button onclick="document.documentElement.classList.toggle('dark')" class="text-slate-400 hover:text-primary dark:hover:text-primary">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-h-screen overflow-hidden w-full relative">
+        
+        <!-- Header -->
+        <header id="header" class="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 glass-panel border-b border-surface-border dark:border-surface-darkBorder sticky top-0 z-30 shrink-0">
+            <div class="flex items-center gap-4">
+                <button class="lg:hidden text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <h1 class="text-xl font-semibold text-slate-900 dark:text-white">Audit & Analytics</h1>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="relative hidden md:block">
+                    <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-gray-500 text-sm"></i>
+                    <input type="text" placeholder="Search logs, tenants, users..." class="filter-input rounded-lg pl-9 pr-4 py-1.5 text-sm w-64 transition-colors">
+                </div>
+                
+                <button class="btn-secondary px-3 py-1.5 text-sm flex items-center gap-2">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span>Last 30 Days</span>
+                    <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                </button>
+                
+                <button class="relative p-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-surface-darkHover">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative" id="main-content">
+            
+            <!-- Tabs -->
+            <div class="flex border-b border-surface-border dark:border-surface-darkBorder mb-6">
+                <button class="tab-btn active" onclick="switchTab('analytics')">Platform Analytics</button>
+                <button class="tab-btn" onclick="switchTab('audit')">Audit Trail</button>
+                <button class="tab-btn" onclick="switchTab('errors')">Error Tracking</button>
+            </div>
+
+            <!-- ANALYTICS TAB CONTENT -->
+            <div id="tab-analytics" class="space-y-6">
+                
+                <!-- KPI Cards -->
+                <section id="analytics-kpis" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="stat-card p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-sm text-slate-500 dark:text-gray-400 font-medium">Total Tenants</p>
+                            <span class="badge badge-success">+12%</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white">1,248</h3>
+                        <p class="text-xs text-slate-500 dark:text-gray-400 mt-2">142 new this month</p>
+                    </div>
+                    
+                    <div class="stat-card p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-sm text-slate-500 dark:text-gray-400 font-medium">Platform Revenue</p>
+                            <span class="badge badge-success">+8.4%</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white">$84,520</h3>
+                        <p class="text-xs text-slate-500 dark:text-gray-400 mt-2">MRR (Estimated)</p>
+                    </div>
+                    
+                    <div class="stat-card p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-sm text-slate-500 dark:text-gray-400 font-medium">Active Users</p>
+                            <span class="badge badge-warning">-2.1%</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white">45,211</h3>
+                        <p class="text-xs text-slate-500 dark:text-gray-400 mt-2">Across all tenant portals</p>
+                    </div>
+                    
+                    <div class="stat-card p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-sm text-slate-500 dark:text-gray-400 font-medium">Avg Error Rate</p>
+                            <span class="badge badge-success">-0.5%</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white">0.12%</h3>
+                        <p class="text-xs text-slate-500 dark:text-gray-400 mt-2">System wide health</p>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <section id="analytics-charts" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Growth Chart -->
+                    <div class="stat-card col-span-1 lg:col-span-2 p-5">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-base font-semibold text-slate-900 dark:text-white">Tenant Growth & Revenue Trends</h3>
+                            <button class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-ellipsis"></i></button>
+                        </div>
+                        <div id="growthChart" class="h-[300px] w-full"></div>
+                    </div>
+                    
+                    <!-- Module Usage -->
+                    <div class="stat-card col-span-1 p-5">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-base font-semibold text-slate-900 dark:text-white">Module Adoption</h3>
+                            <button class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-ellipsis"></i></button>
+                        </div>
+                        <div id="moduleChart" class="h-[300px] w-full"></div>
+                    </div>
+                </section>
+                
+                <!-- Top Tenants Table -->
+                <section id="top-tenants" class="stat-card overflow-hidden">
+                    <div class="p-5 border-b border-surface-border dark:border-surface-darkBorder flex justify-between items-center">
+                        <h3 class="text-base font-semibold text-slate-900 dark:text-white">Top Performing Tenants</h3>
+                        <button class="text-primary text-sm font-medium hover:underline">View All</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full data-table">
+                            <thead>
+                                <tr>
+                                    <th>Tenant Name</th>
+                                    <th>Plan</th>
+                                    <th>Users</th>
+                                    <th>Monthly GMV</th>
+                                    <th>Health Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded bg-slate-100 dark:bg-surface-darkHover flex items-center justify-center text-xs font-bold">BB</div>
+                                            <div>
+                                                <p class="font-medium text-slate-900 dark:text-white">Burger Barn</p>
+                                                <p class="text-xs text-slate-500 dark:text-gray-400">burgerbarn.threeportal.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-info">Enterprise</span></td>
+                                    <td>1,245</td>
+                                    <td class="font-medium">$45,200</td>
+                                    <td><div class="flex items-center gap-2"><div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full w-16"><div class="bg-green-500 h-1.5 rounded-full" style="width: 95%"></div></div> <span class="text-xs">95/100</span></div></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded bg-slate-100 dark:bg-surface-darkHover flex items-center justify-center text-xs font-bold">SS</div>
+                                            <div>
+                                                <p class="font-medium text-slate-900 dark:text-white">Salon Style</p>
+                                                <p class="text-xs text-slate-500 dark:text-gray-400">salonstyle.threeportal.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-success">Pro</span></td>
+                                    <td>850</td>
+                                    <td class="font-medium">$28,400</td>
+                                    <td><div class="flex items-center gap-2"><div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full w-16"><div class="bg-green-500 h-1.5 rounded-full" style="width: 88%"></div></div> <span class="text-xs">88/100</span></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- AUDIT TRAIL TAB CONTENT (Hidden by default) -->
+            <div id="tab-audit" class="hidden space-y-6">
+                <!-- Filters -->
+                <section id="audit-filters" class="stat-card p-5">
+                    <div class="flex flex-col md:flex-row gap-4 items-end">
+                        <div class="flex-1 w-full">
+                            <label class="block text-xs font-medium text-slate-500 dark:text-gray-400 mb-1.5">Search</label>
+                            <input type="text" placeholder="Search by actor, IP, or resource..." class="w-full filter-input rounded-lg px-3 py-2 text-sm">
+                        </div>
+                        <div class="w-full md:w-48">
+                            <label class="block text-xs font-medium text-slate-500 dark:text-gray-400 mb-1.5">Action Type</label>
+                            <select class="w-full filter-input rounded-lg px-3 py-2 text-sm">
+                                <option>All Actions</option>
+                                <option>Create</option>
+                                <option>Update</option>
+                                <option>Delete</option>
+                                <option>Login</option>
+                            </select>
+                        </div>
+                        <div class="w-full md:w-48">
+                            <label class="block text-xs font-medium text-slate-500 dark:text-gray-400 mb-1.5">Portal</label>
+                            <select class="w-full filter-input rounded-lg px-3 py-2 text-sm">
+                                <option>All Portals</option>
+                                <option>Platform Admin</option>
+                                <option>Business Admin</option>
+                                <option>Customer</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <button class="btn-secondary px-4 py-2 text-sm w-full md:w-auto">Clear</button>
+                            <button class="btn-primary px-4 py-2 text-sm w-full md:w-auto">Apply Filters</button>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex gap-2">
+                        <span class="text-xs text-slate-500 dark:text-gray-400 flex items-center">Saved Filters:</span>
+                        <span class="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-gray-300 cursor-pointer hover:bg-slate-200">Failed Logins</span>
+                        <span class="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-gray-300 cursor-pointer hover:bg-slate-200">Tenant Deletions</span>
+                        <span class="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-gray-300 cursor-pointer hover:bg-slate-200">Settings Changed</span>
+                    </div>
+                </section>
+
+                <!-- Audit Log Table -->
+                <section id="audit-table" class="stat-card overflow-hidden">
+                    <div class="p-4 border-b border-surface-border dark:border-surface-darkBorder flex justify-between items-center bg-slate-50 dark:bg-[#1a1d24]">
+                        <span class="text-sm font-medium text-slate-600 dark:text-gray-300">Showing 1-15 of 2,492 events</span>
+                        <button class="btn-secondary px-3 py-1.5 text-xs"><i class="fa-solid fa-file-export mr-1"></i> Export CSV</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full data-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Actor</th>
+                                    <th>Action</th>
+                                    <th>Resource</th>
+                                    <th>Portal</th>
+                                    <th>IP Address</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="whitespace-nowrap">Oct 24, 14:32:11</td>
+                                    <td>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold">SA</div>
+                                            <span class="font-medium">sysadmin@threeportal.com</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-warning">UPDATE</span></td>
+                                    <td>Tenant Settings (T-8492)</td>
+                                    <td>Platform</td>
+                                    <td class="font-mono text-xs text-slate-500">192.168.1.104</td>
+                                    <td><span class="text-green-500"><i class="fa-solid fa-check-circle"></i></span></td>
+                                    <td><button class="text-slate-400 hover:text-primary"><i class="fa-solid fa-eye"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td class="whitespace-nowrap">Oct 24, 14:15:05</td>
+                                    <td>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold">JD</div>
+                                            <span class="font-medium">j.doe@burgerbarn.com</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-info">LOGIN</span></td>
+                                    <td>Authentication Session</td>
+                                    <td>Business</td>
+                                    <td class="font-mono text-xs text-slate-500">203.0.113.42</td>
+                                    <td><span class="text-green-500"><i class="fa-solid fa-check-circle"></i></span></td>
+                                    <td><button class="text-slate-400 hover:text-primary"><i class="fa-solid fa-eye"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td class="whitespace-nowrap">Oct 24, 13:45:22</td>
+                                    <td>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold">UK</div>
+                                            <span class="font-medium">Unknown User</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-error">FAILED_LOGIN</span></td>
+                                    <td>Authentication Session</td>
+                                    <td>Platform</td>
+                                    <td class="font-mono text-xs text-red-500">45.22.19.102</td>
+                                    <td><span class="text-red-500"><i class="fa-solid fa-xmark-circle"></i></span></td>
+                                    <td><button class="text-slate-400 hover:text-primary"><i class="fa-solid fa-eye"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t border-surface-border dark:border-surface-darkBorder flex justify-between items-center">
+                        <button class="btn-secondary px-3 py-1 text-sm disabled:opacity-50" disabled>Previous</button>
+                        <div class="flex gap-1">
+                            <button class="w-8 h-8 rounded bg-primary text-white text-sm font-medium">1</button>
+                            <button class="w-8 h-8 rounded hover:bg-slate-100 dark:hover:bg-surface-darkHover text-slate-600 dark:text-gray-300 text-sm font-medium">2</button>
+                            <button class="w-8 h-8 rounded hover:bg-slate-100 dark:hover:bg-surface-darkHover text-slate-600 dark:text-gray-300 text-sm font-medium">3</button>
+                            <span class="w-8 h-8 flex items-center justify-center text-slate-500">...</span>
+                        </div>
+                        <button class="btn-secondary px-3 py-1 text-sm">Next</button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ERRORS TAB CONTENT (Hidden by default) -->
+            <div id="tab-errors" class="hidden space-y-6">
+                <!-- Empty State Example for Errors -->
+                <div class="stat-card p-12 flex flex-col items-center justify-center text-center">
+                    <div class="w-20 h-20 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-shield-check text-3xl text-green-500"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">System is Healthy</h3>
+                    <p class="text-slate-500 dark:text-gray-400 max-w-md mb-6">No critical errors have been logged in the selected timeframe. The platform is operating within normal parameters.</p>
+                    <button class="btn-secondary px-4 py-2 text-sm" onclick="switchTab('analytics')">Return to Analytics</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update content
+            document.getElementById('tab-analytics').classList.add('hidden');
+            document.getElementById('tab-audit').classList.add('hidden');
+            document.getElementById('tab-errors').classList.add('hidden');
+            
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            
+            // Trigger chart resize if switching to analytics
+            if(tabId === 'analytics') {
+                window.dispatchEvent(new Event('resize'));
+            }
+        }
+
+        // Plotly Charts Initialization
+        window.addEventListener('load', function() {
+            try {
+                const isDark = document.documentElement.classList.contains('dark');
+                const textColor = isDark ? '#94a3b8' : '#64748b';
+                const gridColor = isDark ? '#2a2d35' : '#e2e8f0';
+                const bgColor = 'transparent';
+
+                // Chart 1: Growth & Revenue (Line Chart)
+                const growthData = [
+                    {
+                        x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                        y: [800, 850, 920, 980, 1050, 1120, 1180, 1248],
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        name: 'Tenants',
+                        line: {color: '#3b82f6', width: 3},
+                        marker: {size: 6}
+                    },
+                    {
+                        x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                        y: [52000, 56000, 61000, 68000, 72000, 78000, 81000, 84520],
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Revenue ($)',
+                        yaxis: 'y2',
+                        line: {color: '#f97316', width: 3, dash: 'solid'},
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(249, 115, 22, 0.1)'
+                    }
+                ];
+
+                const growthLayout = {
+                    paper_bgcolor: bgColor,
+                    plot_bgcolor: bgColor,
+                    font: { color: textColor, family: 'Inter, sans-serif' },
+                    margin: { t: 10, r: 50, b: 40, l: 50 },
+                    xaxis: { showgrid: false, zeroline: false },
+                    yaxis: { showgrid: true, gridcolor: gridColor, zeroline: false },
+                    yaxis2: {
+                        overlaying: 'y',
+                        side: 'right',
+                        showgrid: false,
+                        zeroline: false
+                    },
+                    showlegend: true,
+                    legend: { orientation: 'h', y: -0.2, x: 0.5, xanchor: 'center' }
+                };
+
+                Plotly.newPlot('growthChart', growthData, growthLayout, {responsive: true, displayModeBar: false});
+
+                // Chart 2: Module Adoption (Donut Chart)
+                const moduleData = [{
+                    values: [45, 25, 20, 10],
+                    labels: ['Storefront', 'Bookings', 'Loyalty', 'Advanced Analytics'],
+                    type: 'pie',
+                    hole: 0.6,
+                    marker: {
+                        colors: ['#f97316', '#3b82f6', '#22c55e', '#8b5cf6']
+                    },
+                    textinfo: 'none'
+                }];
+
+                const moduleLayout = {
+                    paper_bgcolor: bgColor,
+                    plot_bgcolor: bgColor,
+                    font: { color: textColor, family: 'Inter, sans-serif' },
+                    margin: { t: 10, r: 10, b: 10, l: 10 },
+                    showlegend: true,
+                    legend: { orientation: 'h', y: -0.1, x: 0.5, xanchor: 'center' }
+                };
+
+                Plotly.newPlot('moduleChart', moduleData, moduleLayout, {responsive: true, displayModeBar: false});
+
+                // Handle theme toggle chart updates
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.attributeName === 'class') {
+                            const isDarkNow = document.documentElement.classList.contains('dark');
+                            const newTextColor = isDarkNow ? '#94a3b8' : '#64748b';
+                            const newGridColor = isDarkNow ? '#2a2d35' : '#e2e8f0';
+                            
+                            const update = {
+                                'font.color': newTextColor,
+                                'yaxis.gridcolor': newGridColor
+                            };
+                            
+                            Plotly.relayout('growthChart', update);
+                            Plotly.relayout('moduleChart', {'font.color': newTextColor});
+                        }
+                    });
+                });
+                
+                observer.observe(document.documentElement, { attributes: true });
+
+            } catch(e) {
+                console.error('Error initializing charts:', e);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -7,7 +7,6 @@ import type {
 } from "@platform/types";
 
 import {
-	TenantCustomDomainPolicyError,
 	TenantCustomDomainPolicyService,
 	type TenantCustomDomainVerificationDecision
 } from "./tenant-custom-domain-policy.service";

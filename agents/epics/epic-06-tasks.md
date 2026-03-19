@@ -1,6 +1,10 @@
 # Epic 6 Technical Task Plan
 
+> **UX Design References:** See `agents/design/screen-reference-index.md` for the full screen-to-brief mapping. Catalog/service admin views reference `Portal Design - Business Admin - catalog and services.html`. Content views reference `Portal Design - Business Admin - content and locations.html`. Storefront views reference `Portal Design - Customer Portal menu and services.html`.
+
 ## E6-S1 Catalog Domain Model
+
+UX References: `Portal Design - Business Admin - catalog and services.html` (BA-04/05 Products+Categories tabs), `Portal Design - Customer Portal menu and services.html` (CP-02/03)
 
 Technical Tasks:
 - E6-S1-T1: finalize schema for categories, items, pricing, status, and media references
@@ -18,6 +22,8 @@ Handoff Focus:
 
 ## E6-S2 Service and Booking Domain Model
 
+UX References: `Portal Design - Business Admin - catalog and services.html` (BA-06 Services tab), `Portal Design - Customer Portal menu and services.html` (CP-07/08)
+
 Technical Tasks:
 - E6-S2-T1: finalize schema for services, durations, availability-related settings, and pricing
 - E6-S2-T2: implement service domain services for CRUD and eligibility rules
@@ -34,6 +40,8 @@ Handoff Focus:
 
 ## E6-S3 Staff and Assignment Domain Model
 
+UX References: `Portal Design - Business Admin - customers and staff.html` (BA-07 Staff tab)
+
 Technical Tasks:
 - E6-S3-T1: finalize schema for staff profiles, location relationships, and bookable state
 - E6-S3-T2: implement staff management services distinct from tenant-user identity management
@@ -49,6 +57,8 @@ Handoff Focus:
 - staff-resource model, assignment lookups, and separation from auth membership entities
 
 ## E6-S4 Content and SEO Domain Model
+
+UX References: `Portal Design - Business Admin - content and locations.html` (BA-14 Pages tab, BA-15 Announcements tab)
 
 Technical Tasks:
 - E6-S4-T1: finalize schema for content pages, publish state, SEO metadata, and slugs

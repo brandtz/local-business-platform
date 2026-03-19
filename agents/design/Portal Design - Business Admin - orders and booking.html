@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Admin Portal - Orders & Bookings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#8B5CF6', // Purple from inspiration
+                        primaryHover: '#7C3AED',
+                        surface: '#FFFFFF', // Light theme surface
+                        background: '#F3F4F6', // Light background
+                        textMain: '#111827',
+                        textMuted: '#6B7280',
+                        border: '#E5E7EB',
+                        error: '#EF4444',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        cardBg: '#FFFFFF',
+                        sidebarBg: '#FFFFFF',
+                    },
+                    boxShadow: {
+                        'card': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                        '3xl': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; color: #111827; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+        
+        .nav-item.active {
+            background-color: #F5F3FF;
+            color: #8B5CF6;
+            font-weight: 600;
+        }
+        .nav-item.active i {
+            color: #8B5CF6;
+        }
+        .nav-icon-container {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .nav-item.active .nav-icon-container {
+            background-color: #8B5CF6;
+            color: white;
+        }
+        .nav-item.active .nav-icon-container i {
+            color: white;
+        }
+        
+        .tab-btn {
+            position: relative;
+            padding-bottom: 1rem;
+            color: #6B7280;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .tab-btn:hover {
+            color: #111827;
+        }
+        .tab-btn.active {
+            color: #111827;
+            font-weight: 600;
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #8B5CF6;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .status-new { background-color: #DBEAFE; color: #2563EB; }
+        .status-progress { background-color: #FEF3C7; color: #D97706; }
+        .status-ready { background-color: #D1FAE5; color: #059669; }
+        .status-completed { background-color: #F3F4F6; color: #4B5563; }
+        
+        .glass-card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+            border-radius: 1.5rem;
+        }
+        
+        /* Calendar specific styles */
+        .cal-grid {
+            display: grid;
+            grid-template-columns: 80px repeat(7, 1fr);
+            border-left: 1px solid #E5E7EB;
+            border-top: 1px solid #E5E7EB;
+        }
+        .cal-cell {
+            border-right: 1px solid #E5E7EB;
+            border-bottom: 1px solid #E5E7EB;
+            min-height: 60px;
+            position: relative;
+        }
+        .cal-header {
+            background-color: #F9FAFB;
+            font-weight: 500;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.875rem;
+            color: #6B7280;
+        }
+        .cal-time {
+            text-align: right;
+            padding-right: 10px;
+            font-size: 0.75rem;
+            color: #9CA3AF;
+            transform: translateY(-50%);
+        }
+        .booking-event {
+            position: absolute;
+            left: 4px;
+            right: 4px;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.1s;
+            overflow: hidden;
+        }
+        .booking-event:hover {
+            transform: scale(1.02);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="w-full min-h-screen m-0 overflow-x-hidden flex flex-col md:flex-row text-textMain">
+
+    <!-- Mobile Header & Hamburger -->
+    <div class="md:hidden w-full bg-surface border-b border-border p-4 flex justify-between items-center z-50 sticky top-0 shadow-sm">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">V</div>
+            <span class="font-bold text-lg text-textMain">Veshoe Admin</span>
+        </div>
+        <button id="mobile-menu-btn" class="text-textMuted hover:text-textMain">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="hidden md:flex flex-col w-64 bg-sidebarBg border-r border-border h-screen sticky top-0 z-40 transition-all duration-300 shadow-soft">
+        <!-- Logo -->
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">V</div>
+            <span class="font-bold text-xl tracking-tight text-textMain">Veshoe</span>
+        </div>
+
+        <!-- Search -->
+        <div class="px-6 mb-4">
+            <div class="relative">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-textMuted text-sm"></i>
+                <input type="text" placeholder="Search Anything" class="w-full bg-background border-none rounded-xl pl-9 pr-4 py-2.5 text-sm text-textMain focus:ring-2 focus:ring-primary/50 transition-shadow">
+            </div>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="flex-1 px-4 space-y-1.5 overflow-y-auto">
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-house text-sm"></i>
+                </div>
+                Dashboard
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-box-open text-sm"></i>
+                </div>
+                Catalog & Services
+            </a>
+            
+            <a href="#" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors">
+                <div class="nav-icon-container">
+                    <i class="fa-solid fa-cart-shopping text-sm"></i>
+                </div>
+                Orders & Bookings
+                <span class="ml-auto bg-primary/10 text-primary text-xs font-bold py-0.5 px-2 rounded-full">12</span>
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-users text-sm"></i>
+                </div>
+                Customers & Staff
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-layer-group text-sm"></i>
+                </div>
+                Content & Locations
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-chart-pie text-sm"></i>
+                </div>
+                Analytics
+            </a>
+            
+            <a href="#" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-textMuted hover:bg-background transition-colors mt-8">
+                <div class="nav-icon-container bg-background">
+                    <i class="fa-solid fa-gear text-sm"></i>
+                </div>
+                Settings & Activity
+            </a>
+        </nav>
+
+        <!-- User Profile -->
+        <div class="p-4 mt-auto">
+            <div class="flex items-center gap-3 p-3 rounded-2xl hover:bg-background cursor-pointer transition-colors border border-transparent hover:border-border">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="User" class="w-10 h-10 rounded-full object-cover">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-textMain truncate">Danyal Minson</p>
+                    <p class="text-xs text-textMuted truncate">Store Manager</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-background">
+        
+        <!-- Top Header -->
+        <header class="h-20 bg-surface/80 backdrop-blur-md border-b border-border flex items-center justify-between px-6 lg:px-10 sticky top-0 z-30">
+            <div class="flex items-center gap-4">
+                <h1 class="text-2xl font-bold text-textMain">Operations Queue</h1>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button class="relative p-2 text-textMuted hover:text-textMain transition-colors">
+                    <i class="fa-regular fa-envelope text-lg"></i>
+                </button>
+                <button class="relative p-2 text-textMuted hover:text-textMain transition-colors">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+                </button>
+                <button id="add-new-btn" class="px-5 py-2.5 bg-primary hover:bg-primaryHover text-white text-sm font-medium rounded-xl transition-colors shadow-lg shadow-primary/20 flex items-center gap-2 ml-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden sm:inline">New Order</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Body -->
+        <div class="flex-1 overflow-y-auto p-6 lg:p-8 flex flex-col gap-6">
+            
+            <!-- Main Tabs -->
+            <div class="flex border-b border-border gap-8 mb-2">
+                <button class="tab-btn active text-lg" id="tab-orders" onclick="switchTab('orders')">
+                    Orders
+                    <span class="ml-2 bg-primary/10 text-primary text-xs py-0.5 px-2 rounded-full font-bold">8</span>
+                </button>
+                <button class="tab-btn text-lg" id="tab-bookings" onclick="switchTab('bookings')">
+                    Bookings
+                    <span class="ml-2 bg-background text-textMuted text-xs py-0.5 px-2 rounded-full font-bold">4</span>
+                </button>
+            </div>
+
+            <!-- ================= ORDERS VIEW ================= -->
+            <div id="view-orders" class="flex flex-col gap-6">
+                
+                <!-- Metrics / Pipeline Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card p-5 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">
+                            <i class="fa-solid fa-inbox text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-textMuted font-medium">New Orders</p>
+                            <p class="text-2xl font-bold text-textMain">12</p>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-yellow-50 flex items-center justify-center text-yellow-500">
+                            <i class="fa-solid fa-fire-burner text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-textMuted font-medium">In Progress</p>
+                            <p class="text-2xl font-bold text-textMain">5</p>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-green-500">
+                            <i class="fa-solid fa-bag-shopping text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-textMuted font-medium">Ready for Pickup</p>
+                            <p class="text-2xl font-bold text-textMain">3</p>
+                        </div>
+                    </div>
+                    <div class="glass-card p-5 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-500">
+                            <i class="fa-solid fa-check-double text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-textMuted font-medium">Completed Today</p>
+                            <p class="text-2xl font-bold text-textMain">48</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Toolbar -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-border">
+                    <div class="flex flex-1 w-full sm:w-auto gap-3">
+                        <div class="relative flex-1 max-w-md">
+                            <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-textMuted"></i>
+                            <input type="text" placeholder="Search order ID, customer..." class="w-full bg-background border-none rounded-xl pl-10 pr-4 py-2 text-sm text-textMain focus:ring-2 focus:ring-primary/50 transition-shadow">
+                        </div>
+                        <button class="px-4 py-2 bg-background rounded-xl text-textMain font-medium hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-filter text-textMuted"></i>
+                            <span class="hidden sm:inline">Filters</span>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <select class="bg-background border-none rounded-xl px-4 py-2 text-sm font-medium text-textMain focus:ring-2 focus:ring-primary/50 cursor-pointer">
+                            <option>All Statuses</option>
+                            <option>New</option>
+                            <option>In Progress</option>
+                            <option>Ready</option>
+                        </select>
+                        <select class="bg-background border-none rounded-xl px-4 py-2 text-sm font-medium text-textMain focus:ring-2 focus:ring-primary/50 cursor-pointer">
+                            <option>Today</option>
+                            <option>Yesterday</option>
+                            <option>Last 7 Days</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="glass-card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[900px]">
+                            <thead>
+                                <tr class="bg-gray-50/50 border-b border-border text-xs uppercase text-textMuted font-semibold">
+                                    <th class="py-4 px-6 w-12 text-center">
+                                        <input type="checkbox" class="rounded border-border text-primary focus:ring-primary/50">
+                                    </th>
+                                    <th class="py-4 px-6">Order ID</th>
+                                    <th class="py-4 px-6">Customer</th>
+                                    <th class="py-4 px-6">Items</th>
+                                    <th class="py-4 px-6">Total</th>
+                                    <th class="py-4 px-6">Status</th>
+                                    <th class="py-4 px-6">Time</th>
+                                    <th class="py-4 px-6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <!-- Order Row 1 -->
+                                <tr class="border-b border-border hover:bg-gray-50 transition-colors cursor-pointer" onclick="openOrderPanel('ORD-8829')">
+                                    <td class="py-4 px-6 text-center" onclick="event.stopPropagation()">
+                                        <input type="checkbox" class="rounded border-border text-primary focus:ring-primary/50">
+                                    </td>
+                                    <td class="py-4 px-6 font-semibold text-textMain">#ORD-8829</td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">JD</div>
+                                            <div>
+                                                <p class="font-medium text-textMain">John Doe</p>
+                                                <p class="text-xs text-textMuted">Pickup</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-textMuted">3 items</td>
+                                    <td class="py-4 px-6 font-medium text-textMain">$142.50</td>
+                                    <td class="py-4 px-6">
+                                        <span class="status-badge status-new">New</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-textMuted">10 mins ago</td>
+                                    <td class="py-4 px-6 text-right" onclick="event.stopPropagation()">
+                                        <button class="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-semibold hover:bg-primary hover:text-white transition-colors">Start Prep</button>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Order Row 2 -->
+                                <tr class="border-b border-border hover:bg-gray-50 transition-colors cursor-pointer" onclick="openOrderPanel('ORD-8828')">
+                                    <td class="py-4 px-6 text-center" onclick="event.stopPropagation()">
+                                        <input type="checkbox" class="rounded border-border text-primary focus:ring-primary/50">
+                                    </td>
+                                    <td class="py-4 px-6 font-semibold text-textMain">#ORD-8828</td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">AS</div>
+                                            <div>
+                                                <p class="font-medium text-textMain">Alice Smith</p>
+                                                <p class="text-xs text-textMuted">Delivery</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-textMuted">1 item</td>
+                                    <td class="py-4 px-6 font-medium text-textMain">$45.00</td>
+                                    <td class="py-4 px-6">
+                                        <span class="status-badge status-progress">In Progress</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-textMuted">25 mins ago</td>
+                                    <td class="py-4 px-6 text-right" onclick="event.stopPropagation()">
+                                        <button class="px-3 py-1.5 bg-gray-100 text-textMain rounded-lg text-xs font-semibold hover:bg-gray-200 transition-colors">Mark Ready</button>
+                                    </td>
+                                </tr>
+
+                                <!-- Order Row 3 -->
+                                <tr class="border-b border-border hover:bg-gray-50 transition-colors cursor-pointer" onclick="openOrderPanel('ORD-8827')">
+                                    <td class="py-4 px-6 text-center" onclick="event.stopPropagation()">
+                                        <input type="checkbox" class="rounded border-border text-primary focus:ring-primary/50">
+                                    </td>
+                                    <td class="py-4 px-6 font-semibold text-textMain">#ORD-8827</td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold text-xs">MJ</div>
+                                            <div>
+                                                <p class="font-medium text-textMain">Mike Johnson</p>
+                                                <p class="text-xs text-textMuted">Pickup</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-textMuted">5 items</td>
+                                    <td class="py-4 px-6 font-medium text-textMain">$210.75</td>
+                                    <td class="py-4 px-6">
+                                        <span class="status-badge status-ready">Ready</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-textMuted">45 mins ago</td>
+                                    <td class="py-4 px-6 text-right" onclick="event.stopPropagation()">
+                                        <button class="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-xs font-semibold hover:bg-green-200 transition-colors">Complete</button>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Order Row 4 -->
+                                <tr class="border-b border-border hover:bg-gray-50 transition-colors cursor-pointer opacity-70">
+                                    <td class="py-4 px-6 text-center" onclick="event.stopPropagation()">
+                                        <input type="checkbox" class="rounded border-border text-primary focus:ring-primary/50">
+                                    </td>
+                                    <td class="py-4 px-6 font-semibold text-textMain">#ORD-8826</td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold text-xs">EK</div>
+                                            <div>
+                                                <p class="font-medium text-textMain">Emma Klein</p>
+                                                <p class="text-xs text-textMuted">Delivery</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-textMuted">2 items</td>
+                                    <td class="py-4 px-6 font-medium text-textMain">$85.20</td>
+                                    <td class="py-4 px-6">
+                                        <span class="status-badge status-completed">Completed</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-textMuted">1 hr ago</td>
+                                    <td class="py-4 px-6 text-right" onclick="event.stopPropagation()">
+                                        <button class="text-textMuted hover:text-textMain"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="p-4 border-t border-border flex items-center justify-between bg-white">
+                        <span class="text-sm text-textMuted font-medium">Showing 1-10 of 48 orders</span>
+                        <div class="flex gap-1">
+                            <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-textMuted hover:bg-gray-50 disabled:opacity-50" disabled><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                            <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-white text-sm font-bold shadow-md shadow-primary/20">1</button>
+                            <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-textMuted hover:bg-gray-50 text-sm font-medium transition-colors">2</button>
+                            <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-textMuted hover:bg-gray-50 text-sm font-medium transition-colors">3</button>
+                            <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-textMuted hover:bg-gray-50 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= BOOKINGS VIEW (Hidden by default) ================= -->
+            <div id="view-bookings" class="hidden flex-col gap-6">
+                
+                <!-- Bookings Toolbar -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-border">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center bg-background rounded-xl p-1">
+                            <button class="px-4 py-1.5 rounded-lg bg-white shadow-sm text-sm font-semibold text-textMain">Day</button>
+                            <button class="px-4 py-1.5 rounded-lg text-sm font-medium text-textMuted hover:text-textMain">Week</button>
+                            <button class="px-4 py-1.5 rounded-lg text-sm font-medium text-textMuted hover:text-textMain">Month</button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="p-2 text-textMuted hover:text-textMain rounded-lg hover:bg-background"><i class="fa-solid fa-chevron-left"></i></button>
+                            <span class="font-bold text-textMain min-w-[140px] text-center">October 24, 2023</span>
+                            <button class="p-2 text-textMuted hover:text-textMain rounded-lg hover:bg-background"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <select class="bg-background border-none rounded-xl px-4 py-2 text-sm font-medium text-textMain focus:ring-2 focus:ring-primary/50 cursor-pointer">
+                            <option>All Staff</option>
+                            <option>Sarah J. (Stylist)</option>
+                            <option>Mike R. (Barber)</option>
+                        </select>
+                        <button class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primaryHover transition-colors shadow-md shadow-primary/20">
+                            + New Booking
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Calendar View -->
+                <div class="glass-card overflow-hidden flex flex-col h-[600px]">
+                    <!-- Staff Headers -->
+                    <div class="grid grid-cols-4 border-b border-border bg-gray-50/50">
+                        <div class="p-4 border-r border-border flex items-center justify-center font-medium text-sm text-textMuted">Time</div>
+                        <div class="p-4 border-r border-border flex flex-col items-center">
+                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" class="w-10 h-10 rounded-full mb-2 border-2 border-white shadow-sm">
+                            <span class="font-semibold text-sm">Sarah Jenkins</span>
+                            <span class="text-xs text-textMuted">Senior Stylist</span>
+                        </div>
+                        <div class="p-4 border-r border-border flex flex-col items-center">
+                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" class="w-10 h-10 rounded-full mb-2 border-2 border-white shadow-sm">
+                            <span class="font-semibold text-sm">Mike Ross</span>
+                            <span class="text-xs text-textMuted">Master Barber</span>
+                        </div>
+                        <div class="p-4 flex flex-col items-center">
+                            <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg" class="w-10 h-10 rounded-full mb-2 border-2 border-white shadow-sm">
+                            <span class="font-semibold text-sm">Elena Cruz</span>
+                            <span class="text-xs text-textMuted">Colorist</span>
+                        </div>
+                    </div>
+
+                    <!-- Time Grid (Scrollable) -->
+                    <div class="flex-1 overflow-y-auto relative bg-white">
+                        <!-- Background Grid Lines -->
+                        <div class="absolute inset-0 grid grid-cols-4 pointer-events-none">
+                            <div class="border-r border-border"></div>
+                            <div class="border-r border-border"></div>
+                            <div class="border-r border-border"></div>
+                            <div></div>
+                        </div>
+
+                        <!-- 9 AM -->
+                        <div class="relative h-20 border-b border-border/50">
+                            <div class="absolute left-0 w-[25%] h-full flex items-start justify-center pt-2">
+                                <span class="text-xs font-medium text-textMuted">9:00 AM</span>
+                            </div>
+                            <!-- Event -->
+                            <div class="absolute left-[25%] w-[25%] top-2 h-16 px-1 z-10">
+                                <div class="w-full h-full bg-purple-100 border-l-4 border-purple-500 rounded-r-lg p-2 cursor-pointer hover:shadow-md transition-shadow" onclick="openBookingPanel()">
+                                    <p class="text-xs font-bold text-purple-900 truncate">Haircut & Wash</p>
+                                    <p class="text-[10px] text-purple-700 truncate">David Miller • Confirmed</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 10 AM -->
+                        <div class="relative h-20 border-b border-border/50">
+                            <div class="absolute left-0 w-[25%] h-full flex items-start justify-center pt-2">
+                                <span class="text-xs font-medium text-textMuted">10:00 AM</span>
+                            </div>
+                            <!-- Event spanning 2 hours -->
+                            <div class="absolute left-[75%] w-[25%] top-2 h-[calc(100%+4rem)] px-1 z-10">
+                                <div class="w-full h-full bg-blue-100 border-l-4 border-blue-500 rounded-r-lg p-2 cursor-pointer hover:shadow-md transition-shadow">
+                                    <p class="text-xs font-bold text-blue-900 truncate">Full Color & Style</p>
+                                    <p class="text-[10px] text-blue-700 truncate">Jessica Wong • Arrived</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 11 AM -->
+                        <div class="relative h-20 border-b border-border/50">
+                            <div class="absolute left-0 w-[25%] h-full flex items-start justify-center pt-2">
+                                <span class="text-xs font-medium text-textMuted">11:00 AM</span>
+                            </div>
+                            <!-- Event -->
+                            <div class="absolute left-[50%] w-[25%] top-2 h-16 px-1 z-10">
+                                <div class="w-full h-full bg-green-100 border-l-4 border-green-500 rounded-r-lg p-2 cursor-pointer hover:shadow-md transition-shadow">
+                                    <p class="text-xs font-bold text-green-900 truncate">Beard Trim</p>
+                                    <p class="text-[10px] text-green-700 truncate">Tom Hardy • Confirmed</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 12 PM -->
+                        <div class="relative h-20 border-b border-border/50 bg-gray-50/30">
+                            <div class="absolute left-0 w-[25%] h-full flex items-start justify-center pt-2">
+                                <span class="text-xs font-medium text-textMuted">12:00 PM</span>
+                            </div>
+                            <!-- Blocked Time -->
+                            <div class="absolute left-[25%] w-[25%] top-2 h-16 px-1 z-10">
+                                <div class="w-full h-full bg-gray-100 border border-dashed border-gray-300 rounded-lg p-2 flex items-center justify-center">
+                                    <span class="text-xs text-gray-500 font-medium">Lunch Break</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 1 PM -->
+                        <div class="relative h-20 border-b border-border/50">
+                            <div class="absolute left-0 w-[25%] h-full flex items-start justify-center pt-2">
+                                <span class="text-xs font-medium text-textMuted">1:00 PM</span>
+                            </div>
+                            <!-- Event -->
+                            <div class="absolute left-[50%] w-[25%] top-10 h-16 px-1 z-10">
+                                <div class="w-full h-full bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg p-2 cursor-pointer hover:shadow-md transition-shadow">
+                                    <p class="text-xs font-bold text-yellow-900 truncate">Classic Cut</p>
+                                    <p class="text-[10px] text-yellow-700 truncate">Walk-in • Pending</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= SIDE PANELS ================= -->
+        
+        <!-- Overlay -->
+        <div id="panel-overlay" class="absolute inset-0 bg-textMain/20 backdrop-blur-sm z-40 hidden transition-opacity opacity-0"></div>
+
+        <!-- Order Detail Panel -->
+        <div id="order-panel" class="absolute top-0 right-0 h-full w-full max-w-lg bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col border-l border-border">
+            
+            <!-- Panel Header -->
+            <div class="h-20 border-b border-border flex items-center justify-between px-6 shrink-0 bg-white">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl font-bold text-textMain">Order #ORD-8829</h2>
+                        <span class="status-badge status-new">New</span>
+                    </div>
+                    <p class="text-xs text-textMuted mt-1">Placed Oct 24, 2023 at 10:42 AM</p>
+                </div>
+                <button onclick="closePanels()" class="w-8 h-8 rounded-full flex items-center justify-center text-textMuted hover:bg-background transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Panel Content -->
+            <div class="flex-1 overflow-y-auto bg-background">
+                
+                <!-- Action Bar -->
+                <div class="bg-white p-4 border-b border-border flex gap-2">
+                    <button class="flex-1 py-2 bg-primary text-white rounded-xl text-sm font-semibold shadow-md shadow-primary/20 hover:bg-primaryHover transition-colors">Accept & Start Prep</button>
+                    <button class="px-4 py-2 bg-white border border-border text-textMain rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"><i class="fa-solid fa-print"></i></button>
+                    <button class="px-4 py-2 bg-white border border-border text-error rounded-xl text-sm font-medium hover:bg-red-50 transition-colors">Reject</button>
+                </div>
+
+                <div class="p-6 space-y-6">
+                    <!-- Customer Info -->
+                    <div class="glass-card p-5">
+                        <h3 class="text-sm font-bold text-textMain uppercase tracking-wider mb-4">Customer Details</h3>
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg shrink-0">JD</div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-textMain text-lg">John Doe</h4>
+                                <div class="mt-2 space-y-1 text-sm text-textMuted">
+                                    <p><i class="fa-solid fa-envelope w-5"></i> john.doe@example.com</p>
+                                    <p><i class="fa-solid fa-phone w-5"></i> +1 (555) 123-4567</p>
+                                </div>
+                                <div class="mt-3 pt-3 border-t border-border flex gap-2">
+                                    <button class="text-xs font-semibold text-primary hover:text-primaryHover bg-primary/5 px-3 py-1.5 rounded-lg">Message</button>
+                                    <button class="text-xs font-semibold text-textMain hover:bg-gray-100 border border-border px-3 py-1.5 rounded-lg">View History</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="glass-card p-0 overflow-hidden">
+                        <div class="p-5 border-b border-border flex justify-between items-center bg-gray-50/50">
+                            <h3 class="text-sm font-bold text-textMain uppercase tracking-wider">Order Items</h3>
+                            <span class="text-sm font-medium text-textMuted">Pickup Order</span>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <!-- Item 1 -->
+                            <div class="flex gap-4">
+                                <div class="w-16 h-16 rounded-xl bg-gray-100 border border-border overflow-hidden shrink-0">
+                                    <div class="w-full h-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-box"></i></div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between">
+                                        <p class="font-bold text-textMain">Premium Leather Care Kit</p>
+                                        <p class="font-bold text-textMain">$34.50</p>
+                                    </div>
+                                    <p class="text-sm text-textMuted mt-1">Qty: 1</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Item 2 -->
+                            <div class="flex gap-4 pt-4 border-t border-border/50">
+                                <div class="w-16 h-16 rounded-xl bg-gray-100 border border-border overflow-hidden shrink-0">
+                                    <div class="w-full h-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-shoe-prints"></i></div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between">
+                                        <p class="font-bold text-textMain">AeroGlide Runner Pro</p>
+                                        <p class="font-bold text-textMain">$108.00</p>
+                                    </div>
+                                    <p class="text-sm text-textMuted mt-1">Size: 10 • Color: Black</p>
+                                    <p class="text-sm text-textMuted">Qty: 1</p>
+                                    <p class="text-xs text-orange-600 bg-orange-50 inline-block px-2 py-1 rounded mt-2"><i class="fa-solid fa-tag mr-1"></i> Discount applied (-20%)</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Totals -->
+                        <div class="p-5 bg-gray-50 border-t border-border space-y-2">
+                            <div class="flex justify-between text-sm text-textMuted">
+                                <span>Subtotal</span>
+                                <span>$169.50</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-textMuted">
+                                <span>Discount (SUMMER20)</span>
+                                <span class="text-green-600">-$27.00</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-textMuted">
+                                <span>Tax</span>
+                                <span>$0.00</span>
+                            </div>
+                            <div class="flex justify-between text-lg font-bold text-textMain pt-2 border-t border-border/50 mt-2">
+                                <span>Total</span>
+                                <span>$142.50</span>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">Paid</span>
+                                <span class="text-xs text-textMuted">via Credit Card ending in •••• 4242</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Audit / Timeline -->
+                    <div class="glass-card p-5">
+                        <h3 class="text-sm font-bold text-textMain uppercase tracking-wider mb-4">Timeline</h3>
+                        <div class="relative pl-4 border-l-2 border-gray-200 space-y-6">
+                            <div class="relative">
+                                <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-primary border-2 border-white"></div>
+                                <p class="text-sm font-bold text-textMain">Order Placed</p>
+                                <p class="text-xs text-textMuted mt-0.5">Oct 24, 10:42 AM by System</p>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-green-500 border-2 border-white"></div>
+                                <p class="text-sm font-bold text-textMain">Payment Confirmed</p>
+                                <p class="text-xs text-textMuted mt-0.5">Oct 24, 10:42 AM via Stripe</p>
+                            </div>
+                            <div class="relative opacity-50">
+                                <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-gray-300 border-2 border-white"></div>
+                                <p class="text-sm font-bold text-textMain">Preparation Started</p>
+                                <p class="text-xs text-textMuted mt-0.5">Pending</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-4 border-t border-border">
+                            <label class="block text-sm font-semibold text-textMain mb-2">Add Note</label>
+                            <div class="flex gap-2">
+                                <input type="text" placeholder="Internal note..." class="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50">
+                                <button class="px-4 py-2 bg-gray-100 text-textMain font-semibold rounded-xl text-sm hover:bg-gray-200">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Detail Panel (Similar structure, slightly different content) -->
+        <div id="booking-panel" class="absolute top-0 right-0 h-full w-full max-w-lg bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col border-l border-border">
+            <div class="h-20 border-b border-border flex items-center justify-between px-6 shrink-0 bg-white">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl font-bold text-textMain">Booking #BK-9912</h2>
+                        <span class="status-badge bg-purple-100 text-purple-700">Confirmed</span>
+                    </div>
+                    <p class="text-xs text-textMuted mt-1">Today, 9:00 AM - 10:00 AM</p>
+                </div>
+                <button onclick="closePanels()" class="w-8 h-8 rounded-full flex items-center justify-center text-textMuted hover:bg-background transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto bg-background p-6 space-y-6">
+                <!-- Service Details -->
+                <div class="glass-card p-5">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-textMain">Haircut & Wash</h3>
+                            <p class="text-sm text-textMuted mt-1">with <span class="font-semibold text-textMain">Sarah Jenkins</span></p>
+                        </div>
+                        <p class="font-bold text-lg text-textMain">$45.00</p>
+                    </div>
+                    
+                    <div class="flex gap-2 mt-4 pt-4 border-t border-border">
+                        <button class="flex-1 py-2 bg-white border border-border text-textMain rounded-xl text-sm font-semibold hover:bg-gray-50 shadow-sm">Reschedule</button>
+                        <button class="flex-1 py-2 bg-white border border-error/30 text-error rounded-xl text-sm font-semibold hover:bg-red-50 shadow-sm">Cancel</button>
+                    </div>
+                </div>
+                
+                <!-- More details would go here following the same pattern -->
+                 <div class="glass-card p-5 flex items-center justify-center h-32 text-textMuted text-sm border-dashed">
+                    [Customer & Audit Details omitted for brevity, follows exact pattern as Orders]
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('hidden')) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('absolute', 'w-full', 'max-w-xs', 'h-screen');
+            } else {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('absolute', 'w-full', 'max-w-xs', 'h-screen');
+            }
+        });
+
+        // Tab Switching
+        function switchTab(tab) {
+            // Update buttons
+            document.getElementById('tab-orders').classList.remove('active');
+            document.getElementById('tab-bookings').classList.remove('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+            
+            // Update views
+            document.getElementById('view-orders').classList.add('hidden');
+            document.getElementById('view-orders').classList.remove('flex');
+            document.getElementById('view-bookings').classList.add('hidden');
+            document.getElementById('view-bookings').classList.remove('flex');
+            
+            document.getElementById('view-' + tab).classList.remove('hidden');
+            document.getElementById('view-' + tab).classList.add('flex');
+        }
+
+        // Panel Logic
+        const overlay = document.getElementById('panel-overlay');
+        const orderPanel = document.getElementById('order-panel');
+        const bookingPanel = document.getElementById('booking-panel');
+
+        function openOrderPanel(id) {
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                orderPanel.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function openBookingPanel() {
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                bookingPanel.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function closePanels() {
+            orderPanel.classList.add('translate-x-full');
+            bookingPanel.classList.add('translate-x-full');
+            overlay.classList.add('opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+
+        overlay.addEventListener('click', closePanels);
+    </script>
+</body>
+</html>

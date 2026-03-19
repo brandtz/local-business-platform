@@ -5,6 +5,7 @@ import type { AuthViewerState } from "@platform/types";
 
 import { getAuthViewerState } from "./auth-state";
 import type { WebCustomerRuntimeConfig } from "./runtime-config";
+import type { TenantFrontendContext } from "./tenant-bootstrap";
 
 function createPage(title: string, description: string): Component {
   return defineComponent({
@@ -17,23 +18,32 @@ function createPage(title: string, description: string): Component {
 }
 
 export function createRoutes(
-  runtimeConfig: WebCustomerRuntimeConfig
+  runtimeConfig: WebCustomerRuntimeConfig,
+  tenantContext?: TenantFrontendContext
 ): RouteRecordRaw[] {
   const authViewerState = getAuthViewerState();
+
+  const tenantLabel = tenantContext
+    ? `${tenantContext.displayName} (${tenantContext.slug})`
+    : "no tenant context";
+
+  const modulesLabel = tenantContext
+    ? tenantContext.enabledModules.join(", ") || "none"
+    : "unknown";
 
   return [
     {
       path: "/",
       component: createPage(
         "Storefront Shell",
-        `${runtimeConfig.appTitle} is ready for tenant-aware customer experiences. Auth state: ${describeAuthViewerState(authViewerState)}.`
+        `${runtimeConfig.appTitle} — Tenant: ${tenantLabel}. Modules: ${modulesLabel}. Auth: ${describeAuthViewerState(authViewerState)}.`
       )
     },
     {
       path: "/status",
       component: createPage(
         "Runtime Status",
-        `Application ${runtimeConfig.appId} bootstrapped successfully.`
+        `App: ${runtimeConfig.appId}. Tenant: ${tenantLabel}. Template: ${tenantContext?.templateKey ?? "none"}.`
       )
     }
   ];

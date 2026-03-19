@@ -1,6 +1,10 @@
 # Epic 7 Technical Task Plan
 
+> **UX Design References:** See `agents/design/screen-reference-index.md` for the full screen-to-brief mapping. Customer-facing views reference `Portal Design - Customer Portal *.html`. Admin operational views reference `Portal Design - Business Admin - orders and booking.html`. Analytics reference `Portal Design - Business Admin - analytics.html`.
+
 ## E7-S1 Cart and Pricing Engine Foundations
+
+UX References: `Portal Design - Customer Portal cart and checkout.html` (CP-04/05 cart + checkout stepper)
 
 Technical Tasks:
 - E7-S1-T1: define cart model and server-side pricing inputs for items, modifiers, discounts, tax, and tip
@@ -17,6 +21,8 @@ Handoff Focus:
 - pricing invariants, cart payload contract, and stale-price handling rules
 
 ## E7-S2 Order Lifecycle and Fulfillment Operations
+
+UX References: `Portal Design - Business Admin - orders and booking.html` (BA-08/09 Orders tab), `Portal Design - Customer Portal - confirmation order-booking details.html` (CP-06)
 
 Technical Tasks:
 - E7-S2-T1: finalize order schema, state machine, and fulfillment mode behavior
@@ -50,6 +56,8 @@ Handoff Focus:
 
 ## E7-S4 Booking Lifecycle Management
 
+UX References: `Portal Design - Business Admin - orders and booking.html` (BA-10/11 Bookings tab + calendar), `Portal Design - Customer Portal - confirmation order-booking details.html` (CP-10)
+
 Technical Tasks:
 - E7-S4-T1: finalize booking schema, status transitions, cancellation windows, and deposit behavior
 - E7-S4-T2: implement booking creation, confirm, cancel, check-in, and complete services
@@ -65,6 +73,8 @@ Handoff Focus:
 - booking state machine, cancellation rules, and admin exception-handling flows
 
 ## E7-S5 Customer Identity and Account History
+
+UX References: `Portal Design - Customer Portal - account.html` (CP-11 through CP-18), `Portal Design - Customer Portal - signin register reset.html` (CP-20)
 
 Technical Tasks:
 - E7-S5-T1: implement customer registration, login, and profile retrieval flows in tenant context
