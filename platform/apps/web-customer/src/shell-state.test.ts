@@ -19,7 +19,6 @@ import {
 	createInitializingResult,
 	createResolvedResult,
 	type BootstrapFailureReason,
-	type BootstrapResult,
 	type TenantFrontendContext
 } from "./tenant-bootstrap";
 
