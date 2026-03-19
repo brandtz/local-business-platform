@@ -334,8 +334,7 @@ describe("safe fallback — no tenant data exposure", () => {
 	];
 
 	function assertNoTenantDataInDescriptor(
-		descriptor: { title: string; message: string },
-		reason: string
+		descriptor: { title: string; message: string }
 	): void {
 		for (const term of sensitiveTerms) {
 			expect(descriptor.title).not.toContain(term);
@@ -346,31 +345,31 @@ describe("safe fallback — no tenant data exposure", () => {
 	it("no-host descriptor does not expose tenant data", () => {
 		const descriptor = describeBootstrapShellState(createFailedResult("no-host"));
 
-		assertNoTenantDataInDescriptor(descriptor, "no-host");
+		assertNoTenantDataInDescriptor(descriptor);
 	});
 
 	it("tenant-not-found descriptor does not expose tenant data", () => {
 		const descriptor = describeBootstrapShellState(createFailedResult("tenant-not-found"));
 
-		assertNoTenantDataInDescriptor(descriptor, "tenant-not-found");
+		assertNoTenantDataInDescriptor(descriptor);
 	});
 
 	it("tenant-suspended descriptor does not expose tenant data", () => {
 		const descriptor = describeBootstrapShellState(createFailedResult("tenant-suspended"));
 
-		assertNoTenantDataInDescriptor(descriptor, "tenant-suspended");
+		assertNoTenantDataInDescriptor(descriptor);
 	});
 
 	it("tenant-archived descriptor does not expose tenant data", () => {
 		const descriptor = describeBootstrapShellState(createFailedResult("tenant-archived"));
 
-		assertNoTenantDataInDescriptor(descriptor, "tenant-archived");
+		assertNoTenantDataInDescriptor(descriptor);
 	});
 
 	it("api-unreachable descriptor does not expose tenant data", () => {
 		const descriptor = describeBootstrapShellState(createFailedResult("api-unreachable"));
 
-		assertNoTenantDataInDescriptor(descriptor, "api-unreachable");
+		assertNoTenantDataInDescriptor(descriptor);
 	});
 
 	it("no failure descriptor contains the word 'tenant'", () => {

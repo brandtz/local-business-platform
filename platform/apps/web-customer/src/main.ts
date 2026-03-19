@@ -12,9 +12,9 @@ import { createRoutes } from "./routes";
 import { getRuntimeConfig } from "./runtime-config";
 import {
 	classifyBootstrapResult,
-	describeBootstrapShellState,
 	isRetryableBootstrapFailure,
-	resolveBootstrapShellPolicy
+	resolveBootstrapShellPolicy,
+	type BootstrapShellCategory
 } from "./shell-state";
 import {
 	isBootstrapResolved,
@@ -117,7 +117,7 @@ function mountShellState(result: BootstrapResult): void {
 
 function renderShellState(
 	descriptor: ShellStateDescriptor,
-	category: string,
+	category: BootstrapShellCategory,
 	retryable: boolean
 ) {
 	switch (category) {
