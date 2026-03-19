@@ -1,10 +1,12 @@
-// E4-S2-T1: Tenant bootstrap orchestration — resolves tenant context from the
+// E4-S2-T1/T3: Tenant bootstrap orchestration — resolves tenant context from the
 // current host before Vue router renders. Provides injection keys for all
 // downstream components to access the resolved tenant context.
 // Security: tenant context must match the host — never cross-contaminate.
+// Never cache configuration across tenant boundaries.
 
 import { type InjectionKey } from "vue";
 import type { TenantResolutionTenantRecord } from "@platform/types";
+import { classifyApiError, type ApiClientConfig } from "@platform/sdk";
 
 import {
 	createFailedResult,
@@ -32,7 +34,7 @@ export type TenantBootstrapData = {
 	tenantConfig: TenantConfigPayload | null;
 };
 
-/** Pluggable data source. E4-S2-T3 will provide the real API-backed version. */
+/** Pluggable data source. */
 export type TenantBootstrapDataSource = () => Promise<TenantBootstrapData>;
 
 // ── Bootstrap Options ────────────────────────────────────────────────────────
@@ -76,15 +78,110 @@ export async function executeTenantBootstrap(
 	);
 }
 
+// ── API-Backed Data Source (E4-S2-T3) ────────────────────────────────────────
+
+const BOOTSTRAP_ENDPOINT = "/tenant/bootstrap";
+
+/**
+ * Creates a data source that fetches tenant resolution data and configuration
+ * from the backend API. Uses classifyApiError() for error classification.
+ * Never caches across tenant boundaries — every call is a fresh fetch.
+ */
+export function createApiBootstrapDataSource(
+	config: ApiClientConfig
+): TenantBootstrapDataSource {
+	return async () => {
+		const url = `${config.baseUrl}${BOOTSTRAP_ENDPOINT}`;
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), config.timeout);
+
+		let response: Response;
+
+		try {
+			response = await fetch(url, {
+				method: "GET",
+				credentials: config.withCredentials ? "include" : "same-origin",
+				headers: { Accept: "application/json" },
+				signal: controller.signal
+			});
+		} catch {
+			throw classifyApiError(null);
+		} finally {
+			clearTimeout(timeoutId);
+		}
+
+		if (!response.ok) {
+			throw classifyApiError(response.status);
+		}
+
+		const body: unknown = await response.json();
+
+		return parseBootstrapResponse(body);
+	};
+}
+
+/**
+ * Validates and parses the raw API response into TenantBootstrapData.
+ * Throws if the response shape is invalid.
+ */
+export function parseBootstrapResponse(body: unknown): TenantBootstrapData {
+	if (typeof body !== "object" || body === null) {
+		throw new Error("Invalid bootstrap response: expected object");
+	}
+
+	const record = body as Record<string, unknown>;
+
+	if (!Array.isArray(record.tenants)) {
+		throw new Error("Invalid bootstrap response: tenants must be an array");
+	}
+
+	const tenantConfig =
+		record.tenantConfig != null && typeof record.tenantConfig === "object"
+			? validateTenantConfig(record.tenantConfig as Record<string, unknown>)
+			: null;
+
+	return {
+		tenants: record.tenants as TenantResolutionTenantRecord[],
+		tenantConfig
+	};
+}
+
+function validateTenantConfig(
+	raw: Record<string, unknown>
+): TenantConfigPayload | null {
+	if ("templateKey" in raw && "enabledModules" in raw) {
+		return raw as unknown as TenantConfigPayload;
+	}
+
+	return null;
+}
+
 // ── Dev / Test Data Source ────────────────────────────────────────────────────
 
 const BOOTSTRAP_OVERRIDE_KEY =
 	"__platform_test_web_customer_tenant_bootstrap__";
 
 /**
- * Creates a data source that reads from sessionStorage (for dev/test) or
+ * Creates a data source that checks sessionStorage for an override (dev/test),
+ * then falls back to the real API-backed data source.
+ */
+export function createBootstrapDataSource(
+	config: ApiClientConfig
+): TenantBootstrapDataSource {
+	const apiFetch = createApiBootstrapDataSource(config);
+
+	return async () => {
+		const override = readBootstrapOverride();
+
+		if (override) return override;
+
+		return apiFetch();
+	};
+}
+
+/**
+ * Creates a data source that reads only from sessionStorage (for dev/test) or
  * returns an empty tenant list, which causes "tenant-not-found".
- * E4-S2-T3 will replace this with the real API-backed data source.
  */
 export function createDevBootstrapDataSource(): TenantBootstrapDataSource {
 	return async () => {
