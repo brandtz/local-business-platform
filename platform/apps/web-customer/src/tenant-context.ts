@@ -136,17 +136,24 @@ export function parseBootstrapResponse(body: unknown): TenantBootstrapData {
 	}
 
 	const tenantConfig =
-		record.tenantConfig != null &&
-		typeof record.tenantConfig === "object" &&
-		"templateKey" in (record.tenantConfig as Record<string, unknown>) &&
-		"enabledModules" in (record.tenantConfig as Record<string, unknown>)
-			? (record.tenantConfig as TenantConfigPayload)
+		record.tenantConfig != null && typeof record.tenantConfig === "object"
+			? validateTenantConfig(record.tenantConfig as Record<string, unknown>)
 			: null;
 
 	return {
 		tenants: record.tenants as TenantResolutionTenantRecord[],
 		tenantConfig
 	};
+}
+
+function validateTenantConfig(
+	raw: Record<string, unknown>
+): TenantConfigPayload | null {
+	if ("templateKey" in raw && "enabledModules" in raw) {
+		return raw as unknown as TenantConfigPayload;
+	}
+
+	return null;
 }
 
 // ── Dev / Test Data Source ────────────────────────────────────────────────────
