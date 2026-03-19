@@ -7,6 +7,7 @@ import { createApp, defineComponent, h } from "vue";
 import { createRouter, createWebHistory, RouterLink, RouterView } from "vue-router";
 
 import type { ShellStateDescriptor } from "@platform/ui";
+import { createApiClientConfig } from "@platform/sdk";
 
 import { createRoutes } from "./routes";
 import { getRuntimeConfig } from "./runtime-config";
@@ -22,7 +23,7 @@ import {
 	type TenantFrontendContext
 } from "./tenant-bootstrap";
 import {
-	createDevBootstrapDataSource,
+	createBootstrapDataSource,
 	executeTenantBootstrap,
 	readManagedPreviewDomains,
 	TENANT_BOOTSTRAP_RESULT_KEY,
@@ -35,13 +36,21 @@ document.title = runtimeConfig.appTitle;
 
 // ── Bootstrap Gate ───────────────────────────────────────────────────────────
 
+function resolveBootstrapDataSource() {
+	const apiConfig = createApiClientConfig("web-customer", {
+		baseUrl: import.meta.env.VITE_API_BASE_URL
+	});
+
+	return createBootstrapDataSource(apiConfig);
+}
+
 async function bootstrap(): Promise<void> {
 	const result = await executeTenantBootstrap({
 		host: window.location.hostname,
 		managedPreviewDomains: readManagedPreviewDomains(
 			import.meta.env.VITE_MANAGED_PREVIEW_DOMAINS
 		),
-		fetchData: createDevBootstrapDataSource()
+		fetchData: resolveBootstrapDataSource()
 	});
 
 	if (isBootstrapResolved(result)) {
