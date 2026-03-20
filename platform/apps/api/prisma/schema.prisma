@@ -97,6 +97,11 @@ model Tenant {
   previewSubdomain String             @unique
   customDomainRecords TenantCustomDomain[]
   memberships      TenantMembership[]
+  categories       CatalogCategory[]
+  items            CatalogItem[]
+  itemVariants     CatalogItemVariant[]
+  itemModifiers    CatalogItemModifier[]
+  mediaReferences  CatalogMediaReference[]
 }
 
 model TenantCustomDomain {
@@ -175,4 +180,111 @@ model AuthSession {
   @@index([userId, scope])
   @@index([expiresAt])
   @@index([revokedAt])
+}
+
+// ---------------------------------------------------------------------------
+// Catalog domain models
+// ---------------------------------------------------------------------------
+
+enum CatalogItemStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum CatalogCategoryStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model CatalogCategory {
+  id               String                @id @default(uuid())
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  tenantId         String
+  name             String
+  slug             String
+  description      String?
+  displayOrder     Int                   @default(0)
+  status           CatalogCategoryStatus @default(ACTIVE)
+  parentCategoryId String?
+  imageUrl         String?
+  tenant           Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parentCategory   CatalogCategory?      @relation("CategoryParent", fields: [parentCategoryId], references: [id], onDelete: SetNull)
+  childCategories  CatalogCategory[]     @relation("CategoryParent")
+  items            CatalogItem[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, status])
+  @@index([tenantId, displayOrder])
+}
+
+model CatalogItem {
+  id             String            @id @default(uuid())
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  tenantId       String
+  categoryId     String
+  name           String
+  slug           String
+  description    String?
+  status         CatalogItemStatus @default(DRAFT)
+  displayOrder   Int               @default(0)
+  tenant         Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category       CatalogCategory   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  variants       CatalogItemVariant[]
+  modifiers      CatalogItemModifier[]
+  mediaReferences CatalogMediaReference[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, categoryId, status])
+  @@index([tenantId, status])
+  @@index([tenantId, displayOrder])
+}
+
+model CatalogItemVariant {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tenantId     String
+  itemId       String
+  name         String
+  priceCents   Int
+  isDefault    Boolean  @default(false)
+  displayOrder Int      @default(0)
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  item         CatalogItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, itemId])
+}
+
+model CatalogItemModifier {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tenantId     String
+  itemId       String
+  name         String
+  priceCents   Int      @default(0)
+  isRequired   Boolean  @default(false)
+  displayOrder Int      @default(0)
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  item         CatalogItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, itemId])
+}
+
+model CatalogMediaReference {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tenantId     String
+  itemId       String
+  url          String
+  altText      String?
+  displayOrder Int      @default(0)
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  item         CatalogItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, itemId])
 }
