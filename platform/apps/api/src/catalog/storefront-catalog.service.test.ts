@@ -47,13 +47,12 @@ describe("StorefrontCatalogService", () => {
 		});
 		catalog.updateItem(TENANT_A, activeItem.id, { status: "active" });
 
-		const draftItem = catalog.createItem(TENANT_A, {
+		catalog.createItem(TENANT_A, {
 			categoryId: activeCat.id,
 			name: "Draft Burger",
 			slug: "draft-burger",
 			variants: [{ isDefault: true, name: "Regular", priceCents: 1500 }]
 		});
-		// draftItem stays in "draft" status
 
 		const result = storefront.getActiveCatalog(TENANT_A);
 
