@@ -125,7 +125,6 @@ Update the active task board to move tasks from Ready → In Progress → Comple
 ## Downstream Consumers
 
 The following prompts depend on output from this one:
-- **Prompt 04** (E6-S3): Staff assignment needs catalog context
 - **Prompt 05** (E6-S5): Vertical templates map onto catalog defaults
 - **Prompt 06** (E6-S6): Domain contract stabilization consolidates catalog contracts
 - **Prompt 07** (E7-S1): Cart and pricing engine consumes catalog item and pricing types

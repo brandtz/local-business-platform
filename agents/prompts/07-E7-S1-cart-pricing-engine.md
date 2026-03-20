@@ -10,8 +10,8 @@
 
 ## Prerequisites
 
-- Epic 6 must be completed (all domain models and contract stabilization).
-- Specifically verify that E6-S1 (catalog) and E6-S6 (contract stabilization) are Completed.
+- Epic 6 must be completed — all stories E6-S1 through E6-S6, prompts 01–06.
+- Specifically verify that E6-S1 (catalog — prompt 01) and E6-S6 (contract stabilization — prompt 06) are Completed.
 - Read E6-S1 and E6-S6 handoff notes for catalog item types, pricing types, and shared contracts.
 
 ## Context for the Agent

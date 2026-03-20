@@ -12,7 +12,8 @@
 
 - Epic 3 must be completed (tenant provisioning).
 - Epic 5 must be completed (tenant operational settings).
-- Epic 7 must be completed (ordering and booking flows).
+- Epic 6 must be completed — prompts 01–06 (domain contracts consumed by payment flows).
+- Epic 7 must be completed — prompts 07–12 (ordering and booking flows that use payments).
 - Verify all prerequisites on the active task board.
 
 ## Context for the Agent

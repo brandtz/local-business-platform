@@ -11,8 +11,9 @@
 ## Prerequisites
 
 - E8-S1 (payment connection management) must be completed — prompt 13.
-- Epic 7 must be completed (order and booking lifecycle for payment integration points).
+- Epic 7 must be completed — prompts 07–12 (order and booking lifecycle for payment integration points).
 - Read E8-S1 handoff notes for payment connection model, encryption strategy, and adapter contract.
+- Read E7-S2 and E7-S4 handoff notes for order and booking payment integration points.
 
 ## Context for the Agent
 

@@ -10,8 +10,9 @@
 
 ## Prerequisites
 
-- Epic 7 must be completed (ordering and booking domain events).
 - Epic 1 must be completed (tenant and queue infrastructure).
+- Epic 6 must be completed — prompts 01–06 (domain contracts for event schemas).
+- Epic 7 must be completed — prompts 07–12 (ordering and booking domain events).
 - Verify prerequisites on the active task board.
 
 ## Context for the Agent

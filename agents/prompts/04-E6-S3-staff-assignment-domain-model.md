@@ -6,7 +6,7 @@
 - Epic: 6
 - Story: E6-S3
 - Tasks: E6-S3-T1, E6-S3-T2, E6-S3-T3, E6-S3-T4
-- Phase: Epic 6 Intermediate (must wait for prompts 02 to complete)
+- Phase: Epic 6 Intermediate (must wait for prompt 02 to complete)
 
 ## Prerequisites
 

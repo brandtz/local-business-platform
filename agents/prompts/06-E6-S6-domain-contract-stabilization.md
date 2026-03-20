@@ -127,10 +127,9 @@ Update the active task board accordingly.
 ## Downstream Consumers
 
 The following prompts depend on output from this one:
-- **Prompt 07** (E7-S1): Cart pricing engine imports catalog contracts
-- **Prompt 08** (E7-S3): Availability computation imports service and staff contracts
-- **Prompt 09** (E7-S2): Order lifecycle imports domain contracts
-- **All Epic 7 and 8 prompts** rely on the contract surface stabilized here
+- **Prompt 07** (E7-S1): Cart pricing engine imports catalog contracts (direct dependency)
+- **Prompt 08** (E7-S3): Availability computation imports service and staff contracts (direct dependency)
+- **Prompts 09–18** rely on the contract surface stabilized here (transitive through prompts 07 and 08)
 
 ## Stop Conditions
 

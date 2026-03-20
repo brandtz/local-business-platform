@@ -10,9 +10,9 @@
 
 ## Prerequisites
 
-- Epic 6 must be completed (service, staff, and domain contracts).
+- Epic 6 must be completed — all stories E6-S1 through E6-S6, prompts 01–06.
 - Epic 5 must be completed (tenant operational settings including location hours).
-- Specifically verify that E6-S2 (services), E6-S3 (staff), and E6-S6 (contracts) are Completed.
+- Specifically verify that E6-S2 (services — prompt 02), E6-S3 (staff — prompt 04), and E6-S6 (contracts — prompt 06) are Completed.
 - Read E6-S2, E6-S3, and E6-S6 handoff notes for service durations, staff assignments, and location data.
 
 ## Context for the Agent
