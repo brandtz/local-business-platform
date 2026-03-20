@@ -96,6 +96,10 @@ Use this file to track the active execution queue.
 - E4-S6-T2 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S6-T2.md | handoff: ./2026-03-17-E4-S6-T2.md
 - E4-S1-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S1-T4.md | handoff: ./2026-03-17-E4-S1-T4.md
 - E4-S6-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S6-T4.md | handoff: ./2026-03-17-E4-S6-T4.md
+- E6-S1-T1 | owner lane: API Surface Lane | packet: ../packets/epic-06/E6-S1-T1.md | handoff: ./2026-03-20-E6-S1-T1.md
+- E6-S1-T2 | owner lane: API Surface Lane | packet: ../packets/epic-06/E6-S1-T2.md | handoff: ./2026-03-20-E6-S1-T2.md
+- E6-S1-T3 | owner lane: API Surface Lane | packet: ../packets/epic-06/E6-S1-T3.md | handoff: ./2026-03-20-E6-S1-T3.md
+- E6-S1-T4 | owner lane: API Surface Lane | packet: ../packets/epic-06/E6-S1-T4.md | handoff: ./2026-03-20-E6-S1-T4.md
 
 ## Board Rules
 

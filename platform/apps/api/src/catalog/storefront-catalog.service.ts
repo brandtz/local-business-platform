@@ -35,7 +35,7 @@ export class StorefrontCatalogService {
 				});
 
 				const storefrontItems: StorefrontItem[] = itemsResult.items.map(
-					(item) => this.mapItem(tenantId, item.id, item.name, item.slug, item.description, item.displayOrder)
+					(item) => this.mapItem(tenantId, item)
 				);
 
 				return {
@@ -67,20 +67,16 @@ export class StorefrontCatalogService {
 		const item = allItems.items.find((i) => i.slug === itemSlug);
 		if (!item) return undefined;
 
-		return this.mapItem(tenantId, item.id, item.name, item.slug, item.description, item.displayOrder);
+		return this.mapItem(tenantId, item);
 	}
 
 	private mapItem(
 		tenantId: string,
-		itemId: string,
-		name: string,
-		slug: string,
-		description: string | undefined,
-		displayOrder: number
+		item: { id: string; name: string; slug: string; description?: string; displayOrder: number }
 	): StorefrontItem {
-		const variants = this.repository.listVariants(tenantId, itemId);
-		const modifiers = this.repository.listModifiers(tenantId, itemId);
-		const media = this.repository.listMedia(tenantId, itemId);
+		const variants = this.repository.listVariants(tenantId, item.id);
+		const modifiers = this.repository.listModifiers(tenantId, item.id);
+		const media = this.repository.listMedia(tenantId, item.id);
 
 		const storefrontVariants: StorefrontItemVariant[] = variants.map((v) => ({
 			displayOrder: v.displayOrder,
@@ -106,13 +102,13 @@ export class StorefrontCatalogService {
 		}));
 
 		return {
-			description,
-			displayOrder,
-			id: itemId,
+			description: item.description,
+			displayOrder: item.displayOrder,
+			id: item.id,
 			media: storefrontMedia,
 			modifiers: storefrontModifiers,
-			name,
-			slug,
+			name: item.name,
+			slug: item.slug,
 			variants: storefrontVariants
 		};
 	}
