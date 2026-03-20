@@ -134,7 +134,7 @@ describe("applyModuleGuards", () => {
 		const guarded = applyModuleGuards(routes, context);
 
 		const menuRoute = guarded.find((r) => r.path === "/menu");
-		const guard = menuRoute!.beforeEnter as Function;
+		const guard = menuRoute!.beforeEnter as (...args: unknown[]) => unknown;
 		expect(guard({}, {}, () => {})).toBe(true);
 	});
 
@@ -145,7 +145,7 @@ describe("applyModuleGuards", () => {
 		const guarded = applyModuleGuards(routes, context);
 
 		const menuRoute = guarded.find((r) => r.path === "/menu");
-		const guard = menuRoute!.beforeEnter as Function;
+		const guard = menuRoute!.beforeEnter as (...args: unknown[]) => unknown;
 		expect(guard({}, {}, () => {})).toBe("/");
 	});
 
@@ -156,7 +156,7 @@ describe("applyModuleGuards", () => {
 		const guarded = applyModuleGuards(routes, context, "/not-available");
 
 		const menuRoute = guarded.find((r) => r.path === "/menu");
-		const guard = menuRoute!.beforeEnter as Function;
+		const guard = menuRoute!.beforeEnter as (...args: unknown[]) => unknown;
 		expect(guard({}, {}, () => {})).toBe("/not-available");
 	});
 });

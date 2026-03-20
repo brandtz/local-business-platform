@@ -15,7 +15,6 @@ import {
 	type BookingsMountPoint,
 	type LoyaltyMountPoint,
 	type PreferencesMountPoint,
-	type AccountSectionDescriptor
 } from "./account-placeholders";
 import { defineComponent, h } from "vue";
 

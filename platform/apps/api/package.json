@@ -9,13 +9,22 @@
     "lint": "eslint . --max-warnings=0",
     "start": "node dist/main.js",
     "test": "vitest run --passWithNoTests",
-    "typecheck": "tsc -b tsconfig.json --force"
+    "typecheck": "tsc -b tsconfig.json --force",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset"
   },
   "dependencies": {
-    "@platform/types": "workspace:*",
     "@nestjs/common": "^11.1.16",
     "@nestjs/core": "^11.1.16",
+    "@platform/types": "workspace:*",
+    "@prisma/client": "^6.19.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.2"
   }
 }

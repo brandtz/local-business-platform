@@ -8,7 +8,6 @@ import {
 	isRouteOfflineSafe,
 	createOfflineRouteMeta,
 	findUnclassifiedRoutes,
-	type RouteOfflineClassification
 } from "./offline-route-behavior";
 import { accountRoutePaths } from "./account-routes";
 

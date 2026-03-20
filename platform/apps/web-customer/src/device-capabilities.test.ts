@@ -11,9 +11,7 @@ import {
 	shouldOfferNotifications,
 	areNotificationsActive,
 	type DeviceCapability,
-	type CapabilityStatus,
 	type PushSubscriptionDescriptor,
-	type NotificationPermissionState
 } from "./device-capabilities";
 
 // ── Capability Detection ─────────────────────────────────────────────────────

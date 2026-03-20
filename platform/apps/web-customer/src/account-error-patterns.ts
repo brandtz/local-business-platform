@@ -6,7 +6,6 @@
 import { defineComponent, h, type Component, type VNode } from "vue";
 
 import type {
-	ShellState,
 	ShellStateDescriptor
 } from "@platform/ui";
 import { resolveShellStateDescriptor } from "@platform/ui";

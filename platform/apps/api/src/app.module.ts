@@ -3,7 +3,8 @@ import { Module } from "@nestjs/common";
 import { AdminTenantController } from "./admin-tenant.controller";
 import { CatalogRepository } from "./catalog/catalog.repository";
 import { CatalogService } from "./catalog/catalog.service";
-import { StorefrontCatalogService } from "./catalog/storefront-catalog.service";
+import { AnnouncementService } from "./content/announcement.service";
+import { ContentPageService } from "./content/content-page.service";
 import { AuditAttributionService } from "./auth/audit-attribution.service";
 import { CustomDomainStatusQueryService } from "./auth/custom-domain-status-query.service";
 import { DomainPromotionWorkflowService } from "./auth/domain-promotion-workflow.service";
@@ -35,16 +36,39 @@ import { TenantPublishPolicyService } from "./auth/tenant-publish-policy.service
 import { TemplateRegistryService } from "./auth/template-registry.service";
 import { TenantRequestPolicyService } from "./auth/tenant-request-policy.service";
 import { TenantResolutionService } from "./auth/tenant-resolution.service";
+import { CatalogBulkService } from "./catalog/catalog-bulk.service";
+import { CatalogCategoryService } from "./catalog/catalog-category.service";
+import { CatalogInventoryService } from "./catalog/catalog-inventory.service";
+import { CatalogItemService } from "./catalog/catalog-item.service";
+import { CatalogModifierService } from "./catalog/catalog-modifier.service";
+import { CatalogStorefrontService } from "./catalog/catalog-storefront.service";
+import { StorefrontCatalogService } from "./catalog/storefront-catalog.service";
 import { HealthController } from "./health.controller";
 import { PlatformTenantsController } from "./platform-tenants.controller";
+import { PrismaService } from "./prisma.service";
+import { ServiceManagementService } from "./services/service-management.service";
+import { StaffAssignmentService } from "./staff/staff-assignment.service";
+import { StaffManagementService } from "./staff/staff-management.service";
+import { StaffScheduleService } from "./staff/staff-schedule.service";
 import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
+import { InquiryLeadService } from "./vertical/inquiry-lead.service";
+import { VerticalTemplateService } from "./vertical/vertical-template.service";
 
 @Module({
   controllers: [AdminTenantController, HealthController, PlatformTenantsController],
   providers: [
+    PrismaService,
+    AnnouncementService,
     AuditAttributionService,
+    CatalogBulkService,
+    CatalogCategoryService,
+    CatalogInventoryService,
+    CatalogItemService,
+    CatalogModifierService,
     CatalogRepository,
     CatalogService,
+    CatalogStorefrontService,
+    ContentPageService,
     CustomDomainStatusQueryService,
     DomainPromotionWorkflowService,
     DomainVerificationWorkflowService,
@@ -61,6 +85,10 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     PrivilegedAuthPolicyService,
     RequestContextService,
     SecurityEventService,
+    ServiceManagementService,
+    StaffAssignmentService,
+    StaffManagementService,
+    StaffScheduleService,
     StorefrontCatalogService,
     TenantAccessService,
     TenantCustomDomainPolicyService,
@@ -76,12 +104,23 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     TemplateRegistryService,
     TenantRequestPolicyService,
     TenantDirectoryQueryService,
-    TenantResolutionService
+    TenantResolutionService,
+    VerticalTemplateService,
+    InquiryLeadService
   ],
   exports: [
+    PrismaService,
+    AnnouncementService,
     AuditAttributionService,
+    CatalogBulkService,
+    CatalogCategoryService,
+    CatalogInventoryService,
+    CatalogItemService,
+    CatalogModifierService,
     CatalogRepository,
     CatalogService,
+    CatalogStorefrontService,
+    ContentPageService,
     CustomDomainStatusQueryService,
     DomainPromotionWorkflowService,
     DomainVerificationWorkflowService,
@@ -98,6 +137,10 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     PrivilegedAuthPolicyService,
     RequestContextService,
     SecurityEventService,
+    ServiceManagementService,
+    StaffAssignmentService,
+    StaffManagementService,
+    StaffScheduleService,
     StorefrontCatalogService,
     TenantAccessService,
     TenantCustomDomainPolicyService,
@@ -113,7 +156,9 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     TemplateRegistryService,
     TenantRequestPolicyService,
     TenantDirectoryQueryService,
-    TenantResolutionService
+    TenantResolutionService,
+    VerticalTemplateService,
+    InquiryLeadService
   ]
 })
 export class AppModule {}

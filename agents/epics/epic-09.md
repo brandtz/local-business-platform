@@ -22,6 +22,7 @@ Enable rapid creation of full tenant experiences from structured onboarding plus
 
 ## Acceptance Criteria
 
+- a platform admin can upload business details (name, description, images, contact info), a basic set of products or services, and generate a fully functional tenant portal — this is the primary platform admin user experience
 - a platform admin or tenant owner can provision, configure, ingest, review, and publish a tenant without bespoke engineering work
 - low-confidence extraction results are blocked from silent publication
 - publish is reproducible, versioned, and reversible
@@ -31,14 +32,16 @@ Enable rapid creation of full tenant experiences from structured onboarding plus
 ### E9-S1: Guided Onboarding Workflow
 
 Outcome:
-- a structured onboarding flow coordinates tenant provisioning, configuration checkpoints, and completion state across platform and tenant actors
+- a structured onboarding flow coordinates tenant provisioning, configuration checkpoints, and completion state across platform and tenant actors — the platform admin experience prioritizes: upload business details (name, description, logo, images) → select vertical template → add initial products or services → configure hours and contact → preview and publish
 
 Dependencies:
 - Epics 3 and 5
+- E12-S1 (subscription package selection during onboarding)
 
 Acceptance Signals:
 - onboarding tracks incomplete, blocked, and completed stages explicitly
 - actors can resume onboarding without losing progress
+- platform admin can complete the core onboarding flow (upload → template → seed → preview → publish) in a single guided session
 
 ### E9-S2: Import Artifact Intake and Job Orchestration
 

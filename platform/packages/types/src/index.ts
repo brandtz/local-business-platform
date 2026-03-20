@@ -2,6 +2,11 @@ export const packageName = "@platform/types";
 
 export * from "./auth";
 export * from "./catalog";
+export * from "./content";
+export * from "./domain-events";
+export * from "./service";
+export * from "./staff";
+export * from "./vertical";
 
 export const appShellIds = [
 	"api",

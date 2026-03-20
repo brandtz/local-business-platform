@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 
 import type { ApiError, ApiErrorKind } from "@platform/sdk";
-import { classifyApiError } from "@platform/sdk";
 
 import {
 	classifyAccountError,

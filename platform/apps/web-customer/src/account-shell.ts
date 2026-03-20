@@ -7,7 +7,6 @@
 import { defineComponent, h, type Component } from "vue";
 import type { NavigationGuard, RouteRecordRaw } from "vue-router";
 
-import type { ShellStateDescriptor } from "@platform/ui";
 import { shouldTransitionAuthState, type ApiError } from "@platform/sdk";
 import type { AuthViewerState } from "@platform/types";
 

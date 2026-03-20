@@ -3,7 +3,7 @@
 // Uses types from tenant-membership (E5-S4-T1) and staff-management (E5-S4-T2).
 
 import type { TenantActorRole } from "@platform/types";
-import type { TenantMemberView, InvitationStatus } from "./../../api/src/tenant-membership.js";
+import type { InvitationStatus } from "./../../api/src/tenant-membership.js";
 import type { StaffListItem } from "./../../api/src/staff-management.js";
 
 // ── View States ──────────────────────────────────────────────────────────────

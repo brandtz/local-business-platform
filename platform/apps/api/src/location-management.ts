@@ -4,7 +4,7 @@
 
 // ── Supported Timezones ──────────────────────────────────────────────────────
 
-const COMMON_TIMEZONES = [
+export const COMMON_TIMEZONES = [
 	"America/New_York",
 	"America/Chicago",
 	"America/Denver",

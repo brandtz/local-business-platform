@@ -11,7 +11,6 @@ import {
 	getVisibleNavigationEntries,
 	isRoleAllowedForRoute,
 	isRouteAccessibleForModules,
-	type AdminRouteEntry
 } from "./admin-route-map";
 
 // ── Route Map Completeness ───────────────────────────────────────────────────

@@ -9,7 +9,7 @@
 import { defineComponent, h, type Component, type VNode } from "vue";
 
 import type { TenantModuleKey } from "@platform/types";
-import type { EmptyStateDescriptor, ShellStateDescriptor } from "@platform/ui";
+import type { EmptyStateDescriptor } from "@platform/ui";
 
 import { getAccountEmptyState, type AccountEmptyStateDescriptor } from "./account-shell";
 import type { TenantFrontendContext } from "./tenant-bootstrap";

@@ -2,11 +2,16 @@
 
 ## E9-S1 Guided Onboarding Workflow
 
+> **Design-Alignment Notes (platform admin primary UX):**
+> The core platform admin experience is: "I upload details about a business — name, description, images — select a vertical, add a basic set of products or services, and the platform generates a tenant portal." This means onboarding must be a guided, step-by-step wizard from the platform admin's perspective, not just a backend orchestration flow. The wizard must: (1) collect business identity, (2) select vertical template from E6-S5, (3) seed initial products/services/content, (4) select subscription package from E12-S1, (5) configure users and feature toggles, (6) preview the generated storefront, (7) publish. Each step must be saveable and resumable.
+
 Technical Tasks:
-- E9-S1-T1: define onboarding stage model, resume state, and actor responsibilities across platform and tenant contexts
+- E9-S1-T1: define onboarding stage model, resume state, and actor responsibilities across platform and tenant contexts — stages include: Business Identity → Vertical Selection → Initial Data Seeding → Subscription Selection → User/Feature Configuration → Preview → Publish
 - E9-S1-T2: implement onboarding orchestration service and progress-tracking persistence
-- E9-S1-T3: create platform-admin and tenant-admin views for onboarding state and next actions
-- E9-S1-T4: define blocking, warning, and complete states for each onboarding checkpoint
+- E9-S1-T3: build platform-admin onboarding wizard UI — step-by-step form flow for: business details input (name, description, logo upload, cover images, contact info, address), vertical template selection (from E6-S5 registry with visual previews), initial product/service entry (simplified CRUD form seeding catalog or service entities from E6-S1/S2), subscription package selection (from E12-S1 plan comparison), and user invitation
+- E9-S1-T4: build tenant-admin onboarding resume view — for cases where the tenant owner completes remaining steps (hours, detailed content, branding refinement)
+- E9-S1-T5: define blocking, warning, and complete states for each onboarding checkpoint — minimum viable publish requires: business name, at least one product or service, selected vertical, and active subscription (or trial)
+- E9-S1-T6: connect onboarding completion to E9-S5 preview generation and E9-S6 publish flow
 
 Test Requirements:
 - unit: onboarding stage transition rules handle resume, skip, and block conditions correctly

@@ -97,11 +97,12 @@ model Tenant {
   previewSubdomain String             @unique
   customDomainRecords TenantCustomDomain[]
   memberships      TenantMembership[]
-  categories       CatalogCategory[]
-  items            CatalogItem[]
-  itemVariants     CatalogItemVariant[]
-  itemModifiers    CatalogItemModifier[]
-  mediaReferences  CatalogMediaReference[]
+  catalogCategories CatalogCategory[]
+  catalogItems     CatalogItem[]
+  services         Service[]
+  staffProfiles    StaffProfile[]
+  contentPages     ContentPage[]
+  announcements    Announcement[]
 }
 
 model TenantCustomDomain {
@@ -182,109 +183,261 @@ model AuthSession {
   @@index([revokedAt])
 }
 
-// ---------------------------------------------------------------------------
-// Catalog domain models
-// ---------------------------------------------------------------------------
+// ─── Epic 6 — Catalog Domain ───────────────────────────────────────────
 
 enum CatalogItemStatus {
-  DRAFT
   ACTIVE
-  ARCHIVED
+  INACTIVE
 }
 
-enum CatalogCategoryStatus {
-  ACTIVE
-  ARCHIVED
+enum CatalogItemVisibility {
+  PUBLISHED
+  DRAFT
 }
 
 model CatalogCategory {
-  id               String                @id @default(uuid())
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
-  tenantId         String
-  name             String
-  slug             String
-  description      String?
-  displayOrder     Int                   @default(0)
-  status           CatalogCategoryStatus @default(ACTIVE)
-  parentCategoryId String?
-  imageUrl         String?
-  tenant           Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  parentCategory   CatalogCategory?      @relation("CategoryParent", fields: [parentCategoryId], references: [id], onDelete: SetNull)
-  childCategories  CatalogCategory[]     @relation("CategoryParent")
-  items            CatalogItem[]
+  id          String        @id @default(uuid())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  tenantId    String
+  name        String
+  slug        String
+  description String?
+  imageUrl    String?
+  sortOrder   Int           @default(0)
+  tenant      Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  items       CatalogItem[]
 
   @@unique([tenantId, slug])
-  @@index([tenantId, status])
-  @@index([tenantId, displayOrder])
+  @@index([tenantId, sortOrder])
 }
 
 model CatalogItem {
-  id             String            @id @default(uuid())
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  tenantId       String
-  categoryId     String
-  name           String
-  slug           String
-  description    String?
-  status         CatalogItemStatus @default(DRAFT)
-  displayOrder   Int               @default(0)
-  tenant         Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  category       CatalogCategory   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  variants       CatalogItemVariant[]
-  modifiers      CatalogItemModifier[]
-  mediaReferences CatalogMediaReference[]
+  id              String                @id @default(uuid())
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  tenantId        String
+  categoryId      String
+  name            String
+  slug            String
+  description     String?
+  price           Int                   // cents
+  compareAtPrice  Int?                  // cents — strike-through price
+  status          CatalogItemStatus     @default(ACTIVE)
+  visibility      CatalogItemVisibility @default(DRAFT)
+  sortOrder       Int                   @default(0)
+  stockQuantity   Int?
+  lowStockThreshold Int?
+  tenant          Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category        CatalogCategory       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  mediaGallery    CatalogItemMedia[]
+  modifierGroups  ModifierGroup[]
 
   @@unique([tenantId, slug])
-  @@index([tenantId, categoryId, status])
+  @@index([tenantId, categoryId, sortOrder])
+  @@index([tenantId, status, visibility])
+}
+
+model CatalogItemMedia {
+  id        String      @id @default(uuid())
+  createdAt DateTime    @default(now())
+  itemId    String
+  url       String
+  altText   String?
+  sortOrder Int         @default(0)
+  item      CatalogItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId, sortOrder])
+}
+
+model ModifierGroup {
+  id          String            @id @default(uuid())
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  tenantId    String
+  itemId      String
+  name        String            // e.g. "Size", "Color", "Add-ons"
+  selectionMode String          @default("single") // "single" | "multiple"
+  isRequired  Boolean           @default(false)
+  minSelections Int             @default(0)
+  maxSelections Int?
+  sortOrder   Int               @default(0)
+  item        CatalogItem       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  options     ModifierOption[]
+
+  @@index([tenantId, itemId, sortOrder])
+}
+
+model ModifierOption {
+  id           String        @id @default(uuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  groupId      String
+  name         String
+  priceAdjustment Int        @default(0) // cents, can be 0 or positive
+  isDefault    Boolean       @default(false)
+  sortOrder    Int           @default(0)
+  group        ModifierGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId, sortOrder])
+}
+
+// ─── Epic 6 — Service Domain ───────────────────────────────────────────
+
+enum ServiceStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Service {
+  id                String           @id @default(uuid())
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  tenantId          String
+  name              String
+  slug              String
+  description       String?
+  durationMinutes   Int
+  price             Int              // cents
+  status            ServiceStatus    @default(ACTIVE)
+  isBookable        Boolean          @default(true)
+  bufferMinutes     Int              @default(0)
+  maxAdvanceDays    Int              @default(60)
+  minAdvanceHours   Int              @default(1)
+  sortOrder         Int              @default(0)
+  tenant            Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  staffAssignments  StaffServiceAssignment[]
+
+  @@unique([tenantId, slug])
   @@index([tenantId, status])
-  @@index([tenantId, displayOrder])
 }
 
-model CatalogItemVariant {
-  id           String   @id @default(uuid())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  tenantId     String
-  itemId       String
-  name         String
-  priceCents   Int
-  isDefault    Boolean  @default(false)
-  displayOrder Int      @default(0)
-  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  item         CatalogItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+// ─── Epic 6 — Staff Domain ────────────────────────────────────────────
 
-  @@index([tenantId, itemId])
+enum StaffStatus {
+  ACTIVE
+  INACTIVE
 }
 
-model CatalogItemModifier {
-  id           String   @id @default(uuid())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  tenantId     String
-  itemId       String
-  name         String
-  priceCents   Int      @default(0)
-  isRequired   Boolean  @default(false)
-  displayOrder Int      @default(0)
-  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  item         CatalogItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+model StaffProfile {
+  id                  String            @id @default(uuid())
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  tenantId            String
+  userId              String?           // optional link to User identity
+  displayName         String
+  email               String?
+  phone               String?
+  photoUrl            String?
+  role                String            // free-text role title
+  status              StaffStatus       @default(ACTIVE)
+  isBookable          Boolean           @default(false)
+  locationId          String?
+  tenant              Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  scheduleWindows     StaffScheduleWindow[]
+  blackoutDates       StaffBlackoutDate[]
+  serviceAssignments  StaffServiceAssignment[]
 
-  @@index([tenantId, itemId])
+  @@unique([tenantId, email])
+  @@index([tenantId, status])
+  @@index([tenantId, locationId])
 }
 
-model CatalogMediaReference {
-  id           String   @id @default(uuid())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  tenantId     String
-  itemId       String
-  url          String
-  altText      String?
-  displayOrder Int      @default(0)
-  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  item         CatalogItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+model StaffScheduleWindow {
+  id          String       @id @default(uuid())
+  createdAt   DateTime     @default(now())
+  staffId     String
+  dayOfWeek   Int          // 0=Sunday … 6=Saturday
+  startTime   String       // "HH:mm" 24h format
+  endTime     String       // "HH:mm" 24h format
+  staff       StaffProfile @relation(fields: [staffId], references: [id], onDelete: Cascade)
 
-  @@index([tenantId, itemId])
+  @@index([staffId, dayOfWeek])
+}
+
+model StaffBlackoutDate {
+  id        String       @id @default(uuid())
+  createdAt DateTime     @default(now())
+  staffId   String
+  date      DateTime     @db.Date
+  reason    String?
+  staff     StaffProfile @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@index([staffId, date])
+}
+
+model StaffServiceAssignment {
+  id        String       @id @default(uuid())
+  createdAt DateTime     @default(now())
+  staffId   String
+  serviceId String
+  staff     StaffProfile @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  service   Service      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([staffId, serviceId])
+}
+
+// ─── Epic 6 — Content & SEO Domain ────────────────────────────────────
+
+enum ContentPageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AnnouncementPlacement {
+  BANNER
+  POPUP
+  INLINE
+}
+
+model ContentPage {
+  id           String            @id @default(uuid())
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  tenantId     String
+  title        String
+  slug         String
+  body         Json              // structured block-based content
+  status       ContentPageStatus @default(DRAFT)
+  seoTitle     String?
+  seoDescription String?
+  ogImageUrl   String?
+  templateRegion String?         // e.g. "hero", "about", "services"
+  sortOrder    Int               @default(0)
+  publishedAt  DateTime?
+  archivedAt   DateTime?
+  tenant       Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, status])
+  @@index([tenantId, templateRegion])
+}
+
+model Announcement {
+  id            String                @id @default(uuid())
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  tenantId      String
+  title         String
+  body          String
+  placement     AnnouncementPlacement @default(BANNER)
+  isActive      Boolean               @default(true)
+  startDate     DateTime?
+  endDate       DateTime?
+  displayPriority Int                 @default(0)
+  tenant        Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, isActive])
+  @@index([tenantId, placement])
+  @@index([tenantId, startDate, endDate])
+}
+
+// ─── Epic 6 — Vertical Template Defaults ──────────────────────────────
+
+enum BusinessVertical {
+  RESTAURANT
+  RETAIL
+  APPOINTMENT
+  CONTRACTOR
 }

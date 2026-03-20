@@ -61,20 +61,20 @@ function createTenantContext(
 describe("createAccountAuthGuard", () => {
 	it("returns true for authenticated users", () => {
 		const guard = createAccountAuthGuard(createAuthenticatedAuthState());
-		const result = (guard as Function)();
+		const result = (guard as () => unknown)();
 		expect(result).toBe(true);
 	});
 
 	it("redirects anonymous users to default sign-in path", () => {
 		const guard = createAccountAuthGuard(createAnonymousAuthState());
-		const result = (guard as Function)();
+		const result = (guard as () => unknown)();
 		expect(result).toBe(accountRoutePaths.signIn);
 	});
 
 	it("redirects anonymous users to custom sign-in path", () => {
 		const options: AccountAuthGuardOptions = { signInPath: "/login" };
 		const guard = createAccountAuthGuard(createAnonymousAuthState(), options);
-		const result = (guard as Function)();
+		const result = (guard as () => unknown)();
 		expect(result).toBe("/login");
 	});
 });
@@ -97,7 +97,7 @@ describe("createAccountModuleGuard", () => {
 			context,
 			meta
 		);
-		const result = (guard as Function)();
+		const result = (guard as () => unknown)();
 		expect(result).toBe(true);
 	});
 
@@ -116,7 +116,7 @@ describe("createAccountModuleGuard", () => {
 			context,
 			meta
 		);
-		const result = (guard as Function)();
+		const result = (guard as () => unknown)();
 		expect(result).toBe(accountRoutePaths.signIn);
 	});
 
@@ -135,7 +135,7 @@ describe("createAccountModuleGuard", () => {
 			context,
 			meta
 		);
-		const result = (guard as Function)();
+		const result = (guard as () => unknown)();
 		expect(result).toBe(accountRoutePaths.root);
 	});
 
@@ -153,7 +153,7 @@ describe("createAccountModuleGuard", () => {
 			context,
 			meta
 		);
-		const result = (guard as Function)();
+		const result = (guard as () => unknown)();
 		expect(result).toBe(true);
 	});
 });
@@ -325,7 +325,7 @@ describe("buildAccountRoutes", () => {
 		);
 		const profileRoute = route.children!.find((c) => c.path === "profile");
 		expect(profileRoute).toBeDefined();
-		const result = (profileRoute!.beforeEnter as Function)();
+		const result = (profileRoute!.beforeEnter as () => unknown)();
 		expect(result).toBe(true);
 	});
 
@@ -336,7 +336,7 @@ describe("buildAccountRoutes", () => {
 		);
 		const profileRoute = route.children!.find((c) => c.path === "profile");
 		expect(profileRoute).toBeDefined();
-		const result = (profileRoute!.beforeEnter as Function)();
+		const result = (profileRoute!.beforeEnter as () => unknown)();
 		expect(result).toBe(accountRoutePaths.signIn);
 	});
 
@@ -347,7 +347,7 @@ describe("buildAccountRoutes", () => {
 		);
 		const ordersRoute = route.children!.find((c) => c.path === "orders");
 		expect(ordersRoute).toBeDefined();
-		const result = (ordersRoute!.beforeEnter as Function)();
+		const result = (ordersRoute!.beforeEnter as () => unknown)();
 		expect(result).toBe(accountRoutePaths.root);
 	});
 
@@ -358,7 +358,7 @@ describe("buildAccountRoutes", () => {
 		);
 		const ordersRoute = route.children!.find((c) => c.path === "orders");
 		expect(ordersRoute).toBeDefined();
-		const result = (ordersRoute!.beforeEnter as Function)();
+		const result = (ordersRoute!.beforeEnter as () => unknown)();
 		expect(result).toBe(true);
 	});
 

@@ -6,19 +6,23 @@
 
 UX References: `Portal Design - Business Admin dashboard.html` (BA-01), all BA sidebar nav patterns
 
+> **Design-Alignment Notes (from wireframe review):**
+> The admin dashboard wireframe shows: 4 KPI cards (Revenue $43.5K +12.5%, Orders 1,284 +8.2%, Bookings 342 -2.4%, Customers 8,932 +15.3%) with trend indicators; a Revenue area chart (switchable time periods); a Traffic Sources donut chart; a Recent Orders table with status badges; and a Recent Activity timeline feed. The sidebar navigation includes: Dashboard, Analytics, Catalog & Services, Orders & Bookings, Customers & Staff, Content & Locations, Settings. Dashboard placeholders must be structured to accept these specific widget types and data contracts — not just empty slots.
+
 Technical Tasks:
-- E5-S1-T1: define tenant-admin route map, information architecture, and role-aware navigation sections
+- E5-S1-T1: define tenant-admin route map, information architecture, and role-aware navigation sections matching the sidebar structure shown in the design (Dashboard, Analytics, Catalog & Services, Orders & Bookings, Customers & Staff, Content & Locations, Settings)
 - E5-S1-T2: implement tenant-admin shell with session-aware route guards and tenant context header
 - E5-S1-T3: connect module enablement to navigation visibility and route accessibility
-- E5-S1-T4: establish admin dashboard placeholders for operations, content, and configuration sections
+- E5-S1-T4: define dashboard widget mount-point contracts for KPI summary cards (with label, value, trend-direction, trend-percentage), chart regions (revenue area chart, traffic donut chart), recent-orders table, and activity timeline — actual data queries are implemented by later epics but the widget interfaces must be established now
+- E5-S1-T5: implement dashboard empty-state and loading-state patterns for each widget slot so partial data availability degrades gracefully
 
 Test Requirements:
-- UI interaction: tenant-admin shell loads only for authorized tenant members
-- integration: module toggles and roles shape navigation consistently
+- UI interaction: tenant-admin shell loads only for authorized tenant members; sidebar matches design navigation hierarchy
+- integration: module toggles and roles shape navigation consistently; dashboard widget mount points accept placeholder and real data interchangeably
 - error-state test: suspended tenant or expired session is handled safely in admin shell
 
 Handoff Focus:
-- admin route map, nav gating logic, and shared dashboard mount points
+- admin route map, nav gating logic, dashboard widget-mount contracts (KPI card interface, chart interface, table interface, timeline interface), and shared dashboard state patterns
 
 ## E5-S2 Business Profile and Brand Configuration
 
@@ -42,19 +46,23 @@ Handoff Focus:
 
 UX References: `Portal Design - Business Admin - content and locations.html` (BA-03 Locations tab)
 
+> **Design-Alignment Notes (from wireframe review):**
+> The design shows a location sidebar list with selectable location cards and a detail form for the selected location (address, timezone, contact, hours grid, fulfillment modes). Staff cards in the Staff tab show location context. The analytics page has location filter dropdowns. Order checkout has delivery-address estimation tied to location. This implies multi-location operations need: per-location hours/rules, location-aware order routing, and location-based analytics aggregation in downstream epics. The domain model here must support those downstream needs.
+
 Technical Tasks:
-- E5-S3-T1: implement location CRUD with address, timezone, and contact fields
-- E5-S3-T2: implement hours, blackout windows, and fulfillment-mode configuration
-- E5-S3-T3: define tax, tipping, cancellation, and lead-time policy configuration model
+- E5-S3-T1: implement location CRUD with address, timezone, contact fields, and geographic coordinates (for delivery radius and distance estimation)
+- E5-S3-T2: implement hours, blackout windows, and fulfillment-mode configuration per location (delivery, pickup, dine-in support flags)
+- E5-S3-T3: define tax, tipping, cancellation, and lead-time policy configuration model — per location where applicable
 - E5-S3-T4: expose normalized operating rules for downstream ordering and booking services
+- E5-S3-T5: define location-selection query model for use by downstream features: analytics location filter, order-routing location resolution, and staff-location assignment lookups
 
 Test Requirements:
-- unit: operating rule validation rejects impossible hours and policy combinations
-- integration: location and operating config persists cleanly and is queryable by downstream modules
-- API contract: rule payloads remain stable for future scheduling and commerce consumers
+- unit: operating rule validation rejects impossible hours and policy combinations; location geocoordinates pass format validation
+- integration: location and operating config persists cleanly and is queryable by downstream modules; multi-location tenants can have independent hours and policies
+- API contract: rule payloads remain stable for future scheduling, commerce, and analytics consumers
 
 Handoff Focus:
-- normalized operating rules contract and location identifier semantics
+- normalized operating rules contract, location identifier semantics, location-selection query model for downstream analytics/routing/assignment
 
 ## E5-S4 Tenant User and Staff Administration
 

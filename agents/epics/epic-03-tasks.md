@@ -82,19 +82,24 @@ Handoff Focus:
 
 ## E3-S6 Platform Operations Console Foundations
 
+> **Design-Alignment Notes (from wireframe review):**
+> The Platform Admin dashboard wireframe shows: 4 KPI cards (Active Tenants 1,284, GMV 30d $4.2M, Failed Payments 42, Job Backlog 156) with trend indicators; a dual-axis chart (Platform Traffic + GMV over time); System Health resource bars (API 45%, Database 62%, Storage 28%, Workers 85%); an Active Alerts list (payment failures, domain verification issues, backup warnings); and a Deployments table (tenant name, status: Deployed/Pending/Failed, time-ago). The dark-theme sidebar with role-based access was established in the platform sign-in screen.
+
 Technical Tasks:
-- E3-S6-T1: define cross-tenant operational summary queries for lifecycle, publish, and health status
-- E3-S6-T2: build platform-admin dashboard shells for tenant list and tenant detail views with privilege context, loading, empty, and failure states
-- E3-S6-T3: expose audit, job, and publish summary widgets or data sources for platform operators
+- E3-S6-T1: define cross-tenant operational summary queries for lifecycle, publish, health status, and aggregate KPI computation (active tenant count, GMV aggregation, failed-payment count, job-backlog count)
+- E3-S6-T2: build platform-admin dashboard shells for tenant list, tenant detail, and KPI card widgets with privilege context, loading, empty, and failure states
+- E3-S6-T3: expose audit, job, and publish summary widgets or data sources for platform operators — including an Active Alerts feed (payment failures, domain verification, backup incidents) with severity and actionability metadata
 - E3-S6-T4: define filtering and search semantics for tenant-level operations views
+- E3-S6-T5: define deployment-status query model — tenant name, deployment state (Deployed/Pending/Failed), and timestamp for the Deployments table widget
+- E3-S6-T6: define system-health data contract for resource utilization display (API, Database, Storage, Workers load percentages) — integration with E10 observability layer
 
 Test Requirements:
-- integration: platform dashboards return cross-tenant summaries without bypassing auth rules
-- UI interaction: platform list and detail screens render state, privilege context, and filters correctly
-- performance check: tenant summary queries scale for shared-runtime administrative usage
+- integration: platform dashboards return cross-tenant summaries without bypassing auth rules; KPI aggregation queries produce correct counts
+- UI interaction: platform list, detail screens, and KPI cards render state, privilege context, alerts, and filters correctly
+- performance check: tenant summary and KPI aggregation queries scale for shared-runtime administrative usage
 
 Handoff Focus:
-- dashboard query contracts, filters, privilege indicators, and cross-tenant summary semantics
+- dashboard query contracts (KPI card data, alert feed, deployment table, system health), filters, privilege indicators, and cross-tenant summary semantics
 
 ## Playwright Delivery Overlay
 

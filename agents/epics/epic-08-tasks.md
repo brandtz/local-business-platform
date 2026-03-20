@@ -18,19 +18,24 @@ Handoff Focus:
 
 ## E8-S2 Payment Intent, Capture, and Refund Abstraction
 
+> **Design-Alignment Notes (from wireframe review):**
+> The admin settings page shows Stripe (connected/active, green) and Square (available to connect) — implying tenants can have multiple payment processors configured. The checkout shows a payment method selector. This means the abstraction layer must support: routing capture to the correct active processor, handling refunds to the original capture processor, and failover behavior when the primary processor is unavailable. Tip amounts from cart (E7-S1) must flow through the payment intent.
+
 Technical Tasks:
-- E8-S2-T1: define provider-neutral payment service interface for checkout, capture, void, and refund behavior
+- E8-S2-T1: define provider-neutral payment service interface for checkout, capture, void, and refund behavior — including tip-amount pass-through from cart pricing engine
 - E8-S2-T2: implement core payment transaction orchestration and ledger-facing persistence model
 - E8-S2-T3: integrate order and booking services with internal payment abstraction points
-- E8-S2-T4: implement tenant-admin refund initiation flow with audit requirements
+- E8-S2-T4: implement tenant-admin refund initiation flow with audit requirements — refund must route to the original capture processor automatically
+- E8-S2-T5: implement multi-processor routing logic — when a tenant has multiple active processors, determine which to use for capture (primary preference with configuration) and ensure refunds target the correct original processor
+- E8-S2-T6: define failover behavior — when primary processor capture fails, attempt secondary if configured; log failure event for E8-S6 alert pipeline
 
 Test Requirements:
-- unit: provider-neutral payment service contracts handle success, failure, and partial refund scenarios
-- integration: order and booking flows create and update payment transactions consistently
-- audit test: refund actions capture actor, reason, and resulting state changes
+- unit: provider-neutral payment service contracts handle success, failure, partial refund, and multi-processor routing scenarios
+- integration: order and booking flows create and update payment transactions consistently; refunds route to correct original processor
+- audit test: refund actions capture actor, reason, processor used, and resulting state changes
 
 Handoff Focus:
-- internal payment interface, transaction state mapping, and refund audit contract
+- internal payment interface, multi-processor routing rules, failover behavior, transaction state mapping, tip pass-through, and refund audit contract
 
 ## E8-S3 Webhook Ingestion and Replay Safety
 

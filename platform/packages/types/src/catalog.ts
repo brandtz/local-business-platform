@@ -219,6 +219,66 @@ export type StorefrontCatalogResponse = {
 };
 
 // ---------------------------------------------------------------------------
+// Extended domain record types (admin / service layer)
+// ---------------------------------------------------------------------------
+
+export const catalogItemStatuses = ["active", "inactive"] as const;
+export type CatalogItemStatus = (typeof catalogItemStatuses)[number];
+
+export const catalogItemVisibilities = ["draft", "published"] as const;
+export type CatalogItemVisibility = (typeof catalogItemVisibilities)[number];
+
+export type CatalogItemRecord = {
+	categoryId: string;
+	compareAtPrice: number | null;
+	description: string | null;
+	id: string;
+	lowStockThreshold: number | null;
+	name: string;
+	price: number;
+	slug: string;
+	sortOrder: number;
+	status: CatalogItemStatus;
+	stockQuantity: number | null;
+	tenantId: string;
+	visibility: CatalogItemVisibility;
+};
+
+export type CatalogListFilter = {
+	categoryId?: string;
+	search?: string;
+	status?: CatalogItemStatus;
+	visibility?: CatalogItemVisibility;
+};
+
+export type CatalogSortField = "name" | "price" | "sortOrder" | "createdAt";
+export type SortDirection = "asc" | "desc";
+
+export const modifierSelectionModes = ["single", "multiple"] as const;
+export type ModifierSelectionMode = (typeof modifierSelectionModes)[number];
+
+export type ModifierGroupRecord = {
+	id: string;
+	isRequired: boolean;
+	itemId: string;
+	maxSelections: number | null;
+	minSelections: number;
+	name: string;
+	selectionMode: ModifierSelectionMode;
+	sortOrder: number;
+	tenantId: string;
+};
+
+export type ModifierOptionRecord = {
+	groupId: string;
+	id: string;
+	isDefault: boolean;
+	name: string;
+	priceAdjustment: number;
+	sortOrder: number;
+};
+
+// ---------------------------------------------------------------------------
 // Validation functions
 // ---------------------------------------------------------------------------
 
@@ -242,4 +302,50 @@ export function isValidSlug(slug: string): boolean {
 
 export function isValidPriceCents(price: number): boolean {
 	return Number.isInteger(price) && price >= 0;
+}
+
+type ValidationError = { field: string; reason: string };
+type ValidationResult =
+	| { valid: true }
+	| { valid: false; errors: ValidationError[] };
+
+export function validateCatalogItemInput(input: {
+	compareAtPrice?: number | null;
+	name: string;
+	price: number;
+	slug: string;
+}): ValidationResult {
+	const errors: ValidationError[] = [];
+
+	if (!input.name || input.name.trim().length === 0) {
+		errors.push({ field: "name", reason: "required" });
+	}
+	if (!isValidSlug(input.slug)) {
+		errors.push({ field: "slug", reason: "invalid" });
+	}
+	if (!isValidPriceCents(input.price)) {
+		errors.push({ field: "price", reason: "invalid" });
+	}
+	if (input.compareAtPrice != null && input.compareAtPrice <= input.price) {
+		errors.push({ field: "compareAtPrice", reason: "must-exceed-price" });
+	}
+
+	return errors.length > 0 ? { valid: false, errors } : { valid: true };
+}
+
+export function validateModifierGroupInput(input: {
+	maxSelections?: number | null;
+	minSelections: number;
+	name: string;
+}): ValidationResult {
+	const errors: ValidationError[] = [];
+
+	if (!input.name || input.name.trim().length === 0) {
+		errors.push({ field: "name", reason: "required" });
+	}
+	if (input.maxSelections != null && input.minSelections > input.maxSelections) {
+		errors.push({ field: "minSelections", reason: "exceeds-max" });
+	}
+
+	return errors.length > 0 ? { valid: false, errors } : { valid: true };
 }
