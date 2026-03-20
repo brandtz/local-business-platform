@@ -1,6 +1,9 @@
 import { Module } from "@nestjs/common";
 
 import { AdminTenantController } from "./admin-tenant.controller";
+import { CatalogRepository } from "./catalog/catalog.repository";
+import { CatalogService } from "./catalog/catalog.service";
+import { StorefrontCatalogService } from "./catalog/storefront-catalog.service";
 import { AuditAttributionService } from "./auth/audit-attribution.service";
 import { CustomDomainStatusQueryService } from "./auth/custom-domain-status-query.service";
 import { DomainPromotionWorkflowService } from "./auth/domain-promotion-workflow.service";
@@ -40,6 +43,8 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
   controllers: [AdminTenantController, HealthController, PlatformTenantsController],
   providers: [
     AuditAttributionService,
+    CatalogRepository,
+    CatalogService,
     CustomDomainStatusQueryService,
     DomainPromotionWorkflowService,
     DomainVerificationWorkflowService,
@@ -56,6 +61,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     PrivilegedAuthPolicyService,
     RequestContextService,
     SecurityEventService,
+    StorefrontCatalogService,
     TenantAccessService,
     TenantCustomDomainPolicyService,
     ModuleRegistryService,
@@ -74,6 +80,8 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
   ],
   exports: [
     AuditAttributionService,
+    CatalogRepository,
+    CatalogService,
     CustomDomainStatusQueryService,
     DomainPromotionWorkflowService,
     DomainVerificationWorkflowService,
@@ -90,6 +98,7 @@ import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
     PrivilegedAuthPolicyService,
     RequestContextService,
     SecurityEventService,
+    StorefrontCatalogService,
     TenantAccessService,
     TenantCustomDomainPolicyService,
     ModuleRegistryService,

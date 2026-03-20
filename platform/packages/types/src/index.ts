@@ -1,6 +1,7 @@
 export const packageName = "@platform/types";
 
 export * from "./auth";
+export * from "./catalog";
 
 export const appShellIds = [
 	"api",
