@@ -1,18 +1,8 @@
-import { createRequire } from "node:module";
-import path from "node:path";
-
 import { defineConfig } from "@playwright/test";
-
-const require = createRequire(import.meta.url);
-const VITE_CLI_PATH = path.resolve(
-	path.dirname(require.resolve("vite/package.json")),
-	"bin",
-	"vite.js"
-);
 
 function createWebServer(cwd: string, port: number) {
 	return {
-		command: `npx -y node@22.14.0 ${VITE_CLI_PATH} --host 127.0.0.1 --port ${port}`,
+		command: `npx -y node@22.14.0 node_modules/vite/bin/vite.js --host 127.0.0.1 --port ${port}`,
 		cwd,
 		reuseExistingServer: !process.env.CI,
 		timeout: 120_000,
