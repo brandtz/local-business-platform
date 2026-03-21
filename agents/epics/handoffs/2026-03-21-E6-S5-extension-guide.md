@@ -92,7 +92,7 @@ fitness: {
     },
     {
       name: '1-on-1 Training Session',
-      slug: '1-on-1-training-session',
+      slug: 'one-on-one-training',
       durationMinutes: 60,
       price: 7500,
       isBookable: true,
@@ -151,7 +151,7 @@ pnpm typecheck:contracts
 The validation suite automatically picks up all entries in `verticalConfigs` and checks:
 
 - All required fields are present and non-empty
-- Slugs are lowercase with hyphens only (pattern: `/^[a-z][a-z0-9-]*$/`)
+- Slugs are lowercase with hyphens only (pattern: `/^[a-z0-9]+(?:-[a-z0-9]+)*$/`)
 - Time formats are valid `HH:MM` (24-hour)
 - Prices are non-negative integers (cents)
 - Category slugs referenced by services actually exist
