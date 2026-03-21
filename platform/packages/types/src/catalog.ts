@@ -219,6 +219,88 @@ export type StorefrontCatalogResponse = {
 };
 
 // ---------------------------------------------------------------------------
+// Storefront assembled types (from CatalogStorefrontService)
+// ---------------------------------------------------------------------------
+
+export type StorefrontModifierGroup = {
+	id: string;
+	isRequired: boolean;
+	maxSelections: number | null;
+	minSelections: number;
+	name: string;
+	options: ModifierOptionRecord[];
+	selectionMode: ModifierSelectionMode;
+};
+
+export type StorefrontCatalogItem = {
+	categoryId: string;
+	categoryName: string;
+	compareAtPrice: number | null;
+	description: string | null;
+	id: string;
+	media: CatalogItemMediaRecord[];
+	modifierGroups: StorefrontModifierGroup[];
+	name: string;
+	price: number;
+	slug: string;
+};
+
+export type StorefrontCategoryListing = {
+	description: string | null;
+	id: string;
+	imageUrl: string | null;
+	itemCount: number;
+	name: string;
+	slug: string;
+};
+
+// ---------------------------------------------------------------------------
+// Category record type (admin / service layer)
+// ---------------------------------------------------------------------------
+
+export type CatalogCategoryRecord = {
+	description: string | null;
+	id: string;
+	imageUrl: string | null;
+	name: string;
+	slug: string;
+	sortOrder: number;
+	tenantId: string;
+};
+
+// ---------------------------------------------------------------------------
+// Media record type
+// ---------------------------------------------------------------------------
+
+export type CatalogItemMediaRecord = {
+	altText: string | null;
+	id: string;
+	itemId: string;
+	sortOrder: number;
+	url: string;
+};
+
+// ---------------------------------------------------------------------------
+// Validation types
+// ---------------------------------------------------------------------------
+
+export type CatalogValidationError = { field: string; reason: string };
+
+export type CatalogValidationResult =
+	| { valid: true }
+	| { valid: false; errors: CatalogValidationError[] };
+
+// ---------------------------------------------------------------------------
+// Bulk operation result
+// ---------------------------------------------------------------------------
+
+export type BulkOperationResult = {
+	affectedCount: number;
+	failedIds: string[];
+	successIds: string[];
+};
+
+// ---------------------------------------------------------------------------
 // Extended domain record types (admin / service layer)
 // ---------------------------------------------------------------------------
 
@@ -304,18 +386,13 @@ export function isValidPriceCents(price: number): boolean {
 	return Number.isInteger(price) && price >= 0;
 }
 
-type ValidationError = { field: string; reason: string };
-type ValidationResult =
-	| { valid: true }
-	| { valid: false; errors: ValidationError[] };
-
 export function validateCatalogItemInput(input: {
 	compareAtPrice?: number | null;
 	name: string;
 	price: number;
 	slug: string;
-}): ValidationResult {
-	const errors: ValidationError[] = [];
+}): CatalogValidationResult {
+	const errors: CatalogValidationError[] = [];
 
 	if (!input.name || input.name.trim().length === 0) {
 		errors.push({ field: "name", reason: "required" });
@@ -337,8 +414,8 @@ export function validateModifierGroupInput(input: {
 	maxSelections?: number | null;
 	minSelections: number;
 	name: string;
-}): ValidationResult {
-	const errors: ValidationError[] = [];
+}): CatalogValidationResult {
+	const errors: CatalogValidationError[] = [];
 
 	if (!input.name || input.name.trim().length === 0) {
 		errors.push({ field: "name", reason: "required" });
