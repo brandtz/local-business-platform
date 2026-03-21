@@ -96,6 +96,22 @@ Use this file to track the active execution queue.
 - E4-S6-T2 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S6-T2.md | handoff: ./2026-03-17-E4-S6-T2.md
 - E4-S1-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S1-T4.md | handoff: ./2026-03-17-E4-S1-T4.md
 - E4-S6-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S6-T4.md | handoff: ./2026-03-17-E4-S6-T4.md
+- E4-S2-T1 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S2-T1.md | handoff: ./2026-03-18-E4-S2-T1.md
+- E4-S2-T2 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S2-T2.md | handoff: ./2026-03-18-E4-S2-T3.md
+- E4-S2-T3 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S2-T3.md | handoff: ./2026-03-18-E4-S2-T3.md
+- E4-S2-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S2-T4.md | handoff: ./2026-03-18-E4-S2-T4.md
+- E4-S3-T1 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S3-T1.md | handoff: ./2026-03-19-E4-S3.md
+- E4-S3-T2 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S3-T2.md | handoff: ./2026-03-19-E4-S3.md
+- E4-S3-T3 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S3-T3.md | handoff: ./2026-03-19-E4-S3.md
+- E4-S3-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S3-T4.md | handoff: ./2026-03-19-E4-S3.md
+- E4-S4-T1 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S4-T1.md | handoff: ./2026-03-19-E4-S4-S5.md
+- E4-S4-T2 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S4-T2.md | handoff: ./2026-03-19-E4-S4-S5.md
+- E4-S4-T3 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S4-T3.md | handoff: ./2026-03-19-E4-S4-S5.md
+- E4-S4-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S4-T4.md | handoff: ./2026-03-19-E4-S4-S5.md
+- E4-S5-T1 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S5-T1.md | handoff: ./2026-03-19-E4-S4-S5.md
+- E4-S5-T2 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S5-T2.md | handoff: ./2026-03-19-E4-S4-S5.md
+- E4-S5-T3 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S5-T3.md | handoff: ./2026-03-19-E4-S4-S5.md
+- E4-S5-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S5-T4.md | handoff: ./2026-03-19-E4-S4-S5.md
 - E6-S1-T1 | owner lane: Backend Domain Lane | handoff: ./2026-03-20-E6-S1-S3.md
 - E6-S1-T2 | owner lane: Backend Domain Lane | handoff: ./2026-03-20-E6-S1-S3.md
 - E6-S1-T3 | owner lane: Backend Domain Lane | handoff: ./2026-03-20-E6-S1-S3.md

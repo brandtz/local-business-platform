@@ -2,7 +2,7 @@
 
 ## Sequence Position
 
-- Prompt: 08 of 18
+- Prompt: 08 of 15 (remaining)
 - Epic: 7
 - Story: E7-S3
 - Tasks: E7-S3-T1, E7-S3-T2, E7-S3-T3, E7-S3-T4
@@ -10,10 +10,11 @@
 
 ## Prerequisites
 
-- Epic 6 must be completed — all stories E6-S1 through E6-S6, prompts 01–06.
+- Epic 6 must be completed — all stories E6-S1 through E6-S6.
 - Epic 5 must be completed (tenant operational settings including location hours).
-- Specifically verify that E6-S2 (services — prompt 02), E6-S3 (staff — prompt 04), and E6-S6 (contracts — prompt 06) are Completed.
-- Read E6-S2, E6-S3, and E6-S6 handoff notes for service durations, staff assignments, and location data.
+- E6-S2 (services) and E6-S3 (staff) are already completed — see handoff `agents/epics/handoffs/2026-03-20-E6-S1-S3.md`.
+- E6-S6 (contracts) must be completed — prompt 06.
+- Read the E6-S1/S2/S3 handoff and E6-S6 handoff notes for service durations, staff assignments, and location data.
 
 ## Context for the Agent
 
@@ -46,8 +47,7 @@ agents/epics/packets/epic-07/E7-S3-T4.md
 Read dependency handoffs:
 
 ```
-agents/epics/handoffs/YYYY-MM-DD-E6-S2-*.md (service durations and booking config)
-agents/epics/handoffs/YYYY-MM-DD-E6-S3-*.md (staff assignments and bookable state)
+agents/epics/handoffs/2026-03-20-E6-S1-S3.md (service durations, staff assignments — completed)
 agents/epics/handoffs/YYYY-MM-DD-E6-S6-*.md (stabilized domain contracts)
 ```
 

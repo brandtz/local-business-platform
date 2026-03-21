@@ -2,10 +2,10 @@
 
 ## Sequence Position
 
-- Prompt: 11 of 18
+- Prompt: 11 of 15 (remaining)
 - Epic: 7
 - Story: E7-S5
-- Tasks: E7-S5-T1, E7-S5-T2, E7-S5-T3, E7-S5-T4
+- Tasks: E7-S5-T1, E7-S5-T2, E7-S5-T3, E7-S5-T4, E7-S5-T5, E7-S5-T6, E7-S5-T7, E7-S5-T8
 - Phase: Epic 7 Integration (must wait for prompts 09 and 10 to complete)
 
 ## Prerequisites
@@ -42,6 +42,10 @@ agents/epics/packets/epic-07/E7-S5-T1.md
 agents/epics/packets/epic-07/E7-S5-T2.md
 agents/epics/packets/epic-07/E7-S5-T3.md
 agents/epics/packets/epic-07/E7-S5-T4.md
+agents/epics/packets/epic-07/E7-S5-T5.md
+agents/epics/packets/epic-07/E7-S5-T6.md
+agents/epics/packets/epic-07/E7-S5-T7.md
+agents/epics/packets/epic-07/E7-S5-T8.md
 ```
 
 Read dependency handoffs:
@@ -72,11 +76,25 @@ agents/design/Portal Design - Customer Portal - signin register reset.html (UX r
 - Implement account queries for order history, booking history, and preferences.
 - History queries must return only the authenticated customer's records for the current tenant.
 
-### E7-S5-T3: Customer Account Shell
-- Connect customer account shell to backend history and profile APIs.
+### E7-S5-T3: Saved Address CRUD
+- Implement saved-address CRUD — add, edit, delete, and set-default address for use in checkout delivery fulfillment.
+
+### E7-S5-T4: Saved Payment Method Management
+- Implement saved payment-method management — list, add, remove, and set-default stored card references (via payment gateway token, not raw card data).
+- Payment method endpoints must never expose raw card numbers.
+
+### E7-S5-T5: Loyalty Account Read Model
+- Define loyalty account read model — current tier, point balance, tier-progression thresholds, and points-history query.
+- This provides the data contract for the Loyalty tab; full loyalty engine is a separate concern.
+
+### E7-S5-T6: Notification Preferences
+- Implement notification-preference model — per-category (orders, bookings, promotions, account) toggles for email, SMS, and push channels.
+
+### E7-S5-T7: Account Shell Integration
+- Connect customer account shell to all 7 backend module APIs (profile, orders, bookings, addresses, payment methods, loyalty, notifications).
 - Account pages must render empty, partial, and populated states correctly.
 
-### E7-S5-T4: Cross-Tenant Identity Behavior
+### E7-S5-T8: Cross-Tenant Identity Behavior
 - Define cross-tenant identity behavior for one person using multiple businesses.
 - Document how shared identity maps to per-tenant customer profiles.
 - Ensure history isolation: Tenant A's orders never appear in Tenant B's account view.
@@ -85,8 +103,9 @@ agents/design/Portal Design - Customer Portal - signin register reset.html (UX r
 
 - Customer histories must be isolated per tenant — this is a hard security requirement.
 - Account endpoints must return only the authenticated customer's own records.
+- Payment method endpoints must never expose raw card numbers — use gateway tokens only.
 - Do NOT modify existing auth or role services from Epic 2 — extend or consume them.
-- Do NOT implement loyalty, rewards, or saved payment methods — those are future scope.
+- Do NOT implement the full loyalty engine or rewards redemption — only the read model contract.
 - Do NOT implement admin-side customer management — that is separate from customer self-service.
 
 ## Validation Commands
@@ -116,11 +135,17 @@ agents/epics/handoffs/YYYY-MM-DD-E7-S5-T1.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S5-T2.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S5-T3.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S5-T4.md
+agents/epics/handoffs/YYYY-MM-DD-E7-S5-T5.md
+agents/epics/handoffs/YYYY-MM-DD-E7-S5-T6.md
+agents/epics/handoffs/YYYY-MM-DD-E7-S5-T7.md
+agents/epics/handoffs/YYYY-MM-DD-E7-S5-T8.md
 ```
 
 Each handoff must include:
 - Task ID and status
-- Customer account contract documented
+- Customer account contract documented (all 7 tabs: profile, orders, bookings, addresses, payment methods, loyalty, notifications)
+- Saved-address and payment-method models documented
+- Loyalty read-model contract and notification-preference schema documented
 - Cross-tenant identity model and assumptions documented
 - History query filters ensuring tenant isolation
 - Which E7-S2 and E7-S4 contracts were consumed
@@ -138,4 +163,4 @@ No prompts in this sequence directly depend on E7-S5 output, but customer identi
 - STOP if E7-S2 or E7-S4 handoffs are not available — write a blocked handoff.
 - STOP if cross-tenant identity behavior requires auth schema changes not planned in Epic 2.
 - STOP if tenant isolation of customer history cannot be validated with integration tests.
-- STOP if the work expands into loyalty, rewards, or admin customer management.
+- STOP if the work expands into full loyalty engine or admin customer management.

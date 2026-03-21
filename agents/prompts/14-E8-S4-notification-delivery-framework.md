@@ -2,7 +2,7 @@
 
 ## Sequence Position
 
-- Prompt: 14 of 18
+- Prompt: 14 of 15 (remaining)
 - Epic: 8
 - Story: E8-S4
 - Tasks: E8-S4-T1, E8-S4-T2, E8-S4-T3, E8-S4-T4

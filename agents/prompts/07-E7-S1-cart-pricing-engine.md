@@ -2,17 +2,17 @@
 
 ## Sequence Position
 
-- Prompt: 07 of 18
+- Prompt: 07 of 15 (remaining)
 - Epic: 7
 - Story: E7-S1
-- Tasks: E7-S1-T1, E7-S1-T2, E7-S1-T3, E7-S1-T4
+- Tasks: E7-S1-T1, E7-S1-T2, E7-S1-T3, E7-S1-T4, E7-S1-T5, E7-S1-T6, E7-S1-T7
 - Phase: Epic 7 Foundation (can run in parallel with prompt 08)
 
 ## Prerequisites
 
 - Epic 6 must be completed — all stories E6-S1 through E6-S6, prompts 01–06.
-- Specifically verify that E6-S1 (catalog — prompt 01) and E6-S6 (contract stabilization — prompt 06) are Completed.
-- Read E6-S1 and E6-S6 handoff notes for catalog item types, pricing types, and shared contracts.
+- Specifically verify that E6-S1 (catalog) and E6-S6 (contract stabilization) are Completed.
+- Read the E6-S1/S2/S3 handoff at `agents/epics/handoffs/2026-03-20-E6-S1-S3.md` and E6-S6 handoff notes for catalog item types, pricing types, and shared contracts.
 
 ## Context for the Agent
 
@@ -41,12 +41,15 @@ agents/epics/packets/epic-07/E7-S1-T1.md
 agents/epics/packets/epic-07/E7-S1-T2.md
 agents/epics/packets/epic-07/E7-S1-T3.md
 agents/epics/packets/epic-07/E7-S1-T4.md
+agents/epics/packets/epic-07/E7-S1-T5.md
+agents/epics/packets/epic-07/E7-S1-T6.md
+agents/epics/packets/epic-07/E7-S1-T7.md
 ```
 
 Read dependency handoffs:
 
 ```
-agents/epics/handoffs/YYYY-MM-DD-E6-S1-*.md (catalog contracts)
+agents/epics/handoffs/2026-03-20-E6-S1-S3.md (catalog contracts — completed)
 agents/epics/handoffs/YYYY-MM-DD-E6-S6-*.md (stabilized domain contracts)
 ```
 
@@ -74,9 +77,20 @@ agents/design/Portal Design - Customer Portal cart and checkout.html (UX referen
 - Create cart API contracts for add, update, remove, and quote operations.
 - Validate quantity, modifier selections, and stale-price scenarios.
 
-### E7-S1-T4: Storefront Cart Integration
+### E7-S1-T4: Fulfillment Mode Selection
+- Define fulfillment-mode selection model (delivery/pickup) with conditional address requirement.
+- Cart must store selected fulfillment type and delivery address when applicable.
+
+### E7-S1-T5: Promo and Loyalty Code Validation
+- Implement promo-code and loyalty-code validation and discount-application service hooks within the pricing pipeline.
+
+### E7-S1-T6: Order Notes
+- Add order-notes field to cart model for customer special instructions.
+
+### E7-S1-T7: Storefront Cart Integration
 - Expose storefront cart state integration using backend-trusted totals only.
 - Client-side cart state must display server-calculated totals, not local calculations.
+- Include all line items in the 3-step stepper data contract (cart summary, fulfillment selection, payment breakdown).
 
 ## Constraints
 
@@ -113,12 +127,16 @@ agents/epics/handoffs/YYYY-MM-DD-E7-S1-T1.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S1-T2.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S1-T3.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S1-T4.md
+agents/epics/handoffs/YYYY-MM-DD-E7-S1-T5.md
+agents/epics/handoffs/YYYY-MM-DD-E7-S1-T6.md
+agents/epics/handoffs/YYYY-MM-DD-E7-S1-T7.md
 ```
 
 Each handoff must include:
 - Task ID and status
 - Pricing invariants documented (determinism, server-authority, edge cases)
-- Cart payload contract shapes
+- Cart payload contract shapes (all 3 stepper stages)
+- Fulfillment mode model and promo/loyalty code interfaces
 - Stale-price handling rules
 - Which E6 catalog contracts were consumed
 
