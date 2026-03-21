@@ -2,12 +2,7 @@ import { Injectable } from "@nestjs/common";
 
 import type {
 	BusinessVertical,
-	ContentPageRecord,
-	CreateContentPageRequest,
-	ServiceRecord,
-	StarterServiceSeed,
 	VerticalTemplateConfig,
-	WeeklyHoursEntry,
 } from "@platform/types";
 import { verticalConfigs } from "@platform/types";
 

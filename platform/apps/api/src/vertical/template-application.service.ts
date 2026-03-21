@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
 import type { BusinessVertical } from "@platform/types";
-import { validateVerticalSelection, verticalConfigs } from "@platform/types";
+import { validateVerticalSelection } from "@platform/types";
 
 import type { VerticalSeedPlan } from "./vertical-domain-mapping.service";
 import { VerticalDomainMappingService } from "./vertical-domain-mapping.service";

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import { VerticalDomainMappingService } from "./vertical-domain-mapping.service";
-import type { BusinessVertical } from "@platform/types";
 import { businessVerticals, verticalConfigs } from "@platform/types";
 
 describe("VerticalDomainMappingService", () => {
