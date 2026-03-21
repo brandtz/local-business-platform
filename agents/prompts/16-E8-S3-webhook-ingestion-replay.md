@@ -2,7 +2,7 @@
 
 ## Sequence Position
 
-- Prompt: 16 of 18
+- Prompt: 16 (original numbering; 15 prompts remain after removing completed)
 - Epic: 8
 - Story: E8-S3
 - Tasks: E8-S3-T1, E8-S3-T2, E8-S3-T3, E8-S3-T4

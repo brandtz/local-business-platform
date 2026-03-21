@@ -2,10 +2,10 @@
 
 ## Sequence Position
 
-- Prompt: 09 of 18
+- Prompt: 09 of 15 (remaining)
 - Epic: 7
 - Story: E7-S2
-- Tasks: E7-S2-T1, E7-S2-T2, E7-S2-T3, E7-S2-T4
+- Tasks: E7-S2-T1, E7-S2-T2, E7-S2-T3, E7-S2-T4, E7-S2-T5, E7-S2-T6
 - Phase: Epic 7 Intermediate (must wait for prompt 07 to complete)
 
 ## Prerequisites
@@ -40,6 +40,8 @@ agents/epics/packets/epic-07/E7-S2-T1.md
 agents/epics/packets/epic-07/E7-S2-T2.md
 agents/epics/packets/epic-07/E7-S2-T3.md
 agents/epics/packets/epic-07/E7-S2-T4.md
+agents/epics/packets/epic-07/E7-S2-T5.md
+agents/epics/packets/epic-07/E7-S2-T6.md
 ```
 
 Read dependency handoffs from prompt 07:
@@ -73,10 +75,19 @@ agents/design/Portal Design - Customer Portal - confirmation order-booking detai
 - Define customer and admin order API contracts and query models.
 - Customer API: view own orders and order details.
 - Admin API: list, filter, view detail, and update order status.
+- Admin queries must support: search by order ID and customer name, filter by status, filter by date range, and pipeline-count aggregation for status badges.
 
 ### E7-S2-T4: Tenant-Admin Operational Views
-- Build tenant-admin operational views for order list, detail, and status actions.
+- Build tenant-admin operational views for order list with pipeline/kanban status counts, individual order detail, and quick-action status transition buttons ("Start Prep", "Mark Ready", "Complete").
 - Admin screens must reflect current status and allowed actions correctly.
+
+### E7-S2-T5: Time-Ago Display and Timestamps
+- Implement time-ago display formatting and order-timestamp query model for admin operational views.
+- Support relative time display (e.g., "5 mins ago") for order pipeline views.
+
+### E7-S2-T6: Customer Order Tracking
+- Define customer-facing order tracking read model — progress bar state mapping, itemized receipt, and confirmation page data contract.
+- Customer sees tracking progress bar, itemized order details, and customer info card.
 
 ## Constraints
 
@@ -113,11 +124,15 @@ agents/epics/handoffs/YYYY-MM-DD-E7-S2-T1.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S2-T2.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S2-T3.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S2-T4.md
+agents/epics/handoffs/YYYY-MM-DD-E7-S2-T5.md
+agents/epics/handoffs/YYYY-MM-DD-E7-S2-T6.md
 ```
 
 Each handoff must include:
 - Task ID and status
 - Order state machine documented (states, valid transitions, fulfillment modes)
+- Pipeline aggregation queries and quick-action semantics documented
+- Customer-facing tracking read model and progress bar mapping documented
 - Customer-versus-admin read model differences documented
 - Which E7-S1 cart contracts were consumed
 

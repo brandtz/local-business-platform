@@ -2,23 +2,21 @@
 
 ## Sequence Position
 
-- Prompt: 06 of 18
+- Prompt: 06 of 15 (remaining)
 - Epic: 6
 - Story: E6-S6
 - Tasks: E6-S6-T1, E6-S6-T2, E6-S6-T3, E6-S6-T4
-- Phase: Epic 6 Consolidation (must wait for prompts 01, 02, 03, and 04 to complete)
+- Phase: Epic 6 Consolidation (must wait for prompt 03 to complete)
 
 ## Prerequisites
 
-- E6-S1 (catalog) must be completed — prompt 01.
-- E6-S2 (services) must be completed — prompt 02.
-- E6-S3 (staff) must be completed — prompt 04.
+- E6-S1 (catalog), E6-S2 (services), E6-S3 (staff) — already completed. See handoff `agents/epics/handoffs/2026-03-20-E6-S1-S3.md`.
 - E6-S4 (content) must be completed — prompt 03.
-- Verify all four on the active task board. Read all E6 handoff notes.
+- Verify E6-S4 completion on the active task board. Read all E6 handoff notes.
 
 ## Context for the Agent
 
-You are performing domain contract stabilization — the final consolidation story of Epic 6. All four domain modules (catalog, services, staff, content) have been implemented. Your job is to consolidate their contracts, define stable shared package types, document domain events or change-notification hooks, and establish versioning rules for future non-breaking extension.
+You are performing domain contract stabilization — the final consolidation story of Epic 6. All four domain modules (catalog, services, staff, content) have been implemented. Catalog, services, and staff were completed on 2026-03-20 (see `agents/epics/handoffs/2026-03-20-E6-S1-S3.md`). Content should be completed by the time this prompt runs. Your job is to consolidate their contracts, define stable shared package types, document domain events or change-notification hooks, and establish versioning rules for future non-breaking extension.
 
 This is a contract-quality and documentation story. The output enables frontend and backend teams across Epics 7 and 8 to target a clear, stable contract surface for these entities.
 
@@ -47,10 +45,8 @@ agents/epics/packets/epic-06/E6-S6-T4.md
 Read ALL E6 handoff notes:
 
 ```
-agents/epics/handoffs/YYYY-MM-DD-E6-S1-*.md (catalog contracts)
-agents/epics/handoffs/YYYY-MM-DD-E6-S2-*.md (service contracts)
-agents/epics/handoffs/YYYY-MM-DD-E6-S3-*.md (staff contracts)
-agents/epics/handoffs/YYYY-MM-DD-E6-S4-*.md (content contracts)
+agents/epics/handoffs/2026-03-20-E6-S1-S3.md (catalog, service, staff contracts — completed)
+agents/epics/handoffs/YYYY-MM-DD-E6-S4-*.md (content contracts — from prompt 03)
 ```
 
 Inspect these code surfaces:

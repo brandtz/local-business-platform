@@ -2,42 +2,45 @@
 
 ## Overview
 
-This directory contains 18 sequenced prompts for cloud agent execution covering Epics 6, 7, and 8. Each file is one self-contained prompt for one agent session targeting one story (typically 4 tasks).
+This directory contains sequenced prompts for cloud agent execution covering Epics 6, 7, and 8. Each file is one self-contained prompt for one agent session targeting one story. Originally 18 prompts; 3 have been removed after completion (01, 02, 04). 15 prompts remain.
 
 ## Current Project Status
 
-As of the generation date for these prompts:
+As of 2026-03-21:
 - **Epics 1–3**: Fully completed (72 tasks)
-- **Epic 4**: Partially completed (S1 and S6 done, S2–S5 remaining)
+- **Epic 4**: Fully completed (S1–S6 all done)
 - **Epic 5**: Not yet started
-- **Epics 6–8**: Not yet started — these prompts cover this work
+- **Epic 6**: Partially completed — S1 (Catalog), S2 (Services), S3 (Staff) are done; S4–S6 remain
+- **Epics 7–8**: Not yet started — these prompts cover this work
 
-**IMPORTANT**: Epics 4 and 5 must be completed before most Epic 6 work can begin. The dependency chain is strict.
+**Completed prompts removed**: Prompts 01 (E6-S1), 02 (E6-S2), and 04 (E6-S3) have been removed because that work is complete. See handoff `agents/epics/handoffs/2026-03-20-E6-S1-S3.md` for details.
+
+**IMPORTANT**: Epic 5 must be completed before most remaining Epic 6 work can begin. The dependency chain is strict.
 
 ## Dependency Sequence
 
 Prompts are numbered 01–18 in dependency order. The sequence reflects when each story CAN start based on prerequisite completion.
 
-### Phase 1: Epic 6 Foundation (parallel-safe after E5 completes)
+### ~~Phase 1: Epic 6 Foundation~~ — COMPLETED
 
-| Prompt | Story | Title | Can Parallel With |
-|--------|-------|-------|-------------------|
-| 01 | E6-S1 | Catalog Domain Model | 02, 03 |
-| 02 | E6-S2 | Service and Booking Domain Model | 01, 03 |
-| 03 | E6-S4 | Content and SEO Domain Model | 01, 02 |
+Prompts 01 (E6-S1), 02 (E6-S2) removed — work completed 2026-03-20.
 
-### Phase 2: Epic 6 Intermediate
+### Phase 1: Epic 6 Remaining Foundation (after E5 completes)
 
 | Prompt | Story | Title | Depends On |
 |--------|-------|-------|------------|
-| 04 | E6-S3 | Staff and Assignment Domain Model | 02 (E6-S2) |
+| 03 | E6-S4 | Content and SEO Domain Model | E5-S2 |
 
-### Phase 3: Epic 6 Consolidation
+### ~~Phase 2: Epic 6 Intermediate~~ — COMPLETED
+
+Prompt 04 (E6-S3) removed — work completed 2026-03-20.
+
+### Phase 2: Epic 6 Consolidation
 
 | Prompt | Story | Title | Depends On |
 |--------|-------|-------|------------|
-| 05 | E6-S5 | Vertical Template Defaults | 01, 02, 03 (E6-S1, S2, S4) |
-| 06 | E6-S6 | Domain Contract Stabilization | 01, 02, 03, 04 (E6-S1, S2, S3, S4) |
+| 05 | E6-S5 | Vertical Template Defaults | 03 (E6-S4) — E6-S1, S2 already done |
+| 06 | E6-S6 | Domain Contract Stabilization | 03 (E6-S4) — E6-S1, S2, S3 already done |
 
 ### Phase 4: Epic 7 Foundation (parallel-safe after E6 completes)
 
@@ -88,9 +91,9 @@ Prompts are numbered 01–18 in dependency order. The sequence reflects when eac
 
 ## Maximum Safe Parallelism
 
-At most 3 agents can run simultaneously. Use these parallel groups:
+At most 2 agents can run simultaneously in the remaining work. Use these parallel groups:
 
-1. **Group A** (Phase 1): Prompts 01 + 02 + 03
+1. **Group A** (Phase 2): Prompts 05 + 06 (after prompt 03 completes)
 2. **Group B** (Phase 4): Prompts 07 + 08
 3. **Group C** (Phase 6): Prompts 11 + 12
 4. **Group D** (Phase 7): Prompts 13 + 14
@@ -99,10 +102,10 @@ All other prompts are sequential dependencies.
 
 ## How to Use
 
-1. Complete E4-S2 through E4-S5 and all of Epic 5 first.
-2. Start with Phase 1 (prompts 01, 02, 03 in parallel).
-3. After Phase 1 completes, run Phase 2 (prompt 04) then Phase 3 (prompts 05, 06).
-4. After Phase 3 completes, run Phase 4 (prompts 07, 08 in parallel).
+1. Complete all of Epic 5 first.
+2. Run prompt 03 (E6-S4 Content and SEO). E6-S1, S2, and S3 are already done.
+3. After prompt 03 completes, run Phase 2 (prompts 05 + 06 in parallel).
+4. After Phase 2 completes, run Phase 4 (prompts 07 + 08 in parallel).
 5. Continue following the dependency chain through Phase 10.
 6. Prompt 18 is blocked by Epic 9 — defer or run in design-only mode.
 
@@ -116,9 +119,9 @@ All other prompts are sequential dependencies.
 
 ## Total Work Summary
 
-| Epic | Stories | Tasks | Prompts |
-|------|---------|-------|---------|
-| 6 | 6 | 24 | 01–06 |
-| 7 | 6 | 24 | 07–12 |
-| 8 | 6 | 24 | 13–18 |
-| **Total** | **18** | **72** | **18** |
+| Epic | Stories | Remaining Prompts | Status |
+|------|---------|-------------------|--------|
+| 6 | 6 | 03, 05, 06 | S1–S3 complete, S4–S6 remaining |
+| 7 | 6 | 07–12 | Not started |
+| 8 | 6 | 13–18 | Not started |
+| **Total** | **18** | **15** | **3 prompts removed (completed)** |

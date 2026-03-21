@@ -2,15 +2,16 @@
 
 ## Sequence Position
 
-- Prompt: 03 of 18
+- Prompt: 03 of 15 (remaining)
 - Epic: 6
 - Story: E6-S4
-- Tasks: E6-S4-T1, E6-S4-T2, E6-S4-T3, E6-S4-T4
-- Phase: Epic 6 Foundation (can run in parallel with prompts 01 and 02)
+- Tasks: E6-S4-T1, E6-S4-T2, E6-S4-T3, E6-S4-T4, E6-S4-T5, E6-S4-T6
+- Phase: Epic 6 Remaining Foundation (can begin after E5 completes)
 
 ## Prerequisites
 
 - E5-S2 (tenant operational settings) must be completed.
+- E6-S1 (catalog), E6-S2 (services), and E6-S3 (staff) are already completed — see handoff `agents/epics/handoffs/2026-03-20-E6-S1-S3.md`.
 - Verify on the active task board that E5-S2 tasks are Completed.
 - If E5-S2 is not complete, STOP and report a blocked handoff.
 
@@ -18,7 +19,7 @@
 
 You are implementing the content and SEO domain model for a multi-tenant SaaS platform. Tenants need to manage reusable content pages, announcements, and policy content with publish states. Content must support draft and published states with SEO metadata and stable slugs. The storefront consumes content by slug for page rendering.
 
-This work is independent of catalog and service domain models (prompts 01 and 02) and can run in parallel with them, but it depends on Epic 5 tenant operational settings being in place.
+This work is independent of catalog and service domain models (which are already completed) but it depends on Epic 5 tenant operational settings being in place.
 
 ## Required Reading
 
@@ -41,6 +42,14 @@ agents/epics/packets/epic-06/E6-S4-T1.md
 agents/epics/packets/epic-06/E6-S4-T2.md
 agents/epics/packets/epic-06/E6-S4-T3.md
 agents/epics/packets/epic-06/E6-S4-T4.md
+agents/epics/packets/epic-06/E6-S4-T5.md
+agents/epics/packets/epic-06/E6-S4-T6.md
+```
+
+Read completed domain handoffs for context on established patterns:
+
+```
+agents/epics/handoffs/2026-03-20-E6-S1-S3.md (catalog, service, staff domain patterns)
 ```
 
 Inspect these code surfaces:
@@ -59,21 +68,28 @@ agents/epics/handoffs/active-task-board.md (verify E5-S2 completion)
 
 ## Implementation Scope
 
-### E6-S4-T1: Content Schema
-- Finalize Prisma schema for content pages, publish state enum, SEO metadata, and slugs.
-- All entities must be tenant-scoped. Support draft, published, and archived states.
-- Generate migration file and shared TypeScript types.
+### E6-S4-T1: Content Page Schema
+- Finalize Prisma schema for content pages — including structured content body (block-based or rich-text JSON), publish state enum (draft/published/archived), SEO metadata (title, description, OG tags), slugs, and template-region assignments.
+- All entities must be tenant-scoped. Generate migration file and shared TypeScript types.
 
-### E6-S4-T2: Content Services
-- Implement content services for draft, publish, archive, and retrieval behaviors.
+### E6-S4-T2: Announcement Schema
+- Define schema for announcements — title, body, placement type (banner/popup/inline), date-range scheduling (start/end), active state, and display-priority.
+- Announcements are tenant-scoped with scheduling metadata.
+
+### E6-S4-T3: Content Services
+- Implement content services for draft, publish, archive, and retrieval behaviors including scheduled publish support.
 - Enforce tenant isolation and validate slug uniqueness per tenant.
 
-### E6-S4-T3: Admin and Storefront Contracts
-- Define admin editing contracts for content CRUD and storefront read contracts by slug.
+### E6-S4-T4: Announcement Services
+- Implement announcement services for CRUD, activation by date range, and placement-filtered queries.
+- Support placement types: banner, popup, inline. Announcements activate and deactivate by date range.
+
+### E6-S4-T5: Admin and Storefront Contracts
+- Define admin editing contracts (page create/update with structured body payload, media references within body, SEO fields) and storefront read contracts by slug.
 - Admin endpoints support full lifecycle; storefront returns only published content.
 
-### E6-S4-T4: Template Rendering Hooks
-- Establish content model hooks for template rendering and publish workflows.
+### E6-S4-T6: Template Rendering Hooks
+- Establish content model hooks for template rendering, publish workflows, and storefront preview data generation.
 - Content must be consumable by vertical template defaults (E6-S5).
 
 ## Constraints
@@ -110,6 +126,8 @@ agents/epics/handoffs/YYYY-MM-DD-E6-S4-T1.md
 agents/epics/handoffs/YYYY-MM-DD-E6-S4-T2.md
 agents/epics/handoffs/YYYY-MM-DD-E6-S4-T3.md
 agents/epics/handoffs/YYYY-MM-DD-E6-S4-T4.md
+agents/epics/handoffs/YYYY-MM-DD-E6-S4-T5.md
+agents/epics/handoffs/YYYY-MM-DD-E6-S4-T6.md
 ```
 
 Use the template at `agents/epics/handoff-note-template.md`. Each handoff must include:

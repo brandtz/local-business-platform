@@ -2,10 +2,10 @@
 
 ## Sequence Position
 
-- Prompt: 15 of 18
+- Prompt: 15 of 15 (remaining)
 - Epic: 8
 - Story: E8-S2
-- Tasks: E8-S2-T1, E8-S2-T2, E8-S2-T3, E8-S2-T4
+- Tasks: E8-S2-T1, E8-S2-T2, E8-S2-T3, E8-S2-T4, E8-S2-T5, E8-S2-T6
 - Phase: Epic 8 Intermediate (must wait for prompt 13 to complete)
 
 ## Prerequisites
@@ -42,6 +42,8 @@ agents/epics/packets/epic-08/E8-S2-T1.md
 agents/epics/packets/epic-08/E8-S2-T2.md
 agents/epics/packets/epic-08/E8-S2-T3.md
 agents/epics/packets/epic-08/E8-S2-T4.md
+agents/epics/packets/epic-08/E8-S2-T5.md
+agents/epics/packets/epic-08/E8-S2-T6.md
 ```
 
 Read dependency handoffs from prompt 13:
@@ -86,6 +88,15 @@ platform/packages/types/src/
 - Implement tenant-admin refund initiation flow with audit requirements.
 - Refund actions must capture actor, reason, and resulting state changes.
 - Partial refunds must be supported.
+- Refund must route to the original capture processor automatically.
+
+### E8-S2-T5: Multi-Processor Routing
+- Implement multi-processor routing logic — when a tenant has multiple active processors, determine which to use for capture (primary preference with configuration).
+- Ensure refunds target the correct original processor.
+
+### E8-S2-T6: Failover Behavior
+- Define failover behavior — when primary processor capture fails, attempt secondary if configured.
+- Log failure event for E8-S6 alert pipeline.
 
 ## Constraints
 
@@ -126,11 +137,14 @@ agents/epics/handoffs/YYYY-MM-DD-E8-S2-T1.md
 agents/epics/handoffs/YYYY-MM-DD-E8-S2-T2.md
 agents/epics/handoffs/YYYY-MM-DD-E8-S2-T3.md
 agents/epics/handoffs/YYYY-MM-DD-E8-S2-T4.md
+agents/epics/handoffs/YYYY-MM-DD-E8-S2-T5.md
+agents/epics/handoffs/YYYY-MM-DD-E8-S2-T6.md
 ```
 
 Each handoff must include:
 - Task ID and status
 - Internal payment interface documented
+- Multi-processor routing rules and failover behavior documented
 - Transaction state mapping documented
 - Refund audit contract documented
 - Which E8-S1 connection contracts were consumed

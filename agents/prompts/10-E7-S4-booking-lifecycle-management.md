@@ -2,10 +2,10 @@
 
 ## Sequence Position
 
-- Prompt: 10 of 18
+- Prompt: 10 of 15 (remaining)
 - Epic: 7
 - Story: E7-S4
-- Tasks: E7-S4-T1, E7-S4-T2, E7-S4-T3, E7-S4-T4
+- Tasks: E7-S4-T1, E7-S4-T2, E7-S4-T3, E7-S4-T4, E7-S4-T5, E7-S4-T6
 - Phase: Epic 7 Intermediate (must wait for prompt 08 to complete)
 
 ## Prerequisites
@@ -40,6 +40,8 @@ agents/epics/packets/epic-07/E7-S4-T1.md
 agents/epics/packets/epic-07/E7-S4-T2.md
 agents/epics/packets/epic-07/E7-S4-T3.md
 agents/epics/packets/epic-07/E7-S4-T4.md
+agents/epics/packets/epic-07/E7-S4-T5.md
+agents/epics/packets/epic-07/E7-S4-T6.md
 ```
 
 Read dependency handoffs from prompt 08:
@@ -74,9 +76,17 @@ agents/design/Portal Design - Customer Portal - confirmation order-booking detai
 - Customer API: create booking, view own bookings.
 - Admin API: list, filter, view, and manage bookings with exception handling.
 
-### E7-S4-T4: Tenant-Admin Operational Screens
-- Build tenant-admin operational screens for booking management and exception handling.
+### E7-S4-T4: Calendar-View Query Model
+- Define calendar-view query model — bookings queryable by date range, staff member, and service type, with time-block data suitable for rendering a day/week/month calendar grid.
+
+### E7-S4-T5: Tenant-Admin Operational Screens
+- Build tenant-admin operational screens for booking list view, calendar view, booking detail, and exception handling (reschedule, no-show, manual override).
 - Admin screens must show allowed transitions and denial reasons clearly.
+- Calendar view renders bookings in correct time slots.
+
+### E7-S4-T6: Customer Booking Tracking
+- Define customer-facing booking confirmation and tracking read model with status-bar progress mapping.
+- Customer sees booking progress/status bar similar to order tracking.
 
 ## Constraints
 
@@ -113,13 +123,17 @@ agents/epics/handoffs/YYYY-MM-DD-E7-S4-T1.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S4-T2.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S4-T3.md
 agents/epics/handoffs/YYYY-MM-DD-E7-S4-T4.md
+agents/epics/handoffs/YYYY-MM-DD-E7-S4-T5.md
+agents/epics/handoffs/YYYY-MM-DD-E7-S4-T6.md
 ```
 
 Each handoff must include:
 - Task ID and status
 - Booking state machine documented (states, valid transitions, cancellation rules)
+- Calendar-view data contract documented
 - Double-booking prevention mechanism documented
-- Admin exception-handling flows described
+- Admin exception-handling flows (reschedule, no-show) described
+- Customer booking tracking read model documented
 - Which E7-S3 slot computation contracts were consumed
 
 Update the active task board accordingly.
