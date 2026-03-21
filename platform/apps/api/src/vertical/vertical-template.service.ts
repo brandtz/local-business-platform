@@ -2,8 +2,10 @@ import { Injectable } from "@nestjs/common";
 
 import type {
 	BusinessVertical,
+	InquiryFormConfig,
 	VerticalModuleConfig,
 	VerticalTemplateConfig,
+	VerticalThemeDefaults,
 	WeeklyHoursEntry,
 } from "@platform/types";
 import {
@@ -26,6 +28,7 @@ export type SeedResult = {
 	contentPagesSeeded: number;
 	hoursApplied: number;
 	modulesEnabled: readonly string[];
+	servicesSeeded: number;
 	vertical: BusinessVertical;
 };
 
@@ -67,6 +70,14 @@ export class VerticalTemplateService {
 		return this.getConfig(vertical).modules;
 	}
 
+	getThemeDefaults(vertical: BusinessVertical): VerticalThemeDefaults {
+		return this.getConfig(vertical).theme;
+	}
+
+	getInquiryFormConfig(vertical: BusinessVertical): InquiryFormConfig {
+		return this.getConfig(vertical).inquiryForm;
+	}
+
 	/**
 	 * Build a deterministic seed plan for a new tenant.
 	 * Returns the computed seed metadata without side effects.
@@ -77,6 +88,7 @@ export class VerticalTemplateService {
 			vertical,
 			modulesEnabled: this.getEnabledModules(vertical),
 			categoriesSeeded: config.starterCategories.length,
+			servicesSeeded: config.starterServices.length,
 			contentPagesSeeded: config.starterContentPages.length,
 			hoursApplied: config.defaultBusinessHours.length,
 		};

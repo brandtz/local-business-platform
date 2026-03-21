@@ -52,6 +52,8 @@ import { StaffManagementService } from "./staff/staff-management.service";
 import { StaffScheduleService } from "./staff/staff-schedule.service";
 import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
 import { InquiryLeadService } from "./vertical/inquiry-lead.service";
+import { TemplateApplicationService } from "./vertical/template-application.service";
+import { VerticalDomainMappingService } from "./vertical/vertical-domain-mapping.service";
 import { VerticalTemplateService } from "./vertical/vertical-template.service";
 
 @Module({
@@ -106,6 +108,8 @@ import { VerticalTemplateService } from "./vertical/vertical-template.service";
     TenantDirectoryQueryService,
     TenantResolutionService,
     VerticalTemplateService,
+    VerticalDomainMappingService,
+    TemplateApplicationService,
     InquiryLeadService
   ],
   exports: [
@@ -158,6 +162,8 @@ import { VerticalTemplateService } from "./vertical/vertical-template.service";
     TenantDirectoryQueryService,
     TenantResolutionService,
     VerticalTemplateService,
+    VerticalDomainMappingService,
+    TemplateApplicationService,
     InquiryLeadService
   ]
 })
