@@ -1,7 +1,14 @@
+import { createRequire } from "node:module";
+import path from "node:path";
+
 import { defineConfig } from "@playwright/test";
 
-const VITE_CLI_PATH =
-	"../../node_modules/.pnpm/vite@8.0.0_@types+node@25.5.0_esbuild@0.27.4_tsx@4.21.0_yaml@2.8.2/node_modules/vite/bin/vite.js";
+const require = createRequire(import.meta.url);
+const VITE_CLI_PATH = path.resolve(
+	path.dirname(require.resolve("vite/package.json")),
+	"bin",
+	"vite.js"
+);
 
 function createWebServer(cwd: string, port: number) {
 	return {
