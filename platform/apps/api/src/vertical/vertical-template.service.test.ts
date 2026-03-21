@@ -13,6 +13,8 @@ describe("VerticalTemplateService", () => {
 			expect(config.vertical).toBe(vertical);
 			expect(config.modules).toBeDefined();
 			expect(config.starterCategories.length).toBeGreaterThan(0);
+			expect(config.theme).toBeDefined();
+			expect(config.inquiryForm).toBeDefined();
 		});
 
 		it("throws for unsupported vertical", () => {
@@ -85,6 +87,12 @@ describe("VerticalTemplateService", () => {
 			expect(plan.contentPagesSeeded).toBe(2);
 			expect(plan.hoursApplied).toBe(7);
 			expect(plan.modulesEnabled).toContain("catalog");
+			expect(plan.servicesSeeded).toBe(0);
+		});
+
+		it("includes service count for contractor", () => {
+			const plan = service.buildSeedPlan("contractor");
+			expect(plan.servicesSeeded).toBe(3);
 		});
 	});
 
@@ -99,6 +107,68 @@ describe("VerticalTemplateService", () => {
 
 		it("contractor enables inquiry form", () => {
 			expect(service.isModuleEnabled("contractor", "inquiryForm")).toBe(true);
+		});
+	});
+
+	describe("getThemeDefaults", () => {
+		it("returns theme defaults for restaurant", () => {
+			const theme = service.getThemeDefaults("restaurant");
+			expect(theme.themePreset).toBe("starter-warm");
+			expect(theme.brandPreset).toBe("starter-restaurant");
+			expect(theme.navigationPreset).toBe("restaurant-default");
+		});
+
+		it("returns theme defaults for contractor", () => {
+			const theme = service.getThemeDefaults("contractor");
+			expect(theme.themePreset).toBe("starter-professional");
+			expect(theme.brandPreset).toBe("starter-contractor");
+		});
+
+		it.each([...businessVerticals])("returns non-empty theme for %s", (vertical) => {
+			const theme = service.getThemeDefaults(vertical);
+			expect(theme.themePreset).toBeTruthy();
+			expect(theme.brandPreset).toBeTruthy();
+			expect(theme.navigationPreset).toBeTruthy();
+		});
+	});
+
+	describe("getInquiryFormConfig", () => {
+		it("returns enabled inquiry form for contractor", () => {
+			const config = service.getInquiryFormConfig("contractor");
+			expect(config.enabled).toBe(true);
+			expect(config.heading).toBeTruthy();
+			expect(config.submitLabel).toBeTruthy();
+			expect(config.fields.length).toBeGreaterThan(0);
+		});
+
+		it("returns disabled inquiry form for restaurant", () => {
+			const config = service.getInquiryFormConfig("restaurant");
+			expect(config.enabled).toBe(false);
+		});
+
+		it("returns disabled inquiry form for retail", () => {
+			const config = service.getInquiryFormConfig("retail");
+			expect(config.enabled).toBe(false);
+		});
+
+		it("contractor form has required name and email fields", () => {
+			const config = service.getInquiryFormConfig("contractor");
+			const nameField = config.fields.find((f) => f.name === "name");
+			const emailField = config.fields.find((f) => f.name === "email");
+			expect(nameField).toBeDefined();
+			expect(nameField!.required).toBe(true);
+			expect(emailField).toBeDefined();
+			expect(emailField!.required).toBe(true);
+		});
+
+		it("contractor form has optional phone and message fields", () => {
+			const config = service.getInquiryFormConfig("contractor");
+			const phoneField = config.fields.find((f) => f.name === "phone");
+			const messageField = config.fields.find((f) => f.name === "message");
+			expect(phoneField).toBeDefined();
+			expect(phoneField!.required).toBe(false);
+			expect(messageField).toBeDefined();
+			expect(messageField!.required).toBe(false);
 		});
 	});
 });
