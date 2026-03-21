@@ -97,7 +97,7 @@ Use this file to track the active execution queue.
 - E4-S1-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S1-T4.md | handoff: ./2026-03-17-E4-S1-T4.md
 - E4-S6-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S6-T4.md | handoff: ./2026-03-17-E4-S6-T4.md
 - E4-S2-T1 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S2-T1.md | handoff: ./2026-03-18-E4-S2-T1.md
-- E4-S2-T2 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S2-T2.md | handoff: ./2026-03-18-E4-S2-T3.md
+- E4-S2-T2 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S2-T2.md | handoff: ./2026-03-18-E4-S2-T1.md (T2 shell-state work completed alongside T1)
 - E4-S2-T3 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S2-T3.md | handoff: ./2026-03-18-E4-S2-T3.md
 - E4-S2-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S2-T4.md | handoff: ./2026-03-18-E4-S2-T4.md
 - E4-S3-T1 | owner lane: Frontend Systems Lane | packet: ../packets/epic-04/E4-S3-T1.md | handoff: ./2026-03-19-E4-S3.md
