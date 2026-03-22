@@ -13,6 +13,7 @@ export * from "./order";
 export * from "./payment";
 export * from "./service";
 export * from "./staff";
+export * from "./subscription";
 export * from "./vertical";
 
 export const appShellIds = [
