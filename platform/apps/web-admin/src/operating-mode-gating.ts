@@ -2,7 +2,7 @@
 // Extends module-based navigation filtering with operating-mode semantics so that
 // admin users see only the sections relevant to their tenant's operating mode.
 
-import type { TenantOperatingMode, TransactionFlow, TenantModuleKey } from "@platform/types";
+import type { TenantOperatingMode, TransactionFlow } from "@platform/types";
 
 import {
 	resolveOperatingMode,

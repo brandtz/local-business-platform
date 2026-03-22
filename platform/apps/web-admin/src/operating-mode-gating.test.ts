@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { tenantModuleKeys, type TenantModuleKey } from "@platform/types";
+import { tenantModuleKeys } from "@platform/types";
 
 import {
 	resolveAdminOperatingMode,
