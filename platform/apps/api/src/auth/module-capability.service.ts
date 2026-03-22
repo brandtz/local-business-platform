@@ -89,7 +89,8 @@ export class ModuleCapabilityService {
 			catalog: enabledSet.has("catalog"),
 			content: enabledSet.has("content"),
 			operations: enabledSet.has("operations"),
-			ordering: enabledSet.has("ordering")
+			ordering: enabledSet.has("ordering"),
+			portfolio: enabledSet.has("portfolio")
 		};
 	}
 }
