@@ -202,15 +202,17 @@ export function validateRefundForm(input: {
   amountCents: number;
   maxAmountCents: number;
   reason: string;
+  currency?: string;
 }): RefundFormValidation {
   const errors: string[] = [];
+  const currency = input.currency ?? "usd";
 
   if (input.amountCents <= 0) {
     errors.push("Refund amount must be greater than zero.");
   }
   if (input.amountCents > input.maxAmountCents) {
     errors.push(
-      `Refund amount cannot exceed ${formatCents(input.maxAmountCents, "usd")}.`,
+      `Refund amount cannot exceed ${formatCents(input.maxAmountCents, currency)}.`,
     );
   }
   if (!input.reason || input.reason.trim().length === 0) {

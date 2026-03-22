@@ -285,11 +285,11 @@ export class PaymentTransactionService {
       idempotencyKey: input.idempotencyKey,
       metadata: input.metadata ?? {},
     });
-    this.transactionRepo.updateTransactionStatus(failedTxn.id, "failed", {
+    const updatedFailed = this.transactionRepo.updateTransactionStatus(failedTxn.id, "failed", {
       failureReason: result.error ?? "Payment processing failed.",
     });
-    this.emitAuditEvent(failedTxn, "payment_failed", null, null);
-    return { ...failedTxn, failureReason: result.error ?? "Payment processing failed." };
+    this.emitAuditEvent(updatedFailed!, "payment_failed", null, null);
+    return updatedFailed!;
   }
 
   // -----------------------------------------------------------------------
