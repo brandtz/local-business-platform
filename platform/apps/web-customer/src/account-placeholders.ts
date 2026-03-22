@@ -34,10 +34,28 @@ export type BookingsMountPoint = {
 	readonly emptyState: EmptyStateDescriptor;
 };
 
+export type AddressesMountPoint = {
+	readonly sectionKey: "addresses";
+	readonly listComponent: Component;
+	readonly formComponent: Component;
+	readonly emptyState: EmptyStateDescriptor;
+};
+
+export type PaymentMethodsMountPoint = {
+	readonly sectionKey: "payment-methods";
+	readonly listComponent: Component;
+	readonly emptyState: EmptyStateDescriptor;
+};
+
 export type LoyaltyMountPoint = {
 	readonly sectionKey: "loyalty";
 	readonly dashboardComponent: Component;
 	readonly emptyState: EmptyStateDescriptor;
+};
+
+export type NotificationsMountPoint = {
+	readonly sectionKey: "notifications";
+	readonly formComponent: Component;
 };
 
 export type PreferencesMountPoint = {
@@ -48,13 +66,19 @@ export type PreferencesMountPoint = {
 export type AccountMountPoint =
 	| OrdersMountPoint
 	| BookingsMountPoint
+	| AddressesMountPoint
+	| PaymentMethodsMountPoint
 	| LoyaltyMountPoint
+	| NotificationsMountPoint
 	| PreferencesMountPoint;
 
 export type AccountMountPointMap = {
 	orders?: OrdersMountPoint;
 	bookings?: BookingsMountPoint;
+	addresses?: AddressesMountPoint;
+	"payment-methods"?: PaymentMethodsMountPoint;
 	loyalty?: LoyaltyMountPoint;
+	notifications?: NotificationsMountPoint;
 	preferences?: PreferencesMountPoint;
 };
 
@@ -96,7 +120,10 @@ export type AccountSectionDescriptor = {
 export const accountSections: readonly AccountSectionDescriptor[] = [
 	{ key: "orders", label: "Orders", requiredModule: "ordering" },
 	{ key: "bookings", label: "Bookings", requiredModule: "bookings" },
+	{ key: "addresses", label: "Saved Addresses" },
+	{ key: "payment-methods", label: "Payment Methods" },
 	{ key: "loyalty", label: "Loyalty" },
+	{ key: "notifications", label: "Notifications" },
 	{ key: "preferences", label: "Preferences" }
 ];
 

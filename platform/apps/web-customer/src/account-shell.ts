@@ -108,10 +108,25 @@ const accountEmptyStates: Record<string, AccountEmptyStateDescriptor> = {
 		actionLabel: "Book Now",
 		actionPath: "/book"
 	},
+	addresses: {
+		section: "addresses",
+		title: "No Saved Addresses",
+		message: "Add a delivery address to speed up checkout.",
+	},
+	"payment-methods": {
+		section: "payment-methods",
+		title: "No Payment Methods",
+		message: "Add a payment method for faster checkout.",
+	},
 	loyalty: {
 		section: "loyalty",
 		title: "Loyalty Program",
 		message: "Start earning rewards with your purchases.",
+	},
+	notifications: {
+		section: "notifications",
+		title: "Notification Preferences",
+		message: "Manage how you receive updates about orders, bookings, and promotions.",
 	},
 	preferences: {
 		section: "preferences",
