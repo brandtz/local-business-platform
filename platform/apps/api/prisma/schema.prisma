@@ -661,6 +661,84 @@ model PaymentConnection {
   @@index([tenantId, provider, status])
 }
 
+// ─── Epic 8 — Notification Delivery Domain ────────────────────────────
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  IN_APP
+}
+
+enum DeliveryStatus {
+  PENDING
+  QUEUED
+  SENDING
+  DELIVERED
+  FAILED
+  BOUNCED
+  DEAD_LETTER
+}
+
+model NotificationTemplate {
+  id               String              @id @default(uuid())
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  tenantId         String?             // null = shared/default template
+  eventType        String              // e.g. "order.confirmed"
+  channel          NotificationChannel
+  subjectTemplate  String
+  bodyTemplate     String
+  isCustomizable   Boolean             @default(true)
+  isActive         Boolean             @default(true)
+
+  @@unique([tenantId, eventType, channel])
+  @@index([eventType, channel])
+}
+
+model NotificationDelivery {
+  id                    String              @id @default(uuid())
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  tenantId              String
+  notificationEventId   String
+  channel               NotificationChannel
+  recipientAddress      String
+  renderedSubject       String
+  renderedBody          String              @db.Text
+  status                DeliveryStatus      @default(PENDING)
+  attemptCount          Int                 @default(0)
+  maxAttempts           Int                 @default(3)
+  failureCategory       String?
+  failureReason         String?
+  providerName          String?
+  providerMessageId     String?
+  idempotencyKey        String              @unique
+  lastAttemptAt         DateTime?
+  deliveredAt           DateTime?
+
+  @@index([tenantId, status])
+  @@index([tenantId, channel, status])
+  @@index([tenantId, createdAt])
+  @@index([notificationEventId])
+}
+
+model InAppNotification {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  tenantId     String
+  recipientId  String
+  eventType    String
+  title        String
+  body         String
+  entityType   String?
+  entityId     String?
+  isRead       Boolean  @default(false)
+  readAt       DateTime?
+
+  @@index([tenantId, recipientId, isRead])
+  @@index([tenantId, recipientId, createdAt])
+}
+
 // ─── Epic 6 — Vertical Template Defaults ──────────────────────────────
 
 enum BusinessVertical {
