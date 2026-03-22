@@ -60,6 +60,12 @@ import {
 	applyTenantFilterCriteria,
 	tenantModuleKeys,
 	tenantVerticalTemplateKeys,
+	operatingModes,
+	transactionFlows,
+	resolveOperatingMode,
+	getOperatingModeRules,
+	isTransactionFlowAllowed,
+	getBlockedFlows,
 	type TenantProvisioningRequest,
 	type TenantProvisioningResult,
 	type TenantProvisioningSummary,
@@ -984,6 +990,100 @@ describe("auth types contract", () => {
 
 			expect(result).toHaveLength(1);
 			expect(result[0].tenantId).toBe("t-2");
+		});
+	});
+
+	// ── Operating Mode Rules ─────────────────────────────────────────────────
+
+	describe("operating mode rules", () => {
+		it("defines three operating modes", () => {
+			expect(operatingModes).toEqual(["ordering", "booking", "hybrid"]);
+		});
+
+		it("defines three transaction flows", () => {
+			expect(transactionFlows).toEqual(["cart", "order", "booking"]);
+		});
+
+		describe("resolveOperatingMode", () => {
+			it("resolves to ordering when only ordering module is enabled", () => {
+				expect(resolveOperatingMode(["catalog", "ordering", "content"])).toBe("ordering");
+			});
+
+			it("resolves to booking when only bookings module is enabled", () => {
+				expect(resolveOperatingMode(["catalog", "bookings", "content"])).toBe("booking");
+			});
+
+			it("resolves to hybrid when both ordering and bookings are enabled", () => {
+				expect(resolveOperatingMode(["catalog", "ordering", "bookings", "content", "operations"])).toBe("hybrid");
+			});
+
+			it("defaults to ordering when neither ordering nor bookings is enabled", () => {
+				expect(resolveOperatingMode(["catalog", "content"])).toBe("ordering");
+			});
+		});
+
+		describe("getOperatingModeRules", () => {
+			it("returns rules for ordering mode", () => {
+				const rules = getOperatingModeRules("ordering");
+				expect(rules.mode).toBe("ordering");
+				expect(rules.allowedFlows).toEqual(["cart", "order"]);
+				expect(rules.requiredModules).toContain("ordering");
+			});
+
+			it("returns rules for booking mode", () => {
+				const rules = getOperatingModeRules("booking");
+				expect(rules.mode).toBe("booking");
+				expect(rules.allowedFlows).toEqual(["booking"]);
+				expect(rules.requiredModules).toContain("bookings");
+			});
+
+			it("returns rules for hybrid mode", () => {
+				const rules = getOperatingModeRules("hybrid");
+				expect(rules.mode).toBe("hybrid");
+				expect(rules.allowedFlows).toEqual(["cart", "order", "booking"]);
+				expect(rules.requiredModules).toContain("ordering");
+				expect(rules.requiredModules).toContain("bookings");
+			});
+		});
+
+		describe("isTransactionFlowAllowed", () => {
+			it("allows cart and order in ordering mode", () => {
+				expect(isTransactionFlowAllowed("ordering", "cart")).toBe(true);
+				expect(isTransactionFlowAllowed("ordering", "order")).toBe(true);
+			});
+
+			it("blocks booking in ordering mode", () => {
+				expect(isTransactionFlowAllowed("ordering", "booking")).toBe(false);
+			});
+
+			it("allows booking in booking mode", () => {
+				expect(isTransactionFlowAllowed("booking", "booking")).toBe(true);
+			});
+
+			it("blocks cart and order in booking mode", () => {
+				expect(isTransactionFlowAllowed("booking", "cart")).toBe(false);
+				expect(isTransactionFlowAllowed("booking", "order")).toBe(false);
+			});
+
+			it("allows all flows in hybrid mode", () => {
+				expect(isTransactionFlowAllowed("hybrid", "cart")).toBe(true);
+				expect(isTransactionFlowAllowed("hybrid", "order")).toBe(true);
+				expect(isTransactionFlowAllowed("hybrid", "booking")).toBe(true);
+			});
+		});
+
+		describe("getBlockedFlows", () => {
+			it("returns booking as blocked for ordering mode", () => {
+				expect(getBlockedFlows("ordering")).toEqual(["booking"]);
+			});
+
+			it("returns cart and order as blocked for booking mode", () => {
+				expect(getBlockedFlows("booking")).toEqual(["cart", "order"]);
+			});
+
+			it("returns empty for hybrid mode", () => {
+				expect(getBlockedFlows("hybrid")).toEqual([]);
+			});
 		});
 	});
 });
