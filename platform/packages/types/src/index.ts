@@ -14,6 +14,7 @@ export * from "./notification";
 export * from "./order";
 export * from "./payment";
 export * from "./portfolio";
+export * from "./search";
 export * from "./service";
 export * from "./staff";
 export * from "./subscription";
