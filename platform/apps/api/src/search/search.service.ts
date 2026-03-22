@@ -21,6 +21,7 @@ import {
 	AUTOCOMPLETE_DEFAULT_LIMIT,
 	AUTOCOMPLETE_MAX_LIMIT,
 	DEFAULT_RELEVANCE_WEIGHTS,
+	indexedEntityTypes,
 	SEARCH_DEFAULT_PAGE_SIZE,
 	SEARCH_MAX_PAGE_SIZE,
 	validateAutocompleteQuery,
@@ -193,15 +194,7 @@ export class SearchService {
 		);
 		const prefix = query.prefix.toLowerCase().trim();
 
-		const entityTypes = query.entityTypes ?? [
-			"catalog-item",
-			"service",
-			"order",
-			"booking",
-			"customer",
-			"staff",
-			"content-page",
-		];
+		const entityTypes = query.entityTypes ?? [...indexedEntityTypes];
 
 		const suggestions: AutocompleteSuggestion[] = [];
 
@@ -367,14 +360,18 @@ export class SearchService {
 
 			// Freshness bonus
 			if (doc.indexedAt && weights.freshnessWeight > 0) {
-				const age =
-					Date.now() - new Date(doc.indexedAt).getTime();
-				const dayAge = age / (1000 * 60 * 60 * 24);
-				const freshness = Math.max(0, 1 - dayAge / 365);
-				score += freshness * weights.freshnessWeight;
+				const indexedTime = new Date(doc.indexedAt).getTime();
+				if (!isNaN(indexedTime)) {
+					const age = Date.now() - indexedTime;
+					const dayAge = age / (1000 * 60 * 60 * 24);
+					const freshness = Math.max(0, 1 - dayAge / 365);
+					score += freshness * weights.freshnessWeight;
+				}
 			}
 
-			// Normalize score to 0–1
+			// Normalize score to 0–1. maxPossible accounts for the highest
+			// achievable raw score: ~1.3 from field match (1.0 × 1.3 exact) +
+			// 0.1 freshness + headroom, capped at 2.0 for safety.
 			const maxPossible = 2.0;
 			score = Math.min(score / maxPossible, 1.0);
 
@@ -407,6 +404,7 @@ export class SearchService {
 
 	private computePrefixScore(text: string, prefix: string): number {
 		const textLower = text.toLowerCase();
+		if (textLower.length === 0) return 0;
 		if (textLower === prefix) return 1.0;
 		// Shorter completions score higher
 		const ratio = prefix.length / textLower.length;
