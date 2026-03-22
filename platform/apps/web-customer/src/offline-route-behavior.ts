@@ -95,6 +95,21 @@ export const routeOfflineClassifications: readonly RouteOfflineClassification[] 
 		rationale: "Loyalty points and rewards require fresh API data"
 	},
 	{
+		routePath: "/account/addresses",
+		behavior: "online-required",
+		rationale: "Saved addresses require live data for CRUD operations"
+	},
+	{
+		routePath: "/account/payment-methods",
+		behavior: "online-required",
+		rationale: "Payment methods require live data and secure API access"
+	},
+	{
+		routePath: "/account/notifications",
+		behavior: "online-required",
+		rationale: "Notification preferences must be loaded from and saved to the API"
+	},
+	{
 		routePath: "/account/preferences",
 		behavior: "online-required",
 		rationale: "Preferences must be loaded from and saved to the API"

@@ -44,8 +44,8 @@ const stubComponent = defineComponent({
 // ── Account Sections ─────────────────────────────────────────────────────────
 
 describe("accountSections", () => {
-	it("defines 4 sections", () => {
-		expect(accountSections).toHaveLength(4);
+	it("defines 7 sections", () => {
+		expect(accountSections).toHaveLength(7);
 	});
 
 	it("includes orders with ordering module requirement", () => {
@@ -114,30 +114,32 @@ describe("checkSectionAvailability", () => {
 });
 
 describe("getAvailableSections", () => {
-	it("returns all 4 sections when all modules enabled", () => {
+	it("returns all 7 sections when all modules enabled", () => {
 		const context = createContext(["ordering", "bookings"]);
-		expect(getAvailableSections(context)).toHaveLength(4);
+		expect(getAvailableSections(context)).toHaveLength(7);
 	});
 
 	it("excludes orders when ordering disabled", () => {
 		const context = createContext(["bookings"]);
 		const available = getAvailableSections(context);
 		expect(available.find((s) => s.key === "orders")).toBeUndefined();
-		expect(available).toHaveLength(3);
+		expect(available).toHaveLength(6);
 	});
 
 	it("excludes bookings when bookings disabled", () => {
 		const context = createContext(["ordering"]);
 		const available = getAvailableSections(context);
 		expect(available.find((s) => s.key === "bookings")).toBeUndefined();
-		expect(available).toHaveLength(3);
+		expect(available).toHaveLength(6);
 	});
 
-	it("returns loyalty and preferences even with no modules", () => {
+	it("returns non-module sections even with no modules", () => {
 		const context = createContext([]);
 		const available = getAvailableSections(context);
-		expect(available).toHaveLength(2);
-		expect(available.map((s) => s.key).sort()).toEqual(["loyalty", "preferences"]);
+		expect(available).toHaveLength(5);
+		expect(available.map((s) => s.key).sort()).toEqual([
+			"addresses", "loyalty", "notifications", "payment-methods", "preferences"
+		]);
 	});
 });
 
@@ -256,14 +258,17 @@ describe("createPlaceholderPage", () => {
 });
 
 describe("createAllPlaceholderPages", () => {
-	it("creates pages for all 4 sections", () => {
+	it("creates pages for all 7 sections", () => {
 		const context = createContext(["ordering", "bookings"]);
 		const pages = createAllPlaceholderPages(context);
-		expect(Object.keys(pages)).toHaveLength(4);
+		expect(Object.keys(pages)).toHaveLength(7);
 		expect(Object.keys(pages).sort()).toEqual([
+			"addresses",
 			"bookings",
 			"loyalty",
+			"notifications",
 			"orders",
+			"payment-methods",
 			"preferences"
 		]);
 	});

@@ -15,7 +15,10 @@ export const accountRoutePaths = {
 	orderDetail: "/account/orders/:orderId",
 	bookings: "/account/bookings",
 	bookingDetail: "/account/bookings/:bookingId",
+	addresses: "/account/addresses",
+	paymentMethods: "/account/payment-methods",
 	loyalty: "/account/loyalty",
+	notifications: "/account/notifications",
 	preferences: "/account/preferences",
 	signIn: "/account/sign-in"
 } as const;
@@ -78,6 +81,27 @@ const accountRouteRegistry: readonly AccountRouteMetadata[] = [
 		path: accountRoutePaths.loyalty,
 		requiresAuth: true,
 		label: "Loyalty",
+		showInNavigation: true
+	},
+	{
+		key: "addresses",
+		path: accountRoutePaths.addresses,
+		requiresAuth: true,
+		label: "Saved Addresses",
+		showInNavigation: true
+	},
+	{
+		key: "payment-methods",
+		path: accountRoutePaths.paymentMethods,
+		requiresAuth: true,
+		label: "Payment Methods",
+		showInNavigation: true
+	},
+	{
+		key: "notifications",
+		path: accountRoutePaths.notifications,
+		requiresAuth: true,
+		label: "Notifications",
 		showInNavigation: true
 	},
 	{

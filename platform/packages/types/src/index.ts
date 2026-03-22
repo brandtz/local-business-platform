@@ -5,6 +5,7 @@ export * from "./booking";
 export * from "./cart";
 export * from "./catalog";
 export * from "./content";
+export * from "./customer";
 export * from "./domain-events";
 export * from "./order";
 export * from "./service";

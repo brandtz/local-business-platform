@@ -151,6 +151,14 @@ Use this file to track the active execution queue.
 - E7-S3-T2 | owner lane: API Surface Lane | packet: ../packets/epic-07/E7-S3-T2.md | handoff: ./2026-03-22-E7-S3-T2.md
 - E7-S3-T3 | owner lane: API Surface Lane | packet: ../packets/epic-07/E7-S3-T3.md | handoff: ./2026-03-22-E7-S3-T3.md
 - E7-S3-T4 | owner lane: Platform Control Lane | packet: ../packets/epic-07/E7-S3-T4.md | handoff: ./2026-03-22-E7-S3-T4.md
+- E7-S5-T1 | owner lane: API Surface Lane | packet: ../packets/epic-07/E7-S5-T1.md | handoff: ./2026-03-22-E7-S5-T1.md
+- E7-S5-T2 | owner lane: API Surface Lane | packet: ../packets/epic-07/E7-S5-T2.md | handoff: ./2026-03-22-E7-S5-T2.md
+- E7-S5-T3 | owner lane: API Surface Lane | packet: ../packets/epic-07/E7-S5-T3.md | handoff: ./2026-03-22-E7-S5-T3.md
+- E7-S5-T4 | owner lane: API Surface Lane | packet: ../packets/epic-07/E7-S5-T4.md | handoff: ./2026-03-22-E7-S5-T4.md
+- E7-S5-T5 | owner lane: API Surface Lane | handoff: ./2026-03-22-E7-S5-T5.md
+- E7-S5-T6 | owner lane: API Surface Lane | handoff: ./2026-03-22-E7-S5-T6.md
+- E7-S5-T7 | owner lane: Frontend Systems Lane | handoff: ./2026-03-22-E7-S5-T7.md
+- E7-S5-T8 | owner lane: Platform Control Lane | handoff: ./2026-03-22-E7-S5-T8.md
 
 ## Board Rules
 

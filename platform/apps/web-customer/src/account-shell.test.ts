@@ -256,13 +256,16 @@ describe("getAccountEmptyState", () => {
 });
 
 describe("getAllAccountEmptyStates", () => {
-	it("returns all 4 empty states", () => {
+	it("returns all 7 empty states", () => {
 		const states = getAllAccountEmptyStates();
-		expect(Object.keys(states)).toHaveLength(4);
+		expect(Object.keys(states)).toHaveLength(7);
 		expect(Object.keys(states).sort()).toEqual([
+			"addresses",
 			"bookings",
 			"loyalty",
+			"notifications",
 			"orders",
+			"payment-methods",
 			"preferences"
 		]);
 	});
@@ -292,8 +295,8 @@ describe("buildAccountRoutes", () => {
 			createTenantContext()
 		);
 		expect(route.children).toBeDefined();
-		// root redirect + profile + orders + order-detail + bookings + booking-detail + loyalty + preferences = 8
-		expect(route.children!.length).toBe(8);
+		// root redirect + profile + orders + order-detail + bookings + booking-detail + addresses + payment-methods + loyalty + notifications + preferences = 11
+		expect(route.children!.length).toBe(11);
 	});
 
 	it("first child is redirect to profile", () => {
