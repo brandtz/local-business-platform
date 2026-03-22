@@ -15,6 +15,11 @@ import {
   paymentTransactionStatuses,
   isValidPaymentTransactionTransition,
   isTerminalPaymentTransactionStatus,
+  webhookEventStatuses,
+  isValidWebhookEventStatus,
+  mapProviderEventToTransactionStatus,
+  stripeEventMapping,
+  squareEventMapping,
 } from "./payment";
 import type { PaymentConnectionRecord } from "./payment";
 
@@ -405,5 +410,86 @@ describe("isTerminalPaymentTransactionStatus", () => {
 
   it("identifies partially_refunded as non-terminal", () => {
     expect(isTerminalPaymentTransactionStatus("partially_refunded")).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// E8-S3: Webhook event status
+// ---------------------------------------------------------------------------
+
+describe("webhookEventStatuses", () => {
+  it("defines all expected statuses", () => {
+    expect(webhookEventStatuses).toContain("pending");
+    expect(webhookEventStatuses).toContain("processing");
+    expect(webhookEventStatuses).toContain("processed");
+    expect(webhookEventStatuses).toContain("failed");
+    expect(webhookEventStatuses).toContain("skipped");
+    expect(webhookEventStatuses.length).toBe(5);
+  });
+
+  it("validates known statuses", () => {
+    for (const s of webhookEventStatuses) {
+      expect(isValidWebhookEventStatus(s)).toBe(true);
+    }
+  });
+
+  it("rejects unknown statuses", () => {
+    expect(isValidWebhookEventStatus("completed")).toBe(false);
+    expect(isValidWebhookEventStatus("")).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// E8-S3: Provider event mapping
+// ---------------------------------------------------------------------------
+
+describe("mapProviderEventToTransactionStatus", () => {
+  it("maps Stripe payment_intent.succeeded to captured", () => {
+    expect(mapProviderEventToTransactionStatus("stripe", "payment_intent.succeeded")).toBe("captured");
+  });
+
+  it("maps Stripe payment_intent.payment_failed to failed", () => {
+    expect(mapProviderEventToTransactionStatus("stripe", "payment_intent.payment_failed")).toBe("failed");
+  });
+
+  it("maps Stripe charge.refunded to refunded", () => {
+    expect(mapProviderEventToTransactionStatus("stripe", "charge.refunded")).toBe("refunded");
+  });
+
+  it("maps Stripe payment_intent.canceled to voided", () => {
+    expect(mapProviderEventToTransactionStatus("stripe", "payment_intent.canceled")).toBe("voided");
+  });
+
+  it("maps Square payment.completed to captured", () => {
+    expect(mapProviderEventToTransactionStatus("square", "payment.completed")).toBe("captured");
+  });
+
+  it("maps Square payment.failed to failed", () => {
+    expect(mapProviderEventToTransactionStatus("square", "payment.failed")).toBe("failed");
+  });
+
+  it("maps Square refund.created to refunded", () => {
+    expect(mapProviderEventToTransactionStatus("square", "refund.created")).toBe("refunded");
+  });
+
+  it("maps Square payment.canceled to voided", () => {
+    expect(mapProviderEventToTransactionStatus("square", "payment.canceled")).toBe("voided");
+  });
+
+  it("returns null for unknown event types", () => {
+    expect(mapProviderEventToTransactionStatus("stripe", "unknown.event")).toBeNull();
+    expect(mapProviderEventToTransactionStatus("square", "unknown.event")).toBeNull();
+  });
+});
+
+describe("stripeEventMapping", () => {
+  it("covers core Stripe event types", () => {
+    expect(Object.keys(stripeEventMapping).length).toBeGreaterThanOrEqual(4);
+  });
+});
+
+describe("squareEventMapping", () => {
+  it("covers core Square event types", () => {
+    expect(Object.keys(squareEventMapping).length).toBeGreaterThanOrEqual(4);
   });
 });

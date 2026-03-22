@@ -542,3 +542,178 @@ export type AdminRefundRequest = {
   reason: string;
   actorId: string;
 };
+
+// ---------------------------------------------------------------------------
+// E8-S3: Webhook ingestion and replay safety
+// ---------------------------------------------------------------------------
+
+/**
+ * Processing status of a stored webhook event.
+ */
+export const webhookEventStatuses = [
+  "pending",
+  "processing",
+  "processed",
+  "failed",
+  "skipped",
+] as const;
+export type WebhookEventStatus = (typeof webhookEventStatuses)[number];
+
+export function isValidWebhookEventStatus(
+  value: string,
+): value is WebhookEventStatus {
+  return (webhookEventStatuses as readonly string[]).includes(value);
+}
+
+/**
+ * Stored webhook event — the source of truth for reconciling
+ * platform payment state with provider payment state.
+ *
+ * Raw payloads are stored for audit and replay. Replay reprocesses
+ * from the stored payload without re-fetching from providers.
+ */
+export type WebhookEventRecord = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  /** Payment provider that sent this webhook. */
+  provider: PaymentProvider;
+  /** Provider-specific event type (e.g. "payment_intent.succeeded"). */
+  eventType: string;
+  /** Provider-assigned event ID used as the idempotency key. */
+  providerEventId: string;
+  /** Raw JSON payload exactly as received from the provider. */
+  rawPayload: string;
+  /** Current processing status. */
+  status: WebhookEventStatus;
+  /** Tenant owning the payment connection that received this webhook. */
+  tenantId: string | null;
+  /** Payment connection ID resolved from the webhook. */
+  connectionId: string | null;
+  /** Number of processing attempts. */
+  attempts: number;
+  /** Last error message if processing failed. */
+  lastError: string | null;
+  /** Timestamp of last processing attempt. */
+  lastProcessedAt: string | null;
+};
+
+/**
+ * Signature verification result from provider-specific verification logic.
+ */
+export type WebhookSignatureVerificationResult = {
+  valid: boolean;
+  error?: string;
+};
+
+/**
+ * Parsed webhook payload — provider-neutral representation after
+ * signature verification and before storage/processing.
+ */
+export type ParsedWebhookPayload = {
+  provider: PaymentProvider;
+  providerEventId: string;
+  eventType: string;
+  rawPayload: string;
+  /** Provider transaction ID referenced in the event, if any. */
+  providerTransactionId: string | null;
+  /** Amount in cents referenced in the event, if any. */
+  amountCents: number | null;
+  /** Additional provider-specific data extracted from the payload. */
+  metadata: Record<string, unknown>;
+};
+
+/**
+ * Mapping from provider event types to internal transaction actions.
+ * Used by webhook event processors for reconciliation.
+ */
+export const stripeEventMapping: Record<
+  string,
+  PaymentTransactionStatus | null
+> = {
+  "payment_intent.succeeded": "captured",
+  "payment_intent.payment_failed": "failed",
+  "charge.refunded": "refunded",
+  "charge.refund.updated": "refunded",
+  "payment_intent.canceled": "voided",
+};
+
+export const squareEventMapping: Record<
+  string,
+  PaymentTransactionStatus | null
+> = {
+  "payment.completed": "captured",
+  "payment.failed": "failed",
+  "refund.created": "refunded",
+  "refund.updated": "refunded",
+  "payment.canceled": "voided",
+};
+
+/**
+ * Returns the target transaction status for a given provider event type.
+ * Returns null if the event type is not recognized (dead letter).
+ */
+export function mapProviderEventToTransactionStatus(
+  provider: PaymentProvider,
+  eventType: string,
+): PaymentTransactionStatus | null {
+  const mapping =
+    provider === "stripe" ? stripeEventMapping : squareEventMapping;
+  return mapping[eventType] ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// E8-S3-T4: Webhook admin views (platform-admin only)
+// ---------------------------------------------------------------------------
+
+/**
+ * Query parameters for listing webhook events.
+ * Platform-admin only — not exposed to tenants.
+ */
+export type WebhookEventListQuery = {
+  provider?: PaymentProvider;
+  eventType?: string;
+  status?: WebhookEventStatus;
+  tenantId?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+/**
+ * Summary row for webhook event listing.
+ * Platform-admin only.
+ */
+export type WebhookEventSummary = {
+  id: string;
+  provider: PaymentProvider;
+  eventType: string;
+  providerEventId: string;
+  status: WebhookEventStatus;
+  tenantId: string | null;
+  attempts: number;
+  createdAt: string;
+  lastProcessedAt: string | null;
+};
+
+/**
+ * Detailed view of a webhook event including raw payload.
+ * Platform-admin only — raw payload visible for debugging.
+ */
+export type WebhookEventDetail = WebhookEventSummary & {
+  rawPayload: string;
+  connectionId: string | null;
+  lastError: string | null;
+  updatedAt: string;
+};
+
+/**
+ * Result of a webhook replay attempt.
+ */
+export type WebhookReplayResult = {
+  eventId: string;
+  success: boolean;
+  newStatus: WebhookEventStatus;
+  error?: string;
+};
