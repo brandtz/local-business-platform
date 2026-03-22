@@ -12,9 +12,7 @@ import type {
 	IndexTriggerEvent,
 	RelevanceWeights,
 	SearchFilterValue,
-	SearchQuery,
 	SearchResult,
-	SearchResultItem,
 	SearchSortParam,
 } from "@platform/types";
 import {

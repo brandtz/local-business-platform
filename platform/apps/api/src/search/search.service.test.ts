@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import type {
-	AutocompleteQuery,
 	EntitySearchQuery,
 	IndexedDocument,
 } from "@platform/types";
