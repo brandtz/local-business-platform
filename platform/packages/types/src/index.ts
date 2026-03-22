@@ -9,6 +9,7 @@ export * from "./customer";
 export * from "./domain-activation";
 export * from "./domain-events";
 export * from "./import";
+export * from "./integration-alerts";
 export * from "./notification";
 export * from "./order";
 export * from "./payment";
