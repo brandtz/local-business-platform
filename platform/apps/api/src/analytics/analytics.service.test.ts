@@ -1,14 +1,13 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 
 import type {
   OrderRecord,
   BookingRecord,
   OrderItemRecord,
-  AnalyticsQueryParams,
   AggregationJobInput,
 } from "@platform/types";
 
-import { AnalyticsService, AnalyticsValidationError } from "./analytics.service";
+import { AnalyticsService } from "./analytics.service";
 import type { OrderDataProvider, BookingDataProvider } from "./analytics.service";
 
 // ─── Test Constants ──────────────────────────────────────────────────────────

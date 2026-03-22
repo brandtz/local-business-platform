@@ -7,7 +7,6 @@ import type {
 	DashboardRevenueChartData,
 	DashboardTrafficChartData,
 	AnalyticsTrendDirection,
-	TimeSeriesDataPoint,
 	AnalyticsAggregationPeriod,
 } from "@platform/types";
 

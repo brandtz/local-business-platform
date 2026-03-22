@@ -7,7 +7,6 @@ import type {
   AnalyticsExportResult,
   AnalyticsDetailViewType,
   AnalyticsQueryParams,
-  AnalyticsKpiSummary,
   ChannelBreakdownResponse,
   TopPerformersResponse,
   RetentionInsightsResponse,
