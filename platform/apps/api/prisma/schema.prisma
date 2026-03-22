@@ -747,3 +747,101 @@ enum BusinessVertical {
   APPOINTMENT
   CONTRACTOR
 }
+
+// ─── Epic 12 — Subscription Package and Tier Model (E12-S1) ──────────
+
+enum BillingInterval {
+  MONTHLY
+  ANNUAL
+}
+
+enum SubscriptionPackageStatus {
+  ACTIVE
+  DEPRECATED
+}
+
+enum UsageLimitType {
+  ORDERS_PER_MONTH
+  STORAGE_GB
+  STAFF_SEATS
+}
+
+enum UsageLimitResetPeriod {
+  MONTHLY
+  ANNUAL
+  NONE
+}
+
+model SubscriptionPackage {
+  id               String                    @id @default(uuid())
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  name             String                    @unique
+  description      String?
+  billingInterval  BillingInterval
+  basePriceCents   Int
+  trialDurationDays Int?
+  status           SubscriptionPackageStatus @default(ACTIVE)
+  deprecatedAt     DateTime?
+  displayOrder     Int                       @default(0)
+  entitlements     PackageEntitlement[]
+  usageLimits      PackageUsageLimit[]
+  premiumFeatures  PackagePremiumFeature[]
+  versions         PackageVersion[]
+
+  @@index([status])
+  @@index([billingInterval])
+  @@index([displayOrder])
+}
+
+model PackageEntitlement {
+  id         String             @id @default(uuid())
+  createdAt  DateTime           @default(now())
+  packageId  String
+  package    SubscriptionPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  moduleKey  String
+  enabled    Boolean            @default(true)
+
+  @@unique([packageId, moduleKey])
+  @@index([packageId])
+}
+
+model PackageUsageLimit {
+  id          String              @id @default(uuid())
+  createdAt   DateTime            @default(now())
+  packageId   String
+  package     SubscriptionPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  limitType   UsageLimitType
+  softLimit   Int?
+  hardLimit   Int
+  resetPeriod UsageLimitResetPeriod @default(MONTHLY)
+
+  @@unique([packageId, limitType])
+  @@index([packageId])
+}
+
+model PackagePremiumFeature {
+  id          String              @id @default(uuid())
+  createdAt   DateTime            @default(now())
+  packageId   String
+  package     SubscriptionPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  featureFlag String
+
+  @@unique([packageId, featureFlag])
+  @@index([packageId])
+}
+
+model PackageVersion {
+  id                   String              @id @default(uuid())
+  createdAt            DateTime            @default(now())
+  packageId            String
+  package              SubscriptionPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  versionNumber        Int
+  changeReason         String?
+  changedBy            String
+  changedAt            DateTime            @default(now())
+  entitlementsSnapshot Json
+
+  @@unique([packageId, versionNumber])
+  @@index([packageId])
+}
