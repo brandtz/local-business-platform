@@ -10,5 +10,8 @@
     "start": "node dist/main.js",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@platform/types": "workspace:*"
   }
 }

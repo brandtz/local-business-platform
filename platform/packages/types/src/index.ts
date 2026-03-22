@@ -8,6 +8,7 @@ export * from "./content";
 export * from "./customer";
 export * from "./domain-activation";
 export * from "./domain-events";
+export * from "./import";
 export * from "./notification";
 export * from "./order";
 export * from "./payment";

@@ -145,7 +145,11 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0(@types/node@25.5.0)(esbuild@0.27.4)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
 
-  apps/worker: {}
+  apps/worker:
+    dependencies:
+      '@platform/types':
+        specifier: workspace:*
+        version: link:../../packages/types
 
   packages/config: {}
 
@@ -603,7 +607,6 @@ packages:
   '@rolldown/binding-win32-x64-msvc@1.0.0-rc.9':
     resolution: {integrity: sha512-G0oA4+w1iY5AGi5HcDTxWsoxF509hrFIPB2rduV5aDqS9FtDg1CAfa7V34qImbjfhIcA8C+RekocJZA96EarwQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [x64]
     os: [win32]
 
   '@rolldown/pluginutils@1.0.0-rc.9':

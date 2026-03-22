@@ -3,6 +3,9 @@
   "compilerOptions": {
     "composite": true
   },
+  "references": [
+    { "path": "../../packages/types/tsconfig.json" }
+  ],
   "include": ["src/**/*.ts"],
   "exclude": ["dist", "node_modules"]
 }
