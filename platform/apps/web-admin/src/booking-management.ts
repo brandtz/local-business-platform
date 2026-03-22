@@ -8,7 +8,6 @@ import type {
 	BookingPipelineCounts,
 	BookingQuickAction,
 	CalendarViewResponse,
-	CalendarDayData,
 	CalendarBookingBlock,
 } from "@platform/types";
 import {
