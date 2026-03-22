@@ -104,6 +104,7 @@ model Tenant {
   contentPages     ContentPage[]
   announcements    Announcement[]
   cartSessions     CartSession[]
+  orders           Order[]
 }
 
 model TenantCustomDomain {
@@ -486,6 +487,92 @@ model CartModifier {
   cartItem         CartItem @relation(fields: [cartItemId], references: [id], onDelete: Cascade)
 
   @@index([cartItemId])
+}
+
+// ─── Epic 7 — Order Domain ────────────────────────────────────────────
+
+enum OrderStatus {
+  DRAFT
+  PLACED
+  CONFIRMED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderFulfillmentMode {
+  DELIVERY
+  PICKUP
+  DINE_IN
+}
+
+model Order {
+  id                   String              @id @default(uuid())
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  tenantId             String
+  customerId           String?
+  customerName         String?
+  customerEmail        String?
+  customerPhone        String?
+  status               OrderStatus         @default(DRAFT)
+  fulfillmentMode      OrderFulfillmentMode @default(PICKUP)
+  deliveryAddressLine1 String?
+  deliveryAddressLine2 String?
+  deliveryCity         String?
+  deliveryState        String?
+  deliveryZip          String?
+  orderNotes           String?
+  subtotalCents        Int
+  discountCents        Int                 @default(0)
+  taxCents             Int                 @default(0)
+  tipCents             Int                 @default(0)
+  deliveryFeeCents     Int                 @default(0)
+  totalCents           Int
+  promoCode            String?
+  loyaltyCode          String?
+  cartSessionId        String?
+  placedAt             DateTime?
+  confirmedAt          DateTime?
+  preparingAt          DateTime?
+  readyAt              DateTime?
+  completedAt          DateTime?
+  cancelledAt          DateTime?
+  cancellationReason   String?
+  tenant               Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  items                OrderItem[]
+
+  @@index([tenantId, status])
+  @@index([tenantId, customerId])
+  @@index([tenantId, createdAt])
+}
+
+model OrderItem {
+  id              String              @id @default(uuid())
+  orderId         String
+  catalogItemId   String
+  catalogItemName String
+  variantId       String?
+  variantName     String?
+  quantity        Int
+  unitPriceCents  Int
+  lineTotalCents  Int
+  order           Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  modifiers       OrderItemModifier[]
+
+  @@index([orderId])
+}
+
+model OrderItemModifier {
+  id               String    @id @default(uuid())
+  orderItemId      String
+  modifierOptionId String
+  modifierName     String
+  priceCents       Int
+  orderItem        OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  @@index([orderItemId])
 }
 
 // ─── Epic 6 — Vertical Template Defaults ──────────────────────────────
