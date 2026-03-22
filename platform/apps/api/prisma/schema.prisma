@@ -106,6 +106,7 @@ model Tenant {
   cartSessions     CartSession[]
   orders           Order[]
   bookings         Booking[]
+  paymentConnections PaymentConnection[]
 }
 
 model TenantCustomDomain {
@@ -621,6 +622,43 @@ model Booking {
   @@index([tenantId, staffId, startTime, endTime])
   @@index([tenantId, startTime])
   @@index([tenantId, serviceId])
+}
+
+// ─── Epic 8 — Payment Connection Domain ───────────────────────────────
+
+enum PaymentProvider {
+  STRIPE
+  SQUARE
+}
+
+enum PaymentConnectionStatus {
+  INACTIVE
+  VERIFYING
+  ACTIVE
+  SUSPENDED
+}
+
+model PaymentConnection {
+  id                  String                  @id @default(uuid())
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+  tenantId            String
+  provider            PaymentProvider
+  displayName         String
+  status              PaymentConnectionStatus @default(INACTIVE)
+  mode                String                  @default("sandbox") // "sandbox" | "production"
+  encryptedCredentials String                 // AES-256-GCM encrypted JSON
+  credentialsIv       String                  // Initialization vector for decryption
+  credentialsTag      String                  // Auth tag for GCM integrity
+  lastVerifiedAt      DateTime?
+  verificationError   String?
+  statusChangedAt     DateTime?
+  suspendedReason     String?
+  tenant              Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, provider])
+  @@index([tenantId, status])
+  @@index([tenantId, provider, status])
 }
 
 // ─── Epic 6 — Vertical Template Defaults ──────────────────────────────
