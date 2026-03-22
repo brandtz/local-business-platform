@@ -101,12 +101,7 @@ export class NotificationDeliveryStore {
 			(r) => r.tenantId === tenantId,
 		);
 		if (filters?.eventType) {
-			records = records.filter(
-				(r) =>
-					(r as NotificationDeliveryRecord & { eventType?: string })
-						.eventType === filters.eventType ||
-					r.notificationEventId.includes(filters.eventType!),
-			);
+			records = records.filter((r) => r.eventType === filters.eventType);
 		}
 		if (filters?.channel) {
 			records = records.filter((r) => r.channel === filters.channel);
@@ -216,10 +211,8 @@ export class NotificationDeliveryStore {
 			if (r.status === "failed" || r.status === "dead-letter" || r.status === "bounced")
 				result.byChannel[r.channel].failed++;
 
-			// By event type — use the idempotency key to extract event type prefix
-			const eventTypeParts = r.idempotencyKey.split(":");
-			const eventTypeKey =
-				eventTypeParts.length >= 2 ? eventTypeParts[1] : "unknown";
+			// By event type
+			const eventTypeKey = r.eventType;
 			if (!result.byEventType[eventTypeKey]) {
 				result.byEventType[eventTypeKey] = { total: 0, delivered: 0, failed: 0 };
 			}
@@ -432,7 +425,7 @@ export class InAppDeliveryAdapter implements DeliveryAdapter {
 			id: `inapp-${job.deliveryId}`,
 			tenantId: job.tenantId,
 			recipientId: job.recipientAddress,
-			eventType: job.renderedSubject as never, // event type will be set from context
+			eventType: job.eventType,
 			title: job.renderedSubject,
 			body: job.renderedBody,
 			isRead: false,
@@ -557,6 +550,7 @@ export class NotificationDeliveryService {
 				id: deliveryId,
 				tenantId: event.tenantId,
 				notificationEventId: event.id,
+				eventType: event.eventType,
 				channel,
 				recipientAddress: event.recipientId,
 				renderedSubject,
@@ -575,6 +569,7 @@ export class NotificationDeliveryService {
 			const job: NotificationDeliveryJob = {
 				deliveryId,
 				notificationEventId: event.id,
+				eventType: event.eventType,
 				tenantId: event.tenantId,
 				channel,
 				recipientAddress: event.recipientId,
@@ -716,6 +711,7 @@ export function buildAdminDeliveryLog(
 ): {
 	entries: Array<{
 		id: string;
+		eventType: string;
 		channel: DeliveryChannel;
 		recipientAddress: string;
 		status: DeliveryStatus;
@@ -740,6 +736,7 @@ export function buildAdminDeliveryLog(
 	return {
 		entries: records.map((r) => ({
 			id: r.id,
+			eventType: r.eventType,
 			channel: r.channel,
 			recipientAddress: r.recipientAddress,
 			status: r.status,

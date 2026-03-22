@@ -271,6 +271,7 @@ describe("EmailDeliveryAdapter", () => {
 		const job: NotificationDeliveryJob = {
 			deliveryId: "del-1",
 			notificationEventId: "ne-1",
+			eventType: "order.confirmed",
 			tenantId: TENANT_A,
 			channel: "email",
 			recipientAddress: "test@example.com",
@@ -288,6 +289,7 @@ describe("EmailDeliveryAdapter", () => {
 		const job: NotificationDeliveryJob = {
 			deliveryId: "del-2",
 			notificationEventId: "ne-2",
+			eventType: "order.confirmed",
 			tenantId: TENANT_A,
 			channel: "email",
 			recipientAddress: "not-an-email",
@@ -320,6 +322,7 @@ describe("SmsDeliveryAdapter", () => {
 		const job: NotificationDeliveryJob = {
 			deliveryId: "del-3",
 			notificationEventId: "ne-3",
+			eventType: "order.confirmed",
 			tenantId: TENANT_A,
 			channel: "sms",
 			recipientAddress: "+15551234567",
@@ -336,6 +339,7 @@ describe("SmsDeliveryAdapter", () => {
 		const job: NotificationDeliveryJob = {
 			deliveryId: "del-4",
 			notificationEventId: "ne-4",
+			eventType: "order.confirmed",
 			tenantId: TENANT_A,
 			channel: "sms",
 			recipientAddress: "123",
@@ -368,6 +372,7 @@ describe("InAppDeliveryAdapter", () => {
 		const job: NotificationDeliveryJob = {
 			deliveryId: "del-5",
 			notificationEventId: "ne-5",
+			eventType: "order.confirmed",
 			tenantId: TENANT_A,
 			channel: "in-app",
 			recipientAddress: "cust-1",
@@ -947,6 +952,7 @@ function createDeliveryRecord(
 		id,
 		tenantId,
 		notificationEventId: `ne-${id}`,
+		eventType: "order.confirmed",
 		channel,
 		recipientAddress:
 			channel === "email"

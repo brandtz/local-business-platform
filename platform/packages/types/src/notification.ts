@@ -151,6 +151,8 @@ export type NotificationDeliveryRecord = {
 	tenantId: string;
 	/** Reference to the notification event. */
 	notificationEventId: string;
+	/** Event type that triggered this delivery. */
+	eventType: NotificationEventType;
 	/** Channel used for this delivery. */
 	channel: DeliveryChannel;
 	/** Recipient address (email, phone, or user ID). */
@@ -229,6 +231,8 @@ export type NotificationDeliveryJob = {
 	deliveryId: string;
 	/** Notification event ID. */
 	notificationEventId: string;
+	/** Event type that triggered this delivery. */
+	eventType: NotificationEventType;
 	/** Tenant ID. */
 	tenantId: string;
 	/** Channel for delivery. */
@@ -534,13 +538,23 @@ export function isNotificationEventType(
 /**
  * Checks whether a delivery status represents a terminal state.
  */
+const terminalStatuses: ReadonlySet<DeliveryStatus> = new Set([
+	"delivered",
+	"failed",
+	"bounced",
+	"dead-letter",
+]);
 export function isTerminalDeliveryStatus(status: DeliveryStatus): boolean {
-	return status === "delivered" || status === "failed" || status === "bounced" || status === "dead-letter";
+	return terminalStatuses.has(status);
 }
 
 /**
  * Checks whether a delivery status represents a retryable state.
  */
+const retryableStatuses: ReadonlySet<DeliveryStatus> = new Set([
+	"pending",
+	"failed",
+]);
 export function isRetryableDeliveryStatus(status: DeliveryStatus): boolean {
-	return status === "pending" || status === "failed";
+	return retryableStatuses.has(status);
 }

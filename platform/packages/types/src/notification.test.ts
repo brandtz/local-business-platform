@@ -338,6 +338,7 @@ describe("NotificationDeliveryRecord type shape", () => {
 			id: "del-1",
 			tenantId: "t-1",
 			notificationEventId: "ne-1",
+			eventType: "order.confirmed",
 			channel: "email",
 			recipientAddress: "test@example.com",
 			renderedSubject: "Order Confirmed",
@@ -378,6 +379,7 @@ describe("NotificationDeliveryJob type shape", () => {
 		const job: NotificationDeliveryJob = {
 			deliveryId: "del-1",
 			notificationEventId: "ne-1",
+			eventType: "order.confirmed",
 			tenantId: "t-1",
 			channel: "email",
 			recipientAddress: "test@example.com",
