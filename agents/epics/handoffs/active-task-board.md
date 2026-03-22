@@ -181,6 +181,18 @@ Use this file to track the active execution queue.
 - E8-S2-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-08/E8-S2-T4.md | handoff: ./2026-03-22-E8-S2-T4.md
 - E8-S2-T5 | owner lane: API Surface Lane | packet: ../packets/epic-08/E8-S2-T5.md | handoff: ./2026-03-22-E8-S2-T5.md
 - E8-S2-T6 | owner lane: API Surface Lane | packet: ../packets/epic-08/E8-S2-T6.md | handoff: ./2026-03-22-E8-S2-T6.md
+- E8-S3-T1 | owner lane: API Surface Lane | packet: ../packets/epic-08/E8-S3-T1.md | handoff: ./2026-03-22-E8-S3-T1.md
+- E8-S3-T2 | owner lane: API Surface Lane | packet: ../packets/epic-08/E8-S3-T2.md | handoff: ./2026-03-22-E8-S3-T2.md
+- E8-S3-T3 | owner lane: API Surface Lane | packet: ../packets/epic-08/E8-S3-T3.md | handoff: ./2026-03-22-E8-S3-T3.md
+- E8-S3-T4 | owner lane: Platform Control Lane | packet: ../packets/epic-08/E8-S3-T4.md | handoff: ./2026-03-22-E8-S3-T4.md
+- E8-S4-T1 | owner lane: API Surface Lane | packet: ../packets/epic-08/E8-S4-T1.md | handoff: ./2026-03-22-E8-S4-T1.md
+- E8-S4-T2 | owner lane: API Surface Lane | packet: ../packets/epic-08/E8-S4-T2.md | handoff: ./2026-03-22-E8-S4-T2.md
+- E8-S4-T3 | owner lane: API Surface Lane | packet: ../packets/epic-08/E8-S4-T3.md | handoff: ./2026-03-22-E8-S4-T3.md
+- E8-S4-T4 | owner lane: Platform Control Lane | packet: ../packets/epic-08/E8-S4-T4.md | handoff: ./2026-03-22-E8-S4-T4.md
+- E8-S5-T1 | owner lane: API Surface Lane | packet: ../packets/epic-08/E8-S5-T1.md | handoff: ./2026-03-22-E8-S5-T1.md (design-only — blocked on Epic 9)
+- E8-S5-T2 | owner lane: API Surface Lane | packet: ../packets/epic-08/E8-S5-T2.md | handoff: ./2026-03-22-E8-S5-T2.md (design-only — blocked on Epic 9)
+- E8-S5-T3 | owner lane: API Surface Lane | packet: ../packets/epic-08/E8-S5-T3.md | handoff: ./2026-03-22-E8-S5-T3.md (design-only — blocked on Epic 9)
+- E8-S5-T4 | owner lane: Frontend Systems Lane | packet: ../packets/epic-08/E8-S5-T4.md | handoff: ./2026-03-22-E8-S5-T4.md (design-only — blocked on Epic 9)
 
 ## Board Rules
 
