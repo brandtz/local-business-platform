@@ -287,6 +287,94 @@ export function validateModuleEnablementSet(
 	return { valid: true };
 }
 
+// ── Operating Mode Rules ─────────────────────────────────────────────────────
+
+export const operatingModes = ["ordering", "booking", "hybrid"] as const;
+
+export type TenantOperatingMode = (typeof operatingModes)[number];
+
+export const transactionFlows = [
+	"cart",
+	"order",
+	"booking"
+] as const;
+
+export type TransactionFlow = (typeof transactionFlows)[number];
+
+export type OperatingModeRules = {
+	readonly mode: TenantOperatingMode;
+	readonly allowedFlows: readonly TransactionFlow[];
+	readonly requiredModules: readonly TenantModuleKey[];
+	readonly description: string;
+};
+
+const operatingModeRulesMap: Record<TenantOperatingMode, OperatingModeRules> = {
+	ordering: {
+		mode: "ordering",
+		allowedFlows: ["cart", "order"],
+		requiredModules: ["catalog", "ordering"],
+		description: "Ordering-only mode: cart and order flows are active; booking flows are disabled."
+	},
+	booking: {
+		mode: "booking",
+		allowedFlows: ["booking"],
+		requiredModules: ["catalog", "bookings"],
+		description: "Booking-only mode: booking flows are active; cart and order flows are disabled."
+	},
+	hybrid: {
+		mode: "hybrid",
+		allowedFlows: ["cart", "order", "booking"],
+		requiredModules: ["catalog", "ordering", "bookings"],
+		description: "Hybrid mode: cart, order, and booking flows are all active."
+	}
+};
+
+/**
+ * Returns the operating mode rules for a given mode.
+ */
+export function getOperatingModeRules(mode: TenantOperatingMode): OperatingModeRules {
+	return operatingModeRulesMap[mode];
+}
+
+/**
+ * Resolves the effective operating mode from the tenant's enabled module set.
+ * - If both ordering and bookings are enabled → hybrid
+ * - If only ordering is enabled → ordering
+ * - If only bookings is enabled → booking
+ * - Falls back to "ordering" when neither is enabled (defensive default)
+ */
+export function resolveOperatingMode(
+	enabledModules: readonly TenantModuleKey[]
+): TenantOperatingMode {
+	const set = new Set<string>(enabledModules);
+	const hasOrdering = set.has("ordering");
+	const hasBookings = set.has("bookings");
+
+	if (hasOrdering && hasBookings) return "hybrid";
+	if (hasBookings) return "booking";
+	return "ordering";
+}
+
+/**
+ * Checks whether a specific transaction flow is allowed under the given operating mode.
+ */
+export function isTransactionFlowAllowed(
+	mode: TenantOperatingMode,
+	flow: TransactionFlow
+): boolean {
+	return (operatingModeRulesMap[mode].allowedFlows as readonly string[]).includes(flow);
+}
+
+/**
+ * Returns the set of transaction flows that are blocked under the given operating mode.
+ */
+export function getBlockedFlows(
+	mode: TenantOperatingMode
+): readonly TransactionFlow[] {
+	const allowed = new Set<string>(operatingModeRulesMap[mode].allowedFlows);
+	return transactionFlows.filter((f) => !allowed.has(f));
+}
+
 export type TenantModuleEnablementRecord = {
 	enabledModules: readonly TenantModuleKey[];
 	tenantId: string;
