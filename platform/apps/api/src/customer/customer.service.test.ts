@@ -596,7 +596,7 @@ describe("CustomerService — Cross-Tenant Identity", () => {
 
 	it("maps one person's identity to per-tenant profiles", () => {
 		const profileA = registerCustomer(service, TENANT_A, "alice@example.com");
-		const profileB = registerCustomer(service, TENANT_B, "alice@example.com");
+		registerCustomer(service, TENANT_B, "alice@example.com");
 
 		const mapping = service.getCrossTenantIdentity(
 			profileA.userId,

@@ -6,8 +6,6 @@ import type {
 	LoyaltyPointsHistoryEntry,
 	NotificationPreferences,
 	NotificationPreferenceEntry,
-	CrossTenantIdentityMapping,
-	TenantCustomerProfileSummary,
 } from "@platform/types";
 import { DEFAULT_TIER_THRESHOLDS, computeLoyaltyTier, createDefaultNotificationPreferences } from "@platform/types";
 
