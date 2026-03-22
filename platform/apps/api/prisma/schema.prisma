@@ -107,6 +107,7 @@ model Tenant {
   orders           Order[]
   bookings         Booking[]
   paymentConnections PaymentConnection[]
+  portfolioProjects  PortfolioProject[]
 }
 
 model TenantCustomDomain {
@@ -844,6 +845,57 @@ model PackageVersion {
 
   @@unique([packageId, versionNumber])
   @@index([packageId])
+}
+
+// ─── Epic 11 — Portfolio & Showcase Module (E11-S5) ───────────────────
+
+enum PortfolioProjectStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum PortfolioMediaTag {
+  BEFORE
+  AFTER
+  GENERAL
+}
+
+model PortfolioProject {
+  id                     String                 @id @default(uuid())
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  tenantId               String
+  title                  String
+  description            Json                   // rich text JSON
+  projectDate            DateTime?
+  location               String?
+  serviceCategories      String[]               @default([])
+  status                 PortfolioProjectStatus  @default(DRAFT)
+  sortOrder              Int                    @default(0)
+  isFeatured             Boolean                @default(false)
+  testimonialQuote       String?
+  testimonialAttribution String?
+  testimonialRating      Int?
+  tenant                 Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  media                  PortfolioProjectMedia[]
+
+  @@index([tenantId, status])
+  @@index([tenantId, sortOrder])
+  @@index([tenantId, isFeatured])
+}
+
+model PortfolioProjectMedia {
+  id        String            @id @default(uuid())
+  createdAt DateTime          @default(now())
+  projectId String
+  url       String
+  altText   String?
+  caption   String?
+  tag       PortfolioMediaTag @default(GENERAL)
+  sortOrder Int               @default(0)
+  project   PortfolioProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, sortOrder])
 }
 
 // ─── Epic 9 — Import Artifact Intake and Job Orchestration (E9-S2) ────

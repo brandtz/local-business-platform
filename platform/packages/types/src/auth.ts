@@ -167,7 +167,8 @@ export const tenantModuleKeys = [
 	"ordering",
 	"bookings",
 	"content",
-	"operations"
+	"operations",
+	"portfolio"
 ] as const;
 
 export type TenantModuleKey = (typeof tenantModuleKeys)[number];
@@ -223,6 +224,13 @@ const moduleRegistry: Record<TenantModuleKey, ModuleRegistryEntry> = {
 		description: "Business operations, hours, and fulfillment configuration",
 		displayName: "Operations",
 		key: "operations",
+		requiredDependencies: []
+	},
+	portfolio: {
+		category: "content",
+		description: "Project portfolio and showcase for service-oriented businesses",
+		displayName: "Portfolio",
+		key: "portfolio",
 		requiredDependencies: []
 	}
 };
