@@ -162,16 +162,17 @@ export class SubscriptionPackageService {
 		);
 
 		// Update core package fields
-		if (input.name !== undefined || input.description !== undefined ||
-			input.billingInterval !== undefined || input.basePriceCents !== undefined ||
-			input.trialDurationDays !== undefined || input.displayOrder !== undefined) {
-			const updateData: Record<string, unknown> = {};
-			if (input.name !== undefined) updateData.name = input.name;
-			if (input.description !== undefined) updateData.description = input.description;
-			if (input.billingInterval !== undefined) updateData.billingInterval = input.billingInterval;
-			if (input.basePriceCents !== undefined) updateData.basePriceCents = input.basePriceCents;
-			if (input.trialDurationDays !== undefined) updateData.trialDurationDays = input.trialDurationDays;
-			if (input.displayOrder !== undefined) updateData.displayOrder = input.displayOrder;
+		const packageFieldKeys = [
+			"name", "description", "billingInterval",
+			"basePriceCents", "trialDurationDays", "displayOrder",
+		] as const;
+		const updateData: Record<string, unknown> = {};
+		for (const key of packageFieldKeys) {
+			if (input[key] !== undefined) {
+				updateData[key] = input[key];
+			}
+		}
+		if (Object.keys(updateData).length > 0) {
 			this.repository.updatePackage(packageId, updateData);
 		}
 
