@@ -4,21 +4,14 @@ import {
 	isValidFulfillmentMode,
 	isValidQuantity,
 	type AddCartItemRequest,
-	type CartModifierRecord,
-	type CartResponse,
 	type CartSessionRecord,
 	type CheckoutStepperData,
-	type DiscountInput,
-	type FulfillmentMode,
 	type PricingInput,
-	type PricingLineItemInput,
 	type PricingQuote,
 	type PromoCodeValidationResult,
 	type LoyaltyCodeValidationResult,
 	type SetFulfillmentRequest,
-	type SetTipRequest,
-	type TaxPolicyInput,
-	type TipInput
+	type SetTipRequest
 } from "./cart";
 
 // ---------------------------------------------------------------------------

@@ -8,7 +8,6 @@ import type {
 	CartResponse,
 	CartSessionRecord,
 	CheckoutStepperData,
-	FulfillmentMode,
 	PricingInput,
 	PricingQuote,
 	SetFulfillmentRequest,

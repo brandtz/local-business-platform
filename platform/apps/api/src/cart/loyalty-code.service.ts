@@ -23,8 +23,10 @@ export class LoyaltyCodeService {
 	 * a real loyalty program backend.
 	 */
 	validate(
-		_tenantId: string,
-		_code: string
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		tenantId: string,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		code: string
 	): LoyaltyCodeValidationResult {
 		// Default implementation: all codes are invalid until a loyalty
 		// program system is implemented.

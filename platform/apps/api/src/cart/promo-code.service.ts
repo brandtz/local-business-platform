@@ -23,8 +23,10 @@ export class PromoCodeService {
 	 * a real promo code backend.
 	 */
 	validate(
-		_tenantId: string,
-		_code: string
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		tenantId: string,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		code: string
 	): PromoCodeValidationResult {
 		// Default implementation: all codes are invalid until a promo code
 		// management system is implemented.

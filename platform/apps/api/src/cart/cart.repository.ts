@@ -1,8 +1,7 @@
 import type {
 	CartItemRecord,
 	CartModifierRecord,
-	CartSessionRecord,
-	FulfillmentMode
+	CartSessionRecord
 } from "@platform/types";
 
 // ---------------------------------------------------------------------------
