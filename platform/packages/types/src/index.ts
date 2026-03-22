@@ -8,6 +8,7 @@ export * from "./content";
 export * from "./customer";
 export * from "./domain-events";
 export * from "./order";
+export * from "./payment";
 export * from "./service";
 export * from "./staff";
 export * from "./vertical";
