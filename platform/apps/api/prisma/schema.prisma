@@ -103,6 +103,7 @@ model Tenant {
   staffProfiles    StaffProfile[]
   contentPages     ContentPage[]
   announcements    Announcement[]
+  cartSessions     CartSession[]
 }
 
 model TenantCustomDomain {
@@ -431,6 +432,60 @@ model Announcement {
   @@index([tenantId, isActive])
   @@index([tenantId, placement])
   @@index([tenantId, startDate, endDate])
+}
+
+// ─── Epic 7 — Cart Domain ─────────────────────────────────────────────
+
+enum FulfillmentMode {
+  DELIVERY
+  PICKUP
+}
+
+model CartSession {
+  id                   String         @id @default(uuid())
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  tenantId             String
+  customerId           String?
+  fulfillmentMode      FulfillmentMode @default(PICKUP)
+  deliveryAddressLine1 String?
+  deliveryAddressLine2 String?
+  deliveryCity         String?
+  deliveryState        String?
+  deliveryZip          String?
+  orderNotes           String?
+  promoCode            String?
+  loyaltyCode          String?
+  tenant               Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  items                CartItem[]
+
+  @@index([tenantId, customerId])
+}
+
+model CartItem {
+  id              String         @id @default(uuid())
+  sessionId       String
+  catalogItemId   String
+  catalogItemName String
+  variantId       String?
+  variantName     String?
+  quantity        Int
+  addedPriceCents Int            // price at the time item was added (cents)
+  session         CartSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  modifiers       CartModifier[]
+
+  @@index([sessionId])
+}
+
+model CartModifier {
+  id               String   @id @default(uuid())
+  cartItemId       String
+  modifierOptionId String
+  modifierName     String
+  priceCents       Int      // modifier price at the time it was added (cents)
+  cartItem         CartItem @relation(fields: [cartItemId], references: [id], onDelete: Cascade)
+
+  @@index([cartItemId])
 }
 
 // ─── Epic 6 — Vertical Template Defaults ──────────────────────────────
