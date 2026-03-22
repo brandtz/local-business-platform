@@ -9,6 +9,9 @@
     "lint": "eslint . --max-warnings=0",
     "start": "node dist/main.js",
     "test": "vitest run --passWithNoTests",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -b tsconfig.json --force"
+  },
+  "dependencies": {
+    "@platform/types": "workspace:*"
   }
 }

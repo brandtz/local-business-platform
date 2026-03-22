@@ -845,3 +845,72 @@ model PackageVersion {
   @@unique([packageId, versionNumber])
   @@index([packageId])
 }
+
+// ─── Epic 9 — Import Artifact Intake and Job Orchestration (E9-S2) ────
+
+enum ImportArtifactType {
+  MENU_PDF
+  MENU_IMAGE
+  SERVICE_LIST_CSV
+  CATALOG_SPREADSHEET
+  BROCHURE_IMAGE
+  PRICE_SHEET_PDF
+}
+
+enum ArtifactUploadStatus {
+  PENDING
+  SCANNING
+  STORED
+  SCAN_FAILED
+  REJECTED
+}
+
+enum ImportJobStatus {
+  PENDING
+  PROCESSING
+  STAGED
+  FAILED
+  COMPLETED
+}
+
+model ImportArtifact {
+  id                String              @id @default(uuid())
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  tenantId          String
+  artifactType      ImportArtifactType
+  originalFilename  String
+  sanitizedFilename String
+  storagePath       String
+  mimeType          String
+  fileSizeBytes     Int
+  uploadStatus      ArtifactUploadStatus @default(PENDING)
+  scanResult        String?
+  uploadedBy        String
+  importJobs        ImportJob[]
+
+  @@index([tenantId])
+  @@index([tenantId, artifactType])
+  @@index([tenantId, uploadStatus])
+}
+
+model ImportJob {
+  id             String          @id @default(uuid())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  tenantId       String
+  artifactId     String
+  artifact       ImportArtifact  @relation(fields: [artifactId], references: [id], onDelete: Cascade)
+  status         ImportJobStatus @default(PENDING)
+  retryCount     Int             @default(0)
+  maxRetries     Int             @default(3)
+  failureReason  String?
+  stagedOutput   Json?
+  createdBy      String
+  startedAt      DateTime?
+  completedAt    DateTime?
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([artifactId])
+}
