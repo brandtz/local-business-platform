@@ -1,6 +1,7 @@
 export const packageName = "@platform/types";
 
 export * from "./auth";
+export * from "./booking";
 export * from "./cart";
 export * from "./catalog";
 export * from "./content";

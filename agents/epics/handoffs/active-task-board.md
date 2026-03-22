@@ -135,6 +135,22 @@ Use this file to track the active execution queue.
 - E6-S4-T4 | owner lane: API Surface Lane | packet: ../packets/epic-06/E6-S4-T2.md | handoff: ./2026-03-21-E6-S4-T4.md
 - E6-S4-T5 | owner lane: API Surface Lane | packet: ../packets/epic-06/E6-S4-T3.md | handoff: ./2026-03-21-E6-S4-T5.md
 - E6-S4-T6 | owner lane: Platform Control Lane | packet: ../packets/epic-06/E6-S4-T4.md | handoff: ./2026-03-21-E6-S4-T6.md
+- E6-S5-T1 | owner lane: Backend Domain Lane | handoff: ./2026-03-21-E6-S5-T1.md
+- E6-S5-T2 | owner lane: Backend Domain Lane | handoff: ./2026-03-21-E6-S5-T2.md
+- E6-S5-T3 | owner lane: Backend Domain Lane | handoff: ./2026-03-21-E6-S5-T3.md
+- E6-S5-T4 | owner lane: Backend Domain Lane | handoff: ./2026-03-21-E6-S5-T4.md
+- E6-S5-T5 | owner lane: Backend Domain Lane | handoff: ./2026-03-21-E6-S5-T5.md
+- E7-S1-T1 | owner lane: API Surface Lane | handoff: ./2026-03-22-E7-S1-T1.md
+- E7-S1-T2 | owner lane: API Surface Lane | handoff: ./2026-03-22-E7-S1-T2.md
+- E7-S1-T3 | owner lane: API Surface Lane | handoff: ./2026-03-22-E7-S1-T3.md
+- E7-S1-T4 | owner lane: API Surface Lane | handoff: ./2026-03-22-E7-S1-T4.md
+- E7-S1-T5 | owner lane: API Surface Lane | handoff: ./2026-03-22-E7-S1-T5.md
+- E7-S1-T6 | owner lane: API Surface Lane | handoff: ./2026-03-22-E7-S1-T6.md
+- E7-S1-T7 | owner lane: API Surface Lane | handoff: ./2026-03-22-E7-S1-T7.md
+- E7-S3-T1 | owner lane: API Surface Lane | packet: ../packets/epic-07/E7-S3-T1.md | handoff: ./2026-03-22-E7-S3-T1.md
+- E7-S3-T2 | owner lane: API Surface Lane | packet: ../packets/epic-07/E7-S3-T2.md | handoff: ./2026-03-22-E7-S3-T2.md
+- E7-S3-T3 | owner lane: API Surface Lane | packet: ../packets/epic-07/E7-S3-T3.md | handoff: ./2026-03-22-E7-S3-T3.md
+- E7-S3-T4 | owner lane: Platform Control Lane | packet: ../packets/epic-07/E7-S3-T4.md | handoff: ./2026-03-22-E7-S3-T4.md
 
 ## Board Rules
 
