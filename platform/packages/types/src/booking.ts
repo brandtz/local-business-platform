@@ -260,3 +260,446 @@ export function buildSlotCacheKey(key: SlotCacheKey): string {
 	}
 	return parts.join(":");
 }
+
+// ─── Booking Lifecycle Types (E7-S4) ─────────────────────────────────────────
+// Booking status state machine, domain records, and lifecycle management.
+
+// ─── Booking Status Enum ─────────────────────────────────────────────────────
+
+export const bookingStatuses = [
+	"requested",
+	"confirmed",
+	"checked-in",
+	"completed",
+	"cancelled",
+	"no-show",
+] as const;
+export type BookingStatus = (typeof bookingStatuses)[number];
+
+/**
+ * Valid transitions from each booking status.
+ * requested → confirmed | cancelled
+ * confirmed → checked-in | cancelled | no-show
+ * checked-in → completed | no-show
+ * completed, cancelled, no-show → (terminal)
+ */
+export const bookingStatusTransitions: Record<BookingStatus, readonly BookingStatus[]> = {
+	requested: ["confirmed", "cancelled"],
+	confirmed: ["checked-in", "cancelled", "no-show"],
+	"checked-in": ["completed", "no-show"],
+	completed: [],
+	cancelled: [],
+	"no-show": [],
+};
+
+export function isValidBookingTransition(from: BookingStatus, to: BookingStatus): boolean {
+	return (bookingStatusTransitions[from] as readonly string[]).includes(to);
+}
+
+export function getNextBookingStatuses(status: BookingStatus): readonly BookingStatus[] {
+	return bookingStatusTransitions[status];
+}
+
+export const terminalBookingStatuses: readonly BookingStatus[] = ["completed", "cancelled", "no-show"];
+
+export function isTerminalBookingStatus(status: BookingStatus): boolean {
+	return (terminalBookingStatuses as readonly string[]).includes(status);
+}
+
+export function isValidBookingStatus(status: string): status is BookingStatus {
+	return (bookingStatuses as readonly string[]).includes(status);
+}
+
+/**
+ * Statuses from which a booking can be cancelled.
+ * Cancellation is allowed from requested and confirmed only.
+ */
+export const cancellableBookingStatuses: readonly BookingStatus[] = [
+	"requested",
+	"confirmed",
+];
+
+export function isBookingCancellable(status: BookingStatus): boolean {
+	return (cancellableBookingStatuses as readonly string[]).includes(status);
+}
+
+// ─── Cancellation Policy ─────────────────────────────────────────────────────
+
+export type CancellationPolicy = {
+	/** Hours before the booking start time that free cancellation is allowed */
+	freeWindowHours: number;
+	/** Whether late cancellations (within the window) are allowed with penalty */
+	allowLateCancellation: boolean;
+	/** Optional penalty description for late cancellations */
+	lateCancellationPenalty: string | null;
+};
+
+export const DEFAULT_CANCELLATION_POLICY: CancellationPolicy = {
+	freeWindowHours: 24,
+	allowLateCancellation: true,
+	lateCancellationPenalty: null,
+};
+
+export type CancellationWindowResult =
+	| { allowed: true; isLate: false }
+	| { allowed: true; isLate: true; penalty: string | null }
+	| { allowed: false; reason: string };
+
+/**
+ * Checks whether cancellation is allowed based on the cancellation policy.
+ * @param bookingStartTime ISO 8601 timestamp of the booking start
+ * @param policy Cancellation policy rules
+ * @param now Current time (injectable for testing)
+ */
+export function evaluateCancellationWindow(
+	bookingStartTime: string,
+	policy: CancellationPolicy,
+	now: Date = new Date()
+): CancellationWindowResult {
+	const startMs = new Date(bookingStartTime).getTime();
+	const nowMs = now.getTime();
+	const hoursUntilStart = (startMs - nowMs) / (1000 * 60 * 60);
+
+	if (hoursUntilStart <= 0) {
+		return { allowed: false, reason: "Booking start time has already passed." };
+	}
+
+	if (hoursUntilStart >= policy.freeWindowHours) {
+		return { allowed: true, isLate: false };
+	}
+
+	if (policy.allowLateCancellation) {
+		return { allowed: true, isLate: true, penalty: policy.lateCancellationPenalty };
+	}
+
+	return {
+		allowed: false,
+		reason: `Cancellation must be at least ${policy.freeWindowHours} hours before the booking.`,
+	};
+}
+
+// ─── Booking Domain Record ───────────────────────────────────────────────────
+
+export type BookingRecord = {
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	tenantId: string;
+	customerId: string | null;
+	customerName: string | null;
+	customerEmail: string | null;
+	customerPhone: string | null;
+	serviceId: string;
+	serviceName: string;
+	staffId: string;
+	staffName: string;
+	locationId: string;
+	startTime: string; // ISO 8601
+	endTime: string; // ISO 8601
+	durationMinutes: number;
+	status: BookingStatus;
+	notes: string | null;
+	cancellationReason: string | null;
+	requestedAt: string | null;
+	confirmedAt: string | null;
+	checkedInAt: string | null;
+	completedAt: string | null;
+	cancelledAt: string | null;
+	noShowAt: string | null;
+};
+
+// ─── Booking Creation Input ──────────────────────────────────────────────────
+
+export type CreateBookingInput = {
+	tenantId: string;
+	locationId: string;
+	customerId: string | null;
+	customerName: string | null;
+	customerEmail: string | null;
+	customerPhone: string | null;
+	serviceId: string;
+	serviceName: string;
+	staffId: string;
+	staffName: string;
+	startTime: string; // ISO 8601
+	endTime: string; // ISO 8601
+	durationMinutes: number;
+	notes: string | null;
+};
+
+// ─── Admin Booking Response Types ────────────────────────────────────────────
+
+export type AdminBookingSummary = {
+	id: string;
+	createdAt: string;
+	status: BookingStatus;
+	customerName: string | null;
+	serviceName: string;
+	staffName: string;
+	startTime: string;
+	endTime: string;
+	durationMinutes: number;
+};
+
+export type AdminBookingDetail = {
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	status: BookingStatus;
+	customerName: string | null;
+	customerEmail: string | null;
+	customerPhone: string | null;
+	serviceId: string;
+	serviceName: string;
+	staffId: string;
+	staffName: string;
+	locationId: string;
+	startTime: string;
+	endTime: string;
+	durationMinutes: number;
+	notes: string | null;
+	cancellationReason: string | null;
+	requestedAt: string | null;
+	confirmedAt: string | null;
+	checkedInAt: string | null;
+	completedAt: string | null;
+	cancelledAt: string | null;
+	noShowAt: string | null;
+	allowedTransitions: readonly BookingStatus[];
+};
+
+export type AdminBookingListQuery = {
+	tenantId: string;
+	status?: BookingStatus;
+	staffId?: string;
+	serviceId?: string;
+	dateFrom?: string;
+	dateTo?: string;
+	search?: string;
+	page?: number;
+	pageSize?: number;
+};
+
+export type AdminBookingListResponse = {
+	bookings: AdminBookingSummary[];
+	total: number;
+	page: number;
+	pageSize: number;
+};
+
+// ─── Customer Booking Response Types ─────────────────────────────────────────
+
+export type CustomerBookingSummary = {
+	id: string;
+	createdAt: string;
+	status: BookingStatus;
+	serviceName: string;
+	staffName: string;
+	startTime: string;
+	endTime: string;
+	durationMinutes: number;
+};
+
+export type CustomerBookingDetail = {
+	id: string;
+	createdAt: string;
+	status: BookingStatus;
+	serviceName: string;
+	staffName: string;
+	startTime: string;
+	endTime: string;
+	durationMinutes: number;
+	notes: string | null;
+	cancelledAt: string | null;
+};
+
+// ─── Booking Tracking (E7-S4-T6) ────────────────────────────────────────────
+
+export const bookingTrackingSteps = [
+	"requested",
+	"confirmed",
+	"checked-in",
+	"completed",
+] as const;
+export type BookingTrackingStep = (typeof bookingTrackingSteps)[number];
+
+export type BookingTrackingStepState = "completed" | "current" | "upcoming" | "skipped";
+
+export type BookingTrackingStepInfo = {
+	step: BookingTrackingStep;
+	label: string;
+	state: BookingTrackingStepState;
+	timestamp: string | null;
+};
+
+export type BookingTrackingData = {
+	bookingId: string;
+	status: BookingStatus;
+	isCancelled: boolean;
+	isNoShow: boolean;
+	steps: BookingTrackingStepInfo[];
+	currentStepIndex: number;
+	serviceName: string;
+	staffName: string;
+	startTime: string;
+	endTime: string;
+	durationMinutes: number;
+};
+
+const bookingStepLabels: Record<BookingTrackingStep, string> = {
+	requested: "Requested",
+	confirmed: "Confirmed",
+	"checked-in": "Checked In",
+	completed: "Completed",
+};
+
+/**
+ * Maps a booking status to tracking step states for progress bar rendering.
+ */
+export function computeBookingTrackingSteps(
+	status: BookingStatus,
+	timestamps: {
+		requestedAt: string | null;
+		confirmedAt: string | null;
+		checkedInAt: string | null;
+		completedAt: string | null;
+	}
+): BookingTrackingStepInfo[] {
+	const stepTimestamps: Record<BookingTrackingStep, string | null> = {
+		requested: timestamps.requestedAt,
+		confirmed: timestamps.confirmedAt,
+		"checked-in": timestamps.checkedInAt,
+		completed: timestamps.completedAt,
+	};
+
+	const isCancelled = status === "cancelled";
+	const isNoShow = status === "no-show";
+	const statusIndex = (isCancelled || isNoShow)
+		? -1
+		: bookingTrackingSteps.indexOf(status as BookingTrackingStep);
+
+	return bookingTrackingSteps.map((step, index) => {
+		let state: BookingTrackingStepState;
+
+		if (isCancelled || isNoShow) {
+			state = stepTimestamps[step] ? "completed" : "skipped";
+		} else if (index < statusIndex) {
+			state = "completed";
+		} else if (index === statusIndex) {
+			state = "current";
+		} else {
+			state = "upcoming";
+		}
+
+		return {
+			step,
+			label: bookingStepLabels[step],
+			state,
+			timestamp: stepTimestamps[step],
+		};
+	});
+}
+
+export function getCurrentBookingTrackingStepIndex(status: BookingStatus): number {
+	if (status === "cancelled" || status === "no-show") return -1;
+	return bookingTrackingSteps.indexOf(status as BookingTrackingStep);
+}
+
+// ─── Booking Quick Actions (Admin) ───────────────────────────────────────────
+
+export type BookingQuickAction = {
+	targetStatus: BookingStatus;
+	label: string;
+	confirmationMessage: string;
+};
+
+export function getBookingQuickActions(status: BookingStatus): BookingQuickAction[] {
+	const actions: BookingQuickAction[] = [];
+	const transitions = bookingStatusTransitions[status];
+
+	for (const target of transitions) {
+		if (target === "cancelled") continue; // cancel is a separate action
+		actions.push(getBookingQuickActionForTransition(target));
+	}
+
+	return actions;
+}
+
+function getBookingQuickActionForTransition(target: BookingStatus): BookingQuickAction {
+	switch (target) {
+		case "confirmed":
+			return {
+				targetStatus: "confirmed",
+				label: "Confirm Booking",
+				confirmationMessage: "Confirm this booking and notify the customer?",
+			};
+		case "checked-in":
+			return {
+				targetStatus: "checked-in",
+				label: "Check In",
+				confirmationMessage: "Check in this customer?",
+			};
+		case "completed":
+			return {
+				targetStatus: "completed",
+				label: "Complete",
+				confirmationMessage: "Mark this booking as completed?",
+			};
+		case "no-show":
+			return {
+				targetStatus: "no-show",
+				label: "Mark No-Show",
+				confirmationMessage: "Mark this booking as no-show? This cannot be undone.",
+			};
+		default:
+			return {
+				targetStatus: target,
+				label: target,
+				confirmationMessage: `Transition booking to ${target}?`,
+			};
+	}
+}
+
+// ─── Calendar View Types (E7-S4-T4) ─────────────────────────────────────────
+
+export type CalendarBookingBlock = {
+	bookingId: string;
+	status: BookingStatus;
+	customerName: string | null;
+	serviceName: string;
+	staffId: string;
+	staffName: string;
+	startTime: string;
+	endTime: string;
+	durationMinutes: number;
+};
+
+export type CalendarViewQuery = {
+	tenantId: string;
+	startDate: string; // YYYY-MM-DD
+	endDate: string; // YYYY-MM-DD
+	staffId?: string;
+	serviceId?: string;
+};
+
+export type CalendarDayData = {
+	date: string; // YYYY-MM-DD
+	blocks: CalendarBookingBlock[];
+};
+
+export type CalendarViewResponse = {
+	days: CalendarDayData[];
+	query: CalendarViewQuery;
+};
+
+// ─── Booking Status Count Aggregation ────────────────────────────────────────
+
+export type BookingStatusCount = {
+	status: BookingStatus;
+	count: number;
+};
+
+export type BookingPipelineCounts = {
+	counts: BookingStatusCount[];
+	total: number;
+};

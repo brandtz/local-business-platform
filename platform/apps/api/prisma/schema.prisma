@@ -105,6 +105,7 @@ model Tenant {
   announcements    Announcement[]
   cartSessions     CartSession[]
   orders           Order[]
+  bookings         Booking[]
 }
 
 model TenantCustomDomain {
@@ -573,6 +574,53 @@ model OrderItemModifier {
   orderItem        OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
 
   @@index([orderItemId])
+}
+
+// ─── Epic 7 — Booking Domain ──────────────────────────────────────────
+
+enum BookingStatus {
+  REQUESTED
+  CONFIRMED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+model Booking {
+  id                String        @id @default(uuid())
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  tenantId          String
+  customerId        String?
+  customerName      String?
+  customerEmail     String?
+  customerPhone     String?
+  serviceId         String
+  serviceName       String
+  staffId           String
+  staffName         String
+  locationId        String
+  startTime         DateTime
+  endTime           DateTime
+  durationMinutes   Int
+  status            BookingStatus @default(REQUESTED)
+  notes             String?
+  cancellationReason String?
+  requestedAt       DateTime?
+  confirmedAt       DateTime?
+  checkedInAt       DateTime?
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+  noShowAt          DateTime?
+  tenant            Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Double-booking prevention: no two active bookings for the same staff at the same time
+  @@index([tenantId, status])
+  @@index([tenantId, customerId])
+  @@index([tenantId, staffId, startTime, endTime])
+  @@index([tenantId, startTime])
+  @@index([tenantId, serviceId])
 }
 
 // ─── Epic 6 — Vertical Template Defaults ──────────────────────────────
