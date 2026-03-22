@@ -12,6 +12,9 @@ import {
   buildPlatformPaymentHealthSummary,
   paymentConnectionSecretFields,
   paymentConnectionStatusTransitions,
+  paymentTransactionStatuses,
+  isValidPaymentTransactionTransition,
+  isTerminalPaymentTransactionStatus,
 } from "./payment";
 import type { PaymentConnectionRecord } from "./payment";
 
@@ -307,5 +310,100 @@ describe("paymentConnectionSecretFields", () => {
     expect(paymentConnectionSecretFields).toContain("encryptedCredentials");
     expect(paymentConnectionSecretFields).toContain("credentialsIv");
     expect(paymentConnectionSecretFields).toContain("credentialsTag");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// E8-S2: Payment transaction state machine tests
+// ---------------------------------------------------------------------------
+
+describe("paymentTransactionStatuses", () => {
+  it("defines all expected statuses", () => {
+    expect(paymentTransactionStatuses).toContain("created");
+    expect(paymentTransactionStatuses).toContain("authorized");
+    expect(paymentTransactionStatuses).toContain("captured");
+    expect(paymentTransactionStatuses).toContain("voided");
+    expect(paymentTransactionStatuses).toContain("refunded");
+    expect(paymentTransactionStatuses).toContain("partially_refunded");
+    expect(paymentTransactionStatuses).toContain("failed");
+    expect(paymentTransactionStatuses.length).toBe(7);
+  });
+});
+
+describe("isValidPaymentTransactionTransition", () => {
+  it("allows created → authorized", () => {
+    expect(isValidPaymentTransactionTransition("created", "authorized")).toBe(true);
+  });
+
+  it("allows created → failed", () => {
+    expect(isValidPaymentTransactionTransition("created", "failed")).toBe(true);
+  });
+
+  it("allows authorized → captured", () => {
+    expect(isValidPaymentTransactionTransition("authorized", "captured")).toBe(true);
+  });
+
+  it("allows authorized → voided", () => {
+    expect(isValidPaymentTransactionTransition("authorized", "voided")).toBe(true);
+  });
+
+  it("allows captured → refunded", () => {
+    expect(isValidPaymentTransactionTransition("captured", "refunded")).toBe(true);
+  });
+
+  it("allows captured → partially_refunded", () => {
+    expect(isValidPaymentTransactionTransition("captured", "partially_refunded")).toBe(true);
+  });
+
+  it("allows partially_refunded → refunded", () => {
+    expect(isValidPaymentTransactionTransition("partially_refunded", "refunded")).toBe(true);
+  });
+
+  it("allows partially_refunded → partially_refunded (additional partial)", () => {
+    expect(isValidPaymentTransactionTransition("partially_refunded", "partially_refunded")).toBe(true);
+  });
+
+  it("rejects created → captured (skip)", () => {
+    expect(isValidPaymentTransactionTransition("created", "captured")).toBe(false);
+  });
+
+  it("rejects refunded → any", () => {
+    expect(isValidPaymentTransactionTransition("refunded", "captured")).toBe(false);
+    expect(isValidPaymentTransactionTransition("refunded", "refunded")).toBe(false);
+  });
+
+  it("rejects voided → any", () => {
+    expect(isValidPaymentTransactionTransition("voided", "captured")).toBe(false);
+  });
+
+  it("rejects failed → any", () => {
+    expect(isValidPaymentTransactionTransition("failed", "captured")).toBe(false);
+    expect(isValidPaymentTransactionTransition("failed", "authorized")).toBe(false);
+  });
+});
+
+describe("isTerminalPaymentTransactionStatus", () => {
+  it("identifies voided as terminal", () => {
+    expect(isTerminalPaymentTransactionStatus("voided")).toBe(true);
+  });
+
+  it("identifies refunded as terminal", () => {
+    expect(isTerminalPaymentTransactionStatus("refunded")).toBe(true);
+  });
+
+  it("identifies failed as terminal", () => {
+    expect(isTerminalPaymentTransactionStatus("failed")).toBe(true);
+  });
+
+  it("identifies captured as non-terminal", () => {
+    expect(isTerminalPaymentTransactionStatus("captured")).toBe(false);
+  });
+
+  it("identifies authorized as non-terminal", () => {
+    expect(isTerminalPaymentTransactionStatus("authorized")).toBe(false);
+  });
+
+  it("identifies partially_refunded as non-terminal", () => {
+    expect(isTerminalPaymentTransactionStatus("partially_refunded")).toBe(false);
   });
 });

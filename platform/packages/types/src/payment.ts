@@ -301,3 +301,244 @@ export function buildPlatformPaymentHealthSummary(
     byProvider,
   };
 }
+
+// ---------------------------------------------------------------------------
+// E8-S2: Payment transaction states and types
+// ---------------------------------------------------------------------------
+
+/**
+ * Payment transaction state machine.
+ * created → authorized → captured → refunded | partially_refunded
+ *                     → voided
+ * Any state can transition to failed.
+ */
+export const paymentTransactionStatuses = [
+  "created",
+  "authorized",
+  "captured",
+  "voided",
+  "refunded",
+  "partially_refunded",
+  "failed",
+] as const;
+export type PaymentTransactionStatus =
+  (typeof paymentTransactionStatuses)[number];
+
+export const paymentTransactionStatusTransitions: Record<
+  PaymentTransactionStatus,
+  readonly PaymentTransactionStatus[]
+> = {
+  created: ["authorized", "failed"],
+  authorized: ["captured", "voided", "failed"],
+  captured: ["refunded", "partially_refunded", "failed"],
+  voided: [],
+  refunded: [],
+  partially_refunded: ["refunded", "partially_refunded"],
+  failed: [],
+};
+
+export function isValidPaymentTransactionTransition(
+  from: PaymentTransactionStatus,
+  to: PaymentTransactionStatus,
+): boolean {
+  return (
+    paymentTransactionStatusTransitions[from] as readonly string[]
+  ).includes(to);
+}
+
+export function isTerminalPaymentTransactionStatus(
+  status: PaymentTransactionStatus,
+): boolean {
+  return (
+    status === "voided" || status === "refunded" || status === "failed"
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Payment transaction record (database read model)
+// ---------------------------------------------------------------------------
+
+export type PaymentTransactionRecord = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  tenantId: string;
+  connectionId: string;
+  provider: PaymentProvider;
+  status: PaymentTransactionStatus;
+  /** Reference to order or booking that initiated this payment. */
+  referenceType: "order" | "booking";
+  referenceId: string;
+  /** Amount in smallest currency unit (e.g. cents). */
+  amountCents: number;
+  currency: string;
+  tipAmountCents: number;
+  /** Provider-side payment intent/transaction ID. */
+  providerTransactionId: string | null;
+  /** Idempotency key to prevent duplicate operations. */
+  idempotencyKey: string;
+  capturedAmountCents: number;
+  refundedAmountCents: number;
+  failureReason: string | null;
+  metadata: Record<string, unknown>;
+};
+
+// ---------------------------------------------------------------------------
+// Payment intent creation input
+// ---------------------------------------------------------------------------
+
+export type CreatePaymentIntentInput = {
+  tenantId: string;
+  referenceType: "order" | "booking";
+  referenceId: string;
+  amountCents: number;
+  currency: string;
+  tipAmountCents?: number;
+  idempotencyKey: string;
+  metadata?: Record<string, unknown>;
+};
+
+// ---------------------------------------------------------------------------
+// Capture payment input
+// ---------------------------------------------------------------------------
+
+export type CapturePaymentInput = {
+  tenantId: string;
+  transactionId: string;
+  amountCents?: number; // Optional override for partial capture
+};
+
+// ---------------------------------------------------------------------------
+// Refund payment input
+// ---------------------------------------------------------------------------
+
+export type RefundPaymentInput = {
+  tenantId: string;
+  transactionId: string;
+  amountCents: number;
+  reason: string;
+  actorId: string;
+  idempotencyKey: string;
+};
+
+// ---------------------------------------------------------------------------
+// Provider adapter operation types (E8-S2-T1)
+// ---------------------------------------------------------------------------
+
+export type ProviderCreateIntentRequest = {
+  amountCents: number;
+  currency: string;
+  tipAmountCents: number;
+  idempotencyKey: string;
+  metadata?: Record<string, unknown>;
+};
+
+export type ProviderCreateIntentResponse = {
+  success: boolean;
+  providerTransactionId?: string;
+  error?: string;
+};
+
+export type ProviderCaptureRequest = {
+  providerTransactionId: string;
+  amountCents: number;
+};
+
+export type ProviderCaptureResponse = {
+  success: boolean;
+  error?: string;
+};
+
+export type ProviderVoidRequest = {
+  providerTransactionId: string;
+};
+
+export type ProviderVoidResponse = {
+  success: boolean;
+  error?: string;
+};
+
+export type ProviderRefundRequest = {
+  providerTransactionId: string;
+  amountCents: number;
+  idempotencyKey: string;
+  reason: string;
+};
+
+export type ProviderRefundResponse = {
+  success: boolean;
+  providerRefundId?: string;
+  error?: string;
+};
+
+// ---------------------------------------------------------------------------
+// Multi-processor routing configuration (E8-S2-T5)
+// ---------------------------------------------------------------------------
+
+export type ProcessorRoutingConfig = {
+  tenantId: string;
+  primaryProvider: PaymentProvider;
+  failoverEnabled: boolean;
+};
+
+// ---------------------------------------------------------------------------
+// Payment audit event (E8-S2-T4)
+// ---------------------------------------------------------------------------
+
+export type PaymentAuditEvent = {
+  id: string;
+  timestamp: string;
+  tenantId: string;
+  transactionId: string;
+  action: "intent_created" | "captured" | "voided" | "refund_initiated" | "refund_completed" | "failover_triggered" | "payment_failed";
+  actorId: string | null;
+  reason: string | null;
+  previousStatus: PaymentTransactionStatus | null;
+  newStatus: PaymentTransactionStatus;
+  amountCents: number | null;
+  provider: PaymentProvider;
+  metadata: Record<string, unknown>;
+};
+
+// ---------------------------------------------------------------------------
+// Admin transaction views (E8-S2-T4)
+// ---------------------------------------------------------------------------
+
+export type AdminTransactionSummary = {
+  id: string;
+  status: PaymentTransactionStatus;
+  referenceType: "order" | "booking";
+  referenceId: string;
+  provider: PaymentProvider;
+  amountCents: number;
+  currency: string;
+  tipAmountCents: number;
+  capturedAmountCents: number;
+  refundedAmountCents: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AdminTransactionDetail = AdminTransactionSummary & {
+  connectionId: string;
+  providerTransactionId: string | null;
+  failureReason: string | null;
+  auditEvents: PaymentAuditEvent[];
+};
+
+export type AdminTransactionListQuery = {
+  tenantId: string;
+  referenceType?: "order" | "booking";
+  referenceId?: string;
+  status?: PaymentTransactionStatus;
+  page?: number;
+  pageSize?: number;
+};
+
+export type AdminRefundRequest = {
+  tenantId: string;
+  transactionId: string;
+  amountCents: number;
+  reason: string;
+  actorId: string;
+};

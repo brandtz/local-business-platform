@@ -1,8 +1,19 @@
-// E8-S1-T2: Payment provider adapter contract.
+// E8-S1-T2 + E8-S2-T1: Payment provider adapter contract.
 // Adapter pattern: no direct provider SDK calls in domain services.
 // Each provider (Stripe, Square) must implement this interface.
+// E8-S2-T1 extends with createIntent, capturePayment, voidPayment, refundPayment.
 
-import type { PaymentProvider } from "@platform/types";
+import type {
+  PaymentProvider,
+  ProviderCreateIntentRequest,
+  ProviderCreateIntentResponse,
+  ProviderCaptureRequest,
+  ProviderCaptureResponse,
+  ProviderVoidRequest,
+  ProviderVoidResponse,
+  ProviderRefundRequest,
+  ProviderRefundResponse,
+} from "@platform/types";
 
 // ---------------------------------------------------------------------------
 // Provider adapter interface
@@ -49,6 +60,43 @@ export interface PaymentProviderAdapter {
   checkConnectionStatus(
     credentials: Record<string, unknown>,
   ): Promise<ProviderConnectionStatus>;
+
+  // -------------------------------------------------------------------------
+  // E8-S2-T1: Payment operation methods
+  // -------------------------------------------------------------------------
+
+  /**
+   * Creates a payment intent with the provider.
+   * Returns a provider-side transaction identifier on success.
+   */
+  createIntent(
+    credentials: Record<string, unknown>,
+    request: ProviderCreateIntentRequest,
+  ): Promise<ProviderCreateIntentResponse>;
+
+  /**
+   * Captures a previously authorized payment.
+   */
+  capturePayment(
+    credentials: Record<string, unknown>,
+    request: ProviderCaptureRequest,
+  ): Promise<ProviderCaptureResponse>;
+
+  /**
+   * Voids a previously authorized (but not captured) payment.
+   */
+  voidPayment(
+    credentials: Record<string, unknown>,
+    request: ProviderVoidRequest,
+  ): Promise<ProviderVoidResponse>;
+
+  /**
+   * Issues a refund against a captured payment.
+   */
+  refundPayment(
+    credentials: Record<string, unknown>,
+    request: ProviderRefundRequest,
+  ): Promise<ProviderRefundResponse>;
 }
 
 // ---------------------------------------------------------------------------
@@ -58,7 +106,7 @@ export interface PaymentProviderAdapter {
 
 /**
  * Stripe adapter stub — validates credential shape only.
- * Real Stripe SDK integration is deferred to E8-S2.
+ * Real Stripe SDK integration is deferred.
  */
 export class StripeProviderAdapter implements PaymentProviderAdapter {
   readonly provider: PaymentProvider = "stripe";
@@ -94,11 +142,70 @@ export class StripeProviderAdapter implements PaymentProviderAdapter {
       error: result.error,
     };
   }
+
+  async createIntent(
+    credentials: Record<string, unknown>,
+    request: ProviderCreateIntentRequest,
+  ): Promise<ProviderCreateIntentResponse> {
+    const verifyResult = await this.verifyCredentials(credentials);
+    if (!verifyResult.success) {
+      return { success: false, error: verifyResult.error };
+    }
+    return {
+      success: true,
+      providerTransactionId: `pi_stripe_${request.idempotencyKey}`,
+    };
+  }
+
+  async capturePayment(
+    credentials: Record<string, unknown>,
+    request: ProviderCaptureRequest,
+  ): Promise<ProviderCaptureResponse> {
+    const verifyResult = await this.verifyCredentials(credentials);
+    if (!verifyResult.success) {
+      return { success: false, error: verifyResult.error };
+    }
+    if (!request.providerTransactionId) {
+      return { success: false, error: "Missing provider transaction ID." };
+    }
+    return { success: true };
+  }
+
+  async voidPayment(
+    credentials: Record<string, unknown>,
+    request: ProviderVoidRequest,
+  ): Promise<ProviderVoidResponse> {
+    const verifyResult = await this.verifyCredentials(credentials);
+    if (!verifyResult.success) {
+      return { success: false, error: verifyResult.error };
+    }
+    if (!request.providerTransactionId) {
+      return { success: false, error: "Missing provider transaction ID." };
+    }
+    return { success: true };
+  }
+
+  async refundPayment(
+    credentials: Record<string, unknown>,
+    request: ProviderRefundRequest,
+  ): Promise<ProviderRefundResponse> {
+    const verifyResult = await this.verifyCredentials(credentials);
+    if (!verifyResult.success) {
+      return { success: false, error: verifyResult.error };
+    }
+    if (!request.providerTransactionId) {
+      return { success: false, error: "Missing provider transaction ID." };
+    }
+    return {
+      success: true,
+      providerRefundId: `re_stripe_${request.idempotencyKey}`,
+    };
+  }
 }
 
 /**
  * Square adapter stub — validates credential shape only.
- * Real Square SDK integration is deferred to E8-S2.
+ * Real Square SDK integration is deferred.
  */
 export class SquareProviderAdapter implements PaymentProviderAdapter {
   readonly provider: PaymentProvider = "square";
@@ -124,6 +231,65 @@ export class SquareProviderAdapter implements PaymentProviderAdapter {
       reachable: result.success,
       accountActive: result.success,
       error: result.error,
+    };
+  }
+
+  async createIntent(
+    credentials: Record<string, unknown>,
+    request: ProviderCreateIntentRequest,
+  ): Promise<ProviderCreateIntentResponse> {
+    const verifyResult = await this.verifyCredentials(credentials);
+    if (!verifyResult.success) {
+      return { success: false, error: verifyResult.error };
+    }
+    return {
+      success: true,
+      providerTransactionId: `sq_pay_${request.idempotencyKey}`,
+    };
+  }
+
+  async capturePayment(
+    credentials: Record<string, unknown>,
+    request: ProviderCaptureRequest,
+  ): Promise<ProviderCaptureResponse> {
+    const verifyResult = await this.verifyCredentials(credentials);
+    if (!verifyResult.success) {
+      return { success: false, error: verifyResult.error };
+    }
+    if (!request.providerTransactionId) {
+      return { success: false, error: "Missing provider transaction ID." };
+    }
+    return { success: true };
+  }
+
+  async voidPayment(
+    credentials: Record<string, unknown>,
+    request: ProviderVoidRequest,
+  ): Promise<ProviderVoidResponse> {
+    const verifyResult = await this.verifyCredentials(credentials);
+    if (!verifyResult.success) {
+      return { success: false, error: verifyResult.error };
+    }
+    if (!request.providerTransactionId) {
+      return { success: false, error: "Missing provider transaction ID." };
+    }
+    return { success: true };
+  }
+
+  async refundPayment(
+    credentials: Record<string, unknown>,
+    request: ProviderRefundRequest,
+  ): Promise<ProviderRefundResponse> {
+    const verifyResult = await this.verifyCredentials(credentials);
+    if (!verifyResult.success) {
+      return { success: false, error: verifyResult.error };
+    }
+    if (!request.providerTransactionId) {
+      return { success: false, error: "Missing provider transaction ID." };
+    }
+    return {
+      success: true,
+      providerRefundId: `sq_refund_${request.idempotencyKey}`,
     };
   }
 }
