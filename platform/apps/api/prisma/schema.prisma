@@ -108,6 +108,7 @@ model Tenant {
   bookings         Booking[]
   paymentConnections PaymentConnection[]
   portfolioProjects  PortfolioProject[]
+  analyticsAggregations AnalyticsAggregation[]
 }
 
 model TenantCustomDomain {
@@ -965,4 +966,58 @@ model ImportJob {
   @@index([tenantId])
   @@index([tenantId, status])
   @@index([artifactId])
+}
+
+// ─── Epic 11 — Business Analytics & Reporting ─────────────────────────────
+
+enum AnalyticsAggregationPeriodEnum {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum AggregationJobStatusEnum {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model AnalyticsAggregation {
+  id                    String                         @id @default(uuid())
+  createdAt             DateTime                       @default(now())
+  updatedAt             DateTime                       @updatedAt
+  tenantId              String
+  locationId            String?
+  periodType            AnalyticsAggregationPeriodEnum
+  periodStart           DateTime
+  periodEnd             DateTime
+  revenueCents          Int                            @default(0)
+  orderCount            Int                            @default(0)
+  bookingCount          Int                            @default(0)
+  newCustomerCount      Int                            @default(0)
+  returningCustomerCount Int                           @default(0)
+  channelBreakdown      Json                           @default("{}")
+  tenant                Tenant                         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, locationId, periodType, periodStart])
+  @@index([tenantId, periodType, periodStart])
+  @@index([tenantId, locationId, periodType])
+}
+
+model AggregationJob {
+  id             String                         @id @default(uuid())
+  createdAt      DateTime                       @default(now())
+  tenantId       String
+  periodType     AnalyticsAggregationPeriodEnum
+  periodStart    DateTime
+  periodEnd      DateTime
+  status         AggregationJobStatusEnum       @default(PENDING)
+  startedAt      DateTime?
+  completedAt    DateTime?
+  failedAt       DateTime?
+  failureReason  String?
+
+  @@index([tenantId, status])
+  @@index([tenantId, periodType, periodStart])
 }
