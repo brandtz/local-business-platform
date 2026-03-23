@@ -8,6 +8,12 @@
 import { inject } from "vue";
 import type { NavigationGuard } from "vue-router";
 import type { TenantModuleKey } from "@platform/types";
+import type {
+	FrontendEntitlementState,
+	NavigationGatingResult,
+	UpgradePromptPayload,
+} from "@platform/types";
+import { evaluateNavigationGating } from "@platform/types";
 
 import type { BootstrapResult, TenantFrontendContext } from "./tenant-bootstrap";
 import {
@@ -185,4 +191,112 @@ export function freezeTenantContext(
 	Object.freeze(context.enabledModules);
 
 	return Object.freeze(context);
+}
+
+// ── E12-S2-T3: Subscription-Aware Feature Gating ────────────────────────────
+
+/**
+ * Options for the subscription-aware route guard.
+ */
+export type RequireEntitlementOptions = {
+	/** Module key required for the route. */
+	requiredModule?: string;
+	/** Premium feature flag required for the route. */
+	requiredPremiumFeature?: string;
+	/** Path to redirect to when entitlement is denied. */
+	redirectTo?: string;
+	/** Path to redirect to for upgrade prompt. */
+	upgradePath?: string;
+};
+
+/**
+ * Creates a Vue Router navigation guard that checks subscription entitlements.
+ * Blocks navigation to routes requiring modules or premium features that are
+ * not included in the tenant's active subscription.
+ *
+ * When entitlement is denied, redirects to the upgrade path to show
+ * an upgrade prompt instead of silently blocking.
+ */
+export function requireEntitlement(
+	entitlementState: FrontendEntitlementState | undefined,
+	options: RequireEntitlementOptions = {},
+): NavigationGuard {
+	const redirectTo = options.redirectTo ?? "/";
+	const upgradePath = options.upgradePath ?? "/settings/billing/upgrade";
+
+	return () => {
+		if (!entitlementState) {
+			return redirectTo;
+		}
+
+		const result = evaluateNavigationGating(
+			entitlementState,
+			options.requiredModule ?? null,
+			options.requiredPremiumFeature ?? null,
+		);
+
+		if (!result.visible) {
+			return redirectTo;
+		}
+
+		if (result.visible && !result.enabled) {
+			return upgradePath;
+		}
+
+		return true;
+	};
+}
+
+/**
+ * Evaluates whether a navigation item should be shown, disabled, or hidden
+ * based on the tenant's subscription entitlements.
+ */
+export function getNavigationGating(
+	entitlementState: FrontendEntitlementState | undefined,
+	requiredModule: string | null,
+	requiredPremiumFeature: string | null,
+): NavigationGatingResult {
+	if (!entitlementState) {
+		return { visible: false };
+	}
+
+	return evaluateNavigationGating(
+		entitlementState,
+		requiredModule,
+		requiredPremiumFeature,
+	);
+}
+
+/**
+ * Returns true if the subscription is in grace period, meaning
+ * the tenant has read-only access to previously entitled features.
+ */
+export function isInGracePeriod(
+	entitlementState: FrontendEntitlementState | undefined,
+): boolean {
+	return entitlementState?.isInGracePeriod ?? false;
+}
+
+/**
+ * Returns the upgrade prompt payload for a denied feature, or null
+ * if the feature is entitled.
+ */
+export function getUpgradePromptForFeature(
+	entitlementState: FrontendEntitlementState | undefined,
+	requiredModule: string | null,
+	requiredPremiumFeature: string | null,
+): UpgradePromptPayload | null {
+	if (!entitlementState) return null;
+
+	const result = evaluateNavigationGating(
+		entitlementState,
+		requiredModule,
+		requiredPremiumFeature,
+	);
+
+	if (result.visible && !result.enabled) {
+		return result.upgradePrompt;
+	}
+
+	return null;
 }

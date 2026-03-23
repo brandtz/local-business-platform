@@ -553,3 +553,384 @@ export function hasEntitlementChanges(
 
 	return false;
 }
+
+// ─── E12-S2-T1: Tenant subscription context ────────────────────────
+
+/**
+ * Represents a tenant's active subscription and its resolved entitlements.
+ * This is the authoritative source for feature availability per tenant.
+ */
+export type TenantSubscriptionContext = {
+	tenantId: string;
+	packageId: string;
+	packageName: string;
+	packageVersionNumber: number;
+	status: TenantSubscriptionStatus;
+	entitlements: PackageEntitlementMap;
+	gracePeriodEnd: string | null;
+	subscribedAt: string;
+};
+
+export const tenantSubscriptionStatuses = [
+	"active",
+	"trialing",
+	"past_due",
+	"grace_period",
+	"canceled",
+	"expired",
+] as const;
+export type TenantSubscriptionStatus =
+	(typeof tenantSubscriptionStatuses)[number];
+
+/**
+ * Result of resolving effective module enablement from subscription entitlements
+ * merged with manual module assignments. Subscription is authoritative.
+ */
+export type EntitlementResolutionResult = {
+	effectiveModules: readonly string[];
+	source: "subscription" | "manual" | "merged";
+	restrictedModules: readonly string[];
+	upgradeSuggestion: string | null;
+};
+
+// ─── E12-S2-T2: Feature gate denial payload ────────────────────────
+
+export const featureGateDenialReasons = [
+	"module-not-entitled",
+	"premium-feature-not-entitled",
+	"usage-limit-exceeded",
+	"subscription-expired",
+	"subscription-canceled",
+	"grace-period-read-only",
+] as const;
+export type FeatureGateDenialReason =
+	(typeof featureGateDenialReasons)[number];
+
+/**
+ * Structured denial payload returned as HTTP 403 when a tenant's subscription
+ * does not include the requested feature.
+ */
+export type FeatureGateDenial = {
+	denied: true;
+	reason: FeatureGateDenialReason;
+	requiredFeature: string;
+	currentPackage: string | null;
+	upgradePrompt: UpgradePromptPayload | null;
+};
+
+export type UpgradePromptPayload = {
+	message: string;
+	suggestedPackageId: string | null;
+	suggestedPackageName: string | null;
+	ctaLabel: string;
+	ctaUrl: string;
+};
+
+// ─── E12-S2-T3: Frontend entitlement state ──────────────────────────
+
+/**
+ * Frontend-consumable entitlement state for navigation filtering,
+ * route guards, and upgrade prompt display.
+ */
+export type FrontendEntitlementState = {
+	modules: Record<string, boolean>;
+	premiumFeatures: readonly string[];
+	usageLimits: Record<string, FrontendUsageLimitState>;
+	subscriptionStatus: TenantSubscriptionStatus | null;
+	isInGracePeriod: boolean;
+	gracePeriodEnd: string | null;
+};
+
+export type FrontendUsageLimitState = {
+	current: number;
+	softLimit: number | null;
+	hardLimit: number;
+	isAtSoftLimit: boolean;
+	isAtHardLimit: boolean;
+	resetPeriod: UsageLimitResetPeriod;
+};
+
+/**
+ * Navigation item gating result for a single route or menu entry.
+ */
+export type NavigationGatingResult =
+	| { visible: true; enabled: true }
+	| { visible: true; enabled: false; upgradePrompt: UpgradePromptPayload }
+	| { visible: false };
+
+// ─── E12-S2-T4: Downgrade behavior types ────────────────────────────
+
+export const downgradeDataPolicies = [
+	"read-only",
+	"hidden",
+	"archived",
+] as const;
+export type DowngradeDataPolicy = (typeof downgradeDataPolicies)[number];
+
+/**
+ * Defines how data is treated for a module after downgrade removes its entitlement.
+ * Data is NEVER deleted on downgrade — it is preserved in read-only or archived state.
+ */
+export type DowngradeModulePolicy = {
+	moduleKey: string;
+	dataPolicy: DowngradeDataPolicy;
+	accessLevel: "read-only" | "none";
+	preserveData: true; // always true — no data deletion on downgrade
+	description: string;
+};
+
+export type DowngradeImpactAssessment = {
+	tenantId: string;
+	fromPackageId: string;
+	toPackageId: string;
+	affectedModules: DowngradeModulePolicy[];
+	affectedPremiumFeatures: string[];
+	affectedUsageLimits: {
+		limitType: UsageLimitType;
+		currentUsage: number;
+		newHardLimit: number;
+		willExceed: boolean;
+	}[];
+	gracePeriodDays: number;
+	gracePeriodEnd: string;
+};
+
+// ─── E12-S2-T5: Usage limit enforcement types ──────────────────────
+
+export const usageLimitStatuses = [
+	"within-limits",
+	"soft-limit-warning",
+	"hard-limit-reached",
+] as const;
+export type UsageLimitStatus = (typeof usageLimitStatuses)[number];
+
+export type UsageLimitCheckResult = {
+	limitType: UsageLimitType;
+	status: UsageLimitStatus;
+	currentUsage: number;
+	softLimit: number | null;
+	hardLimit: number;
+	remainingBeforeHard: number;
+	warningMessage: string | null;
+};
+
+export type UsageTrackingRecord = {
+	tenantId: string;
+	limitType: UsageLimitType;
+	currentUsage: number;
+	periodStart: string;
+	periodEnd: string;
+	lastUpdated: string;
+};
+
+/**
+ * Notification emitted when usage approaches or exceeds limits.
+ */
+export type UsageLimitNotification = {
+	tenantId: string;
+	limitType: UsageLimitType;
+	status: UsageLimitStatus;
+	currentUsage: number;
+	hardLimit: number;
+	message: string;
+	emittedAt: string;
+};
+
+// ─── E12-S2-T1: Entitlement resolution helpers ─────────────────────
+
+/**
+ * Resolves effective module enablement by merging subscription entitlements
+ * (authoritative) with manual module assignments. Subscription takes priority.
+ */
+export function resolveEffectiveModules(
+	subscriptionEntitlements: PackageEntitlementMap | null,
+	manualModules: readonly string[],
+): EntitlementResolutionResult {
+	if (!subscriptionEntitlements) {
+		return {
+			effectiveModules: manualModules,
+			source: "manual",
+			restrictedModules: [],
+			upgradeSuggestion: null,
+		};
+	}
+
+	const subscriptionModules = Object.entries(subscriptionEntitlements.modules)
+		.filter(([, enabled]) => enabled)
+		.map(([key]) => key);
+
+	const restricted = manualModules.filter(
+		(m) => !subscriptionEntitlements.modules[m],
+	);
+
+	if (restricted.length === 0 && subscriptionModules.length === manualModules.length) {
+		return {
+			effectiveModules: subscriptionModules,
+			source: "subscription",
+			restrictedModules: [],
+			upgradeSuggestion: null,
+		};
+	}
+
+	return {
+		effectiveModules: subscriptionModules,
+		source: restricted.length > 0 ? "merged" : "subscription",
+		restrictedModules: restricted,
+		upgradeSuggestion:
+			restricted.length > 0
+				? `Upgrade your plan to access: ${restricted.join(", ")}`
+				: null,
+	};
+}
+
+// ─── E12-S2-T3: Frontend entitlement state builder ─────────────────
+
+export function buildFrontendEntitlementState(
+	subscription: TenantSubscriptionContext | null,
+	usageTracking: Record<string, number>,
+): FrontendEntitlementState {
+	if (!subscription) {
+		return {
+			modules: {},
+			premiumFeatures: [],
+			usageLimits: {},
+			subscriptionStatus: null,
+			isInGracePeriod: false,
+			gracePeriodEnd: null,
+		};
+	}
+
+	const usageLimits: Record<string, FrontendUsageLimitState> = {};
+	for (const [limitType, limitConfig] of Object.entries(
+		subscription.entitlements.usageLimits,
+	)) {
+		if (!limitConfig) continue;
+		const current = usageTracking[limitType] ?? 0;
+		usageLimits[limitType] = {
+			current,
+			softLimit: limitConfig.softLimit,
+			hardLimit: limitConfig.hardLimit,
+			isAtSoftLimit:
+				limitConfig.softLimit !== null && current >= limitConfig.softLimit,
+			isAtHardLimit: current >= limitConfig.hardLimit,
+			resetPeriod: limitConfig.resetPeriod,
+		};
+	}
+
+	return {
+		modules: subscription.entitlements.modules,
+		premiumFeatures: subscription.entitlements.premiumFeatures,
+		usageLimits,
+		subscriptionStatus: subscription.status,
+		isInGracePeriod: subscription.status === "grace_period",
+		gracePeriodEnd: subscription.gracePeriodEnd,
+	};
+}
+
+// ─── E12-S2-T3: Navigation gating helper ────────────────────────────
+
+export function evaluateNavigationGating(
+	entitlementState: FrontendEntitlementState,
+	requiredModule: string | null,
+	requiredPremiumFeature: string | null,
+): NavigationGatingResult {
+	// If no requirements, always visible and enabled
+	if (!requiredModule && !requiredPremiumFeature) {
+		return { visible: true, enabled: true };
+	}
+
+	// Check module entitlement
+	if (requiredModule && !entitlementState.modules[requiredModule]) {
+		return {
+			visible: true,
+			enabled: false,
+			upgradePrompt: {
+				message: `Upgrade your plan to access ${requiredModule}`,
+				suggestedPackageId: null,
+				suggestedPackageName: null,
+				ctaLabel: "Upgrade Plan",
+				ctaUrl: "/settings/billing/upgrade",
+			},
+		};
+	}
+
+	// Check premium feature entitlement
+	if (
+		requiredPremiumFeature &&
+		!entitlementState.premiumFeatures.includes(requiredPremiumFeature)
+	) {
+		return {
+			visible: true,
+			enabled: false,
+			upgradePrompt: {
+				message: `Upgrade your plan to access ${requiredPremiumFeature}`,
+				suggestedPackageId: null,
+				suggestedPackageName: null,
+				ctaLabel: "Upgrade Plan",
+				ctaUrl: "/settings/billing/upgrade",
+			},
+		};
+	}
+
+	return { visible: true, enabled: true };
+}
+
+// ─── E12-S2-T5: Usage limit check helper ────────────────────────────
+
+export function checkUsageLimit(
+	limitType: UsageLimitType,
+	currentUsage: number,
+	limitConfig: {
+		softLimit: number | null;
+		hardLimit: number;
+		resetPeriod: UsageLimitResetPeriod;
+	},
+): UsageLimitCheckResult {
+	const remainingBeforeHard = Math.max(0, limitConfig.hardLimit - currentUsage);
+
+	if (currentUsage >= limitConfig.hardLimit) {
+		return {
+			limitType,
+			status: "hard-limit-reached",
+			currentUsage,
+			softLimit: limitConfig.softLimit,
+			hardLimit: limitConfig.hardLimit,
+			remainingBeforeHard: 0,
+			warningMessage: `You have reached the maximum limit of ${limitConfig.hardLimit} for ${formatUsageLimitTypeName(limitType)}. Please upgrade your plan to continue.`,
+		};
+	}
+
+	if (
+		limitConfig.softLimit !== null &&
+		currentUsage >= limitConfig.softLimit
+	) {
+		return {
+			limitType,
+			status: "soft-limit-warning",
+			currentUsage,
+			softLimit: limitConfig.softLimit,
+			hardLimit: limitConfig.hardLimit,
+			remainingBeforeHard,
+			warningMessage: `You are approaching your limit for ${formatUsageLimitTypeName(limitType)}. ${remainingBeforeHard} remaining before hard limit.`,
+		};
+	}
+
+	return {
+		limitType,
+		status: "within-limits",
+		currentUsage,
+		softLimit: limitConfig.softLimit,
+		hardLimit: limitConfig.hardLimit,
+		remainingBeforeHard,
+		warningMessage: null,
+	};
+}
+
+function formatUsageLimitTypeName(limitType: UsageLimitType): string {
+	const names: Record<UsageLimitType, string> = {
+		orders_per_month: "orders per month",
+		storage_gb: "storage (GB)",
+		staff_seats: "staff seats",
+	};
+	return names[limitType];
+}

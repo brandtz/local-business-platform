@@ -1,5 +1,7 @@
 // E12-S1: Unit tests for subscription package types, validation,
 // entitlement extraction, comparison model, and versioning helpers.
+// E12-S2: Tests for feature gating types, entitlement resolution,
+// frontend state builders, navigation gating, and usage limit checks.
 
 import { describe, expect, it } from "vitest";
 import {
@@ -11,11 +13,17 @@ import {
 	isValidPremiumFeatureFlag,
 	isValidUsageLimitType,
 	validateSubscriptionPackageInput,
+	resolveEffectiveModules,
+	buildFrontendEntitlementState,
+	evaluateNavigationGating,
+	checkUsageLimit,
 } from "./subscription";
 import type {
 	CreateSubscriptionPackageInput,
 	PackageEntitlementMap,
 	SubscriptionPackageWithEntitlements,
+	TenantSubscriptionContext,
+	FrontendEntitlementState,
 } from "./subscription";
 
 // ─── Helpers ────────────────────────────────────────────────────────
@@ -464,5 +472,178 @@ describe("hasEntitlementChanges", () => {
 			usageLimits: {},
 		};
 		expect(hasEntitlementChanges(base, changed)).toBe(true);
+	});
+});
+
+// ─── E12-S2-T1: resolveEffectiveModules ─────────────────────────────
+
+describe("resolveEffectiveModules", () => {
+	it("uses manual modules when no subscription entitlements", () => {
+		const result = resolveEffectiveModules(null, ["catalog", "ordering"]);
+		expect(result.source).toBe("manual");
+		expect(result.effectiveModules).toEqual(["catalog", "ordering"]);
+	});
+
+	it("subscription is authoritative source", () => {
+		const entitlements: PackageEntitlementMap = {
+			modules: { catalog: true, ordering: true },
+			premiumFeatures: [],
+			usageLimits: {},
+		};
+		const result = resolveEffectiveModules(entitlements, ["catalog", "ordering"]);
+		expect(result.source).toBe("subscription");
+		expect(result.effectiveModules).toEqual(["catalog", "ordering"]);
+	});
+
+	it("identifies restricted modules", () => {
+		const entitlements: PackageEntitlementMap = {
+			modules: { catalog: true },
+			premiumFeatures: [],
+			usageLimits: {},
+		};
+		const result = resolveEffectiveModules(entitlements, ["catalog", "ordering"]);
+		expect(result.restrictedModules).toEqual(["ordering"]);
+		expect(result.upgradeSuggestion).toContain("ordering");
+	});
+});
+
+// ─── E12-S2-T3: buildFrontendEntitlementState ───────────────────────
+
+describe("buildFrontendEntitlementState", () => {
+	const testSubscription: TenantSubscriptionContext = {
+		tenantId: "t-1",
+		packageId: "pkg-starter",
+		packageName: "Starter",
+		packageVersionNumber: 1,
+		status: "active",
+		entitlements: {
+			modules: { catalog: true, ordering: true },
+			premiumFeatures: ["advanced-analytics"],
+			usageLimits: {
+				orders_per_month: { softLimit: 100, hardLimit: 150, resetPeriod: "monthly" },
+			},
+		},
+		gracePeriodEnd: null,
+		subscribedAt: "2026-01-01T00:00:00Z",
+	};
+
+	it("builds state from subscription", () => {
+		const state = buildFrontendEntitlementState(testSubscription, { orders_per_month: 50 });
+		expect(state.modules.catalog).toBe(true);
+		expect(state.modules.ordering).toBe(true);
+		expect(state.premiumFeatures).toContain("advanced-analytics");
+		expect(state.subscriptionStatus).toBe("active");
+	});
+
+	it("returns empty state when no subscription", () => {
+		const state = buildFrontendEntitlementState(null, {});
+		expect(state.modules).toEqual({});
+		expect(state.premiumFeatures).toEqual([]);
+		expect(state.subscriptionStatus).toBeNull();
+	});
+
+	it("tracks usage limit state", () => {
+		const state = buildFrontendEntitlementState(testSubscription, { orders_per_month: 120 });
+		expect(state.usageLimits.orders_per_month.isAtSoftLimit).toBe(true);
+		expect(state.usageLimits.orders_per_month.isAtHardLimit).toBe(false);
+	});
+
+	it("detects grace period", () => {
+		const gpSub: TenantSubscriptionContext = {
+			...testSubscription,
+			status: "grace_period",
+			gracePeriodEnd: "2026-04-01T00:00:00Z",
+		};
+		const state = buildFrontendEntitlementState(gpSub, {});
+		expect(state.isInGracePeriod).toBe(true);
+		expect(state.gracePeriodEnd).toBe("2026-04-01T00:00:00Z");
+	});
+});
+
+// ─── E12-S2-T3: evaluateNavigationGating ────────────────────────────
+
+describe("evaluateNavigationGating", () => {
+	const entitlementState: FrontendEntitlementState = {
+		modules: { catalog: true, ordering: true },
+		premiumFeatures: ["advanced-analytics"],
+		usageLimits: {},
+		subscriptionStatus: "active",
+		isInGracePeriod: false,
+		gracePeriodEnd: null,
+	};
+
+	it("returns visible+enabled when no requirements", () => {
+		const result = evaluateNavigationGating(entitlementState, null, null);
+		expect(result.visible).toBe(true);
+		if (result.visible) {
+			expect(result.enabled).toBe(true);
+		}
+	});
+
+	it("returns visible+enabled for entitled module", () => {
+		const result = evaluateNavigationGating(entitlementState, "catalog", null);
+		expect(result.visible).toBe(true);
+		if (result.visible) {
+			expect(result.enabled).toBe(true);
+		}
+	});
+
+	it("returns visible+disabled with upgrade prompt for non-entitled module", () => {
+		const result = evaluateNavigationGating(entitlementState, "bookings", null);
+		expect(result.visible).toBe(true);
+		if (result.visible && !result.enabled) {
+			expect(result.upgradePrompt.ctaLabel).toBe("Upgrade Plan");
+		}
+	});
+
+	it("returns visible+enabled for entitled premium feature", () => {
+		const result = evaluateNavigationGating(entitlementState, null, "advanced-analytics");
+		expect(result.visible).toBe(true);
+		if (result.visible) {
+			expect(result.enabled).toBe(true);
+		}
+	});
+
+	it("returns visible+disabled for non-entitled premium feature", () => {
+		const result = evaluateNavigationGating(entitlementState, null, "sso");
+		expect(result.visible).toBe(true);
+		if (result.visible) {
+			expect(result.enabled).toBe(false);
+		}
+	});
+});
+
+// ─── E12-S2-T5: checkUsageLimit ─────────────────────────────────────
+
+describe("checkUsageLimit", () => {
+	const limitConfig = { softLimit: 100, hardLimit: 150, resetPeriod: "monthly" as const };
+
+	it("returns within-limits when under soft limit", () => {
+		const result = checkUsageLimit("orders_per_month", 50, limitConfig);
+		expect(result.status).toBe("within-limits");
+		expect(result.warningMessage).toBeNull();
+	});
+
+	it("returns soft-limit-warning at soft limit", () => {
+		const result = checkUsageLimit("orders_per_month", 100, limitConfig);
+		expect(result.status).toBe("soft-limit-warning");
+		expect(result.warningMessage).toBeTruthy();
+	});
+
+	it("returns hard-limit-reached at hard limit", () => {
+		const result = checkUsageLimit("orders_per_month", 150, limitConfig);
+		expect(result.status).toBe("hard-limit-reached");
+		expect(result.remainingBeforeHard).toBe(0);
+	});
+
+	it("returns remaining count before hard limit", () => {
+		const result = checkUsageLimit("orders_per_month", 120, limitConfig);
+		expect(result.remainingBeforeHard).toBe(30);
+	});
+
+	it("handles no soft limit", () => {
+		const noSoftLimit = { softLimit: null, hardLimit: 50, resetPeriod: "none" as const };
+		const result = checkUsageLimit("staff_seats", 30, noSoftLimit);
+		expect(result.status).toBe("within-limits");
 	});
 });
