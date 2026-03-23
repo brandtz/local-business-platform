@@ -13,6 +13,7 @@ import { ServicesPage, ServiceDetailPage } from "./pages/services-page";
 import { LoginPage, RegisterPage, ForgotPasswordPage } from "./pages/login-page";
 import { ContentPage } from "./pages/content-page";
 import { CartPage } from "./pages/cart-page";
+import { CheckoutPage } from "./pages/checkout-page";
 import type { WebCustomerRuntimeConfig } from "./runtime-config";
 import type { TenantFrontendContext } from "./tenant-bootstrap";
 
@@ -109,7 +110,7 @@ export function createRoutes(
 		},
 		{
 			path: "/checkout",
-			component: createPage("Checkout", "Checkout flow — coming in E13-S3"),
+			component: CheckoutPage,
 			beforeEnter: authGuard,
 			meta: { title: "Checkout", requiresAuth: true }
 		},
