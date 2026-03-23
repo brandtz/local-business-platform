@@ -17,6 +17,12 @@ import { CartPage } from "./pages/cart-page";
 import { CheckoutPage } from "./pages/checkout-page";
 import { OrderConfirmationPage } from "./pages/order-confirmation-page";
 import { BookingConfirmationPage } from "./pages/booking-confirmation-page";
+import { AccountDashboardPage } from "./pages/account-dashboard-page";
+import { AccountProfilePage } from "./pages/account-profile-page";
+import { AccountOrdersPage, AccountOrderDetailPage } from "./pages/account-orders-page";
+import { AccountBookingsPage, AccountBookingDetailPage } from "./pages/account-bookings-page";
+import { AccountLoyaltyPage } from "./pages/account-loyalty-page";
+import { AccountPaymentsPage } from "./pages/account-payments-page";
 import type { WebCustomerRuntimeConfig } from "./runtime-config";
 import type { TenantFrontendContext } from "./tenant-bootstrap";
 
@@ -136,15 +142,51 @@ export function createRoutes(
 		},
 		{
 			path: "/account",
-			component: createPage("Account", "Account overview — coming in E13-S4"),
+			component: AccountDashboardPage,
 			beforeEnter: authGuard,
 			meta: { title: "Account", requiresAuth: true }
 		},
 		{
-			path: "/account/:pathMatch(.*)*",
-			component: createPage("Account", "Account section — coming in E13-S4"),
+			path: "/account/profile",
+			component: AccountProfilePage,
 			beforeEnter: authGuard,
-			meta: { title: "Account", requiresAuth: true }
+			meta: { title: "Profile Settings", requiresAuth: true }
+		},
+		{
+			path: "/account/orders",
+			component: AccountOrdersPage,
+			beforeEnter: authGuard,
+			meta: { title: "Order History", requiresAuth: true }
+		},
+		{
+			path: "/account/orders/:orderId",
+			component: AccountOrderDetailPage,
+			beforeEnter: authGuard,
+			meta: { title: "Order Details", requiresAuth: true }
+		},
+		{
+			path: "/account/bookings",
+			component: AccountBookingsPage,
+			beforeEnter: authGuard,
+			meta: { title: "Bookings", requiresAuth: true }
+		},
+		{
+			path: "/account/bookings/:bookingId",
+			component: AccountBookingDetailPage,
+			beforeEnter: authGuard,
+			meta: { title: "Booking Details", requiresAuth: true }
+		},
+		{
+			path: "/account/loyalty",
+			component: AccountLoyaltyPage,
+			beforeEnter: authGuard,
+			meta: { title: "Loyalty & Rewards", requiresAuth: true }
+		},
+		{
+			path: "/account/payment-methods",
+			component: AccountPaymentsPage,
+			beforeEnter: authGuard,
+			meta: { title: "Payment Methods", requiresAuth: true }
 		},
 
 		// ── Content Pages ──────────────────────────────────────────────────
