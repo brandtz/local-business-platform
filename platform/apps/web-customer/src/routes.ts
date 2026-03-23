@@ -10,8 +10,13 @@ import { HomePage } from "./pages/home-page";
 import { CatalogPage } from "./pages/catalog-page";
 import { ItemDetailPage } from "./pages/item-detail-page";
 import { ServicesPage, ServiceDetailPage } from "./pages/services-page";
+import { BookingPage } from "./pages/booking-page";
 import { LoginPage, RegisterPage, ForgotPasswordPage } from "./pages/login-page";
 import { ContentPage } from "./pages/content-page";
+import { CartPage } from "./pages/cart-page";
+import { CheckoutPage } from "./pages/checkout-page";
+import { OrderConfirmationPage } from "./pages/order-confirmation-page";
+import { BookingConfirmationPage } from "./pages/booking-confirmation-page";
 import type { WebCustomerRuntimeConfig } from "./runtime-config";
 import type { TenantFrontendContext } from "./tenant-bootstrap";
 
@@ -82,6 +87,11 @@ export function createRoutes(
 			component: ServiceDetailPage,
 			meta: { title: "Service Detail" }
 		},
+		{
+			path: "/book/:serviceId",
+			component: BookingPage,
+			meta: { title: "Book Service" }
+		},
 
 		// ── Auth Pages ─────────────────────────────────────────────────────
 		{
@@ -103,14 +113,26 @@ export function createRoutes(
 		// ── Protected Routes (account, checkout) ───────────────────────────
 		{
 			path: "/cart",
-			component: createPage("Cart", "Shopping cart — coming in E13-S3"),
+			component: CartPage,
 			meta: { title: "Cart" }
 		},
 		{
 			path: "/checkout",
-			component: createPage("Checkout", "Checkout flow — coming in E13-S3"),
+			component: CheckoutPage,
 			beforeEnter: authGuard,
 			meta: { title: "Checkout", requiresAuth: true }
+		},
+		{
+			path: "/orders/:orderId/confirmation",
+			component: OrderConfirmationPage,
+			beforeEnter: authGuard,
+			meta: { title: "Order Confirmation", requiresAuth: true }
+		},
+		{
+			path: "/bookings/:bookingId/confirmation",
+			component: BookingConfirmationPage,
+			beforeEnter: authGuard,
+			meta: { title: "Booking Confirmation", requiresAuth: true }
 		},
 		{
 			path: "/account",
