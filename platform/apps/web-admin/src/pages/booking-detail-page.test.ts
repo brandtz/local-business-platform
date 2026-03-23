@@ -5,9 +5,8 @@ import { describe, expect, it } from "vitest";
 import {
 	buildBookingDetailViewModel,
 	getAvailableExceptionActions,
-	formatBookingDateTime,
 } from "../booking-management";
-import type { AdminBookingDetail, BookingStatus } from "@platform/types";
+import type { AdminBookingDetail } from "@platform/types";
 import { getBookingQuickActions, isBookingCancellable } from "@platform/types";
 
 const NOW = new Date("2026-04-01T12:00:00Z").getTime();

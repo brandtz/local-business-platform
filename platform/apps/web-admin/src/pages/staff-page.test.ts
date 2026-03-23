@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { StaffProfileRecord, StaffScheduleWindowRecord } from "@platform/types";
+import type { StaffProfileRecord } from "@platform/types";
 import { validateStaffProfileInput, validateScheduleWindow, detectScheduleConflicts } from "@platform/types";
 
 describe("StaffPage helpers", () => {

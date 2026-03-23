@@ -7,7 +7,7 @@ import {
 	formatCents,
 	formatAddress,
 } from "../order-management";
-import type { AdminOrderDetail, OrderStatus } from "@platform/types";
+import type { AdminOrderDetail } from "@platform/types";
 import { getOrderQuickActions, isOrderCancellable } from "@platform/types";
 
 const NOW = new Date("2026-03-23T12:00:00Z").getTime();

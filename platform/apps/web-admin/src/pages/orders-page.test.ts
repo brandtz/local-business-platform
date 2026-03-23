@@ -6,7 +6,6 @@ import {
 	buildOrderListRow,
 	buildPipelineView,
 	getOrderStatusBadge,
-	formatCents,
 } from "../order-management";
 import type { AdminOrderSummary, OrderPipelineCounts, OrderStatus } from "@platform/types";
 
