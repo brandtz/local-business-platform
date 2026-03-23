@@ -169,7 +169,8 @@ export const tenantModuleKeys = [
 	"content",
 	"operations",
 	"portfolio",
-	"loyalty"
+	"loyalty",
+	"quotes"
 ] as const;
 
 export type TenantModuleKey = (typeof tenantModuleKeys)[number];
@@ -240,6 +241,13 @@ const moduleRegistry: Record<TenantModuleKey, ModuleRegistryEntry> = {
 		displayName: "Loyalty",
 		key: "loyalty",
 		requiredDependencies: ["ordering"]
+	},
+	quotes: {
+		category: "commerce",
+		description: "Quote and estimate management for service-oriented businesses",
+		displayName: "Quotes",
+		key: "quotes",
+		requiredDependencies: ["catalog"]
 	}
 };
 

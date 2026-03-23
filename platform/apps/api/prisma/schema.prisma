@@ -111,6 +111,7 @@ model Tenant {
   analyticsAggregations AnalyticsAggregation[]
   loyaltyProgramConfig  LoyaltyProgramConfig?
   customerLoyaltyAccounts CustomerLoyaltyAccount[]
+  quotes               Quote[]
 }
 
 model TenantCustomDomain {
@@ -1099,4 +1100,76 @@ model PointLedgerEntry {
   @@index([tenantId, customerId, createdAt])
   @@index([tenantId, customerId, type])
   @@index([expiresAt])
+}
+
+// ---------------------------------------------------------------------------
+// Quote Management (E11-S4)
+// ---------------------------------------------------------------------------
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  VIEWED
+  ACCEPTED
+  DECLINED
+  REVISION_REQUESTED
+  EXPIRED
+}
+
+model Quote {
+  id                   String      @id @default(uuid())
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  tenantId             String
+  quoteNumber          String
+  customerName         String
+  customerEmail        String
+  customerPhone        String?
+  status               QuoteStatus @default(DRAFT)
+  validityDays         Int         @default(30)
+  expiresAt            DateTime
+  notes                String?
+  customerNotes        String?
+  termsAndConditions   String?
+  subtotalCents        Int         @default(0)
+  taxEstimateCents     Int         @default(0)
+  totalCents           Int         @default(0)
+  shareToken           String      @unique
+  shareTokenExpiresAt  DateTime
+  sentAt               DateTime?
+  viewedAt             DateTime?
+  respondedAt          DateTime?
+  acceptedAt           DateTime?
+  declinedAt           DateTime?
+  revisionRequestedAt  DateTime?
+  expiredAt            DateTime?
+  convertedOrderId     String?
+  respondentEmail      String?
+  respondentName       String?
+  revisionNotes        String?
+  lineItems            QuoteLineItem[]
+  tenant               Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, quoteNumber])
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, customerEmail])
+  @@index([shareToken])
+  @@index([expiresAt, status])
+}
+
+model QuoteLineItem {
+  id             String  @id @default(uuid())
+  quoteId        String
+  sortOrder      Int     @default(0)
+  catalogItemId  String?
+  serviceId      String?
+  description    String
+  quantity       Int
+  unitPriceCents Int
+  lineTotalCents Int
+  lineNotes      String?
+  quote          Quote   @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@index([quoteId, sortOrder])
 }
