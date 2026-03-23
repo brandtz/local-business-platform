@@ -26,13 +26,7 @@ const sidebarSectionConfig: Record<string, { icon: string; children?: { label: s
 			{ label: "Services", path: "/catalog/services" },
 		],
 	},
-	"/ordering": {
-		icon: "🛒",
-		children: [
-			{ label: "Orders", path: "/ordering" },
-			{ label: "Bookings", path: "/bookings" },
-		],
-	},
+	"/ordering": { icon: "🛒" },
 	"/bookings": { icon: "📅" },
 	"/content": {
 		icon: "📄",
@@ -42,7 +36,13 @@ const sidebarSectionConfig: Record<string, { icon: string; children?: { label: s
 			{ label: "Locations", path: "/content/locations" },
 		],
 	},
-	"/operations": { icon: "⚙️" },
+	"/operations": {
+		icon: "⚙️",
+		children: [
+			{ label: "Analytics", path: "/analytics" },
+			{ label: "Loyalty", path: "/loyalty" },
+		],
+	},
 	"/users": {
 		icon: "👥",
 		children: [
@@ -56,7 +56,6 @@ const sidebarSectionConfig: Record<string, { icon: string; children?: { label: s
 			{ label: "Profile & Branding", path: "/settings/profile" },
 			{ label: "Payments", path: "/settings/payments" },
 			{ label: "Users", path: "/settings/users" },
-			{ label: "Activity Log", path: "/settings/activity" },
 		],
 	},
 	"/audit": { icon: "📋" },

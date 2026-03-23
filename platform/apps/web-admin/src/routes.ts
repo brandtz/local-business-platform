@@ -155,10 +155,10 @@ export function createRoutes(
       meta: { requiresAuth: true },
     },
 
-    // ── Operations (placeholder) ───────────────────────────────────────────
+    // ── Operations ─────────────────────────────────────────────────────────
     {
       path: "/operations",
-      component: createPage("Operations", "Configure hours, locations, and fulfillment."),
+      redirect: "/analytics",
       meta: { requiresAuth: true },
     },
 
