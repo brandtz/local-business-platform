@@ -18,6 +18,12 @@ import { PaymentSettingsPage } from "./pages/payment-settings-page";
 import { UserManagementPage } from "./pages/user-management-page";
 import { ActivityLogPage } from "./pages/activity-log-page";
 import { AdminLoginPage } from "./pages/admin-login-page";
+import { CatalogCategoriesPage } from "./pages/catalog-categories-page";
+import { CatalogProductsPage } from "./pages/catalog-products-page";
+import { CatalogServicesPage } from "./pages/catalog-services-page";
+import { ContentLocationsPage } from "./pages/content-locations-page";
+import { ContentPagesPage } from "./pages/content-pages-page";
+import { ContentAnnouncementsPage } from "./pages/content-announcements-page";
 
 // ── Placeholder page factory ─────────────────────────────────────────────────
 
@@ -68,30 +74,30 @@ export function createRoutes(
           })
     },
 
-    // ── Catalog (placeholder) ──────────────────────────────────────────────
+    // ── Catalog ──────────────────────────────────────────────────────────
     {
       path: "/catalog",
-      component: createPage("Catalog", "Manage your products, services, and categories."),
+      redirect: "/catalog/categories",
       meta: { requiresAuth: true },
     },
     {
       path: "/catalog/categories",
-      component: createPage("Categories", "Organize your catalog with categories."),
+      component: CatalogCategoriesPage,
       meta: { requiresAuth: true },
     },
     {
       path: "/catalog/products",
-      component: createPage("Products", "Manage your product listings."),
+      component: CatalogProductsPage,
       meta: { requiresAuth: true },
     },
     {
       path: "/catalog/services",
-      component: createPage("Services", "Manage your service offerings."),
+      component: CatalogServicesPage,
       meta: { requiresAuth: true },
     },
     {
       path: "/catalog/new",
-      component: createPage("New Product", "Create a new product."),
+      component: CatalogProductsPage,
       meta: { requiresAuth: true },
     },
 
@@ -114,25 +120,25 @@ export function createRoutes(
       meta: { requiresAuth: true },
     },
 
-    // ── Content (placeholder) ──────────────────────────────────────────────
+    // ── Content ──────────────────────────────────────────────────────────
     {
       path: "/content",
-      component: createPage("Content", "Manage storefront pages and media."),
+      redirect: "/content/pages",
       meta: { requiresAuth: true },
     },
     {
       path: "/content/pages",
-      component: createPage("Pages", "Manage content pages."),
+      component: ContentPagesPage,
       meta: { requiresAuth: true },
     },
     {
       path: "/content/announcements",
-      component: createPage("Announcements", "Create and manage announcements."),
+      component: ContentAnnouncementsPage,
       meta: { requiresAuth: true },
     },
     {
       path: "/content/locations",
-      component: createPage("Locations", "Manage business locations."),
+      component: ContentLocationsPage,
       meta: { requiresAuth: true },
     },
 
