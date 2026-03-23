@@ -19,3 +19,15 @@ export function createSdkClientDescriptor(
 
 // E4-S6-T1: Shared API client conventions and error boundary patterns
 export * from "./api-client";
+
+// HTTP transport layer
+export * from "./http-transport";
+
+// Client factory
+export * from "./client-factory";
+
+// Domain API namespaces
+export * from "./domains";
+
+// Pagination helpers
+export * from "./pagination";
