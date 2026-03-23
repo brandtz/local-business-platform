@@ -3,12 +3,16 @@
 // on failure a shell state renders based on the bootstrap outcome.
 // Security: failure shells must NOT expose tenant identifiers or configuration.
 
-import { createApp, defineComponent, h } from "vue";
-import { createRouter, createWebHistory, RouterLink, RouterView } from "vue-router";
+import { createApp, defineComponent, h, ref } from "vue";
+import { createRouter, createWebHistory } from "vue-router";
 
 import type { ShellStateDescriptor } from "@platform/ui";
 import { createApiClientConfig } from "@platform/sdk";
 
+import { SDK_CLIENT_KEY, createCustomerSdkClient } from "./composables/use-sdk";
+import { createInitialAuthState } from "./composables/use-auth";
+import { CustomerLayout } from "./layout/customer-layout";
+import { createInitialCartState } from "./cart-state";
 import { createRoutes } from "./routes";
 import { getRuntimeConfig } from "./runtime-config";
 import {
@@ -76,22 +80,37 @@ function mountApp(
 		routes: createRoutes(runtimeConfig, frozenContext)
 	});
 
+	// Create SDK client for API calls
+	const sdkClient = createCustomerSdkClient(
+		import.meta.env.VITE_API_BASE_URL
+	);
+	sdkClient.transport.setTenantId(frozenContext.tenantId);
+
 	const AppShell = defineComponent({
 		name: "WebCustomerShell",
 		setup() {
+			const authState = ref(createInitialAuthState());
+			const cartState = ref(createInitialCartState());
+
+			function onLogout(): void {
+				authState.value = {
+					isAuthenticated: false,
+					user: null,
+					token: null,
+					isLoading: false,
+					error: null,
+				};
+				sdkClient.transport.clearAuthToken();
+				router.push("/");
+			}
+
 			return () =>
-				h("div", { class: "app-shell" }, [
-					h("header", [
-						h("h1", frozenContext.displayName),
-						h("p", `Tenant: ${frozenContext.slug} | Template: ${frozenContext.templateKey}`)
-					]),
-					h("nav", [
-						h(RouterLink, { to: "/" }, { default: () => "Home" }),
-						" | ",
-						h(RouterLink, { to: "/status" }, { default: () => "Status" })
-					]),
-					h("main", [h(RouterView)])
-				]);
+				h(CustomerLayout, {
+					tenantContext: frozenContext,
+					authState: authState.value,
+					cartState: cartState.value,
+					onLogout,
+				});
 		}
 	});
 
@@ -99,6 +118,7 @@ function mountApp(
 
 	app.provide(TENANT_CONTEXT_KEY, frozenContext);
 	app.provide(TENANT_BOOTSTRAP_RESULT_KEY, result);
+	app.provide(SDK_CLIENT_KEY, sdkClient);
 	app.use(router);
 	app.mount("#app");
 }
