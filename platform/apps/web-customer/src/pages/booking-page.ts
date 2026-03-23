@@ -25,11 +25,11 @@ function todayDateString(): string {
 	return `${year}-${month}-${day}`;
 }
 
-function formatPrice(cents: number): string {
+export function formatBookingPrice(cents: number): string {
 	return `$${(cents / 100).toFixed(2)}`;
 }
 
-function formatTimeFromISO(iso: string): string {
+export function formatTimeFromISO(iso: string): string {
 	const date = new Date(iso);
 	let hours = date.getHours();
 	const minutes = String(date.getMinutes()).padStart(2, "0");
@@ -200,7 +200,7 @@ function renderSummary(
 			h("dt", "Duration"),
 			h("dd", { "data-testid": "summary-duration" }, `${service.durationMinutes} minutes`),
 			h("dt", "Price"),
-			h("dd", { "data-testid": "summary-price" }, formatPrice(service.price)),
+			h("dd", { "data-testid": "summary-price" }, formatBookingPrice(service.price)),
 			h("dt", "Date"),
 			h("dd", { "data-testid": "summary-date" }, selectedDate || "—"),
 			h("dt", "Time"),

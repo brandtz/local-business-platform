@@ -29,13 +29,33 @@ import { useTenantContext } from "../tenant-context-consumer";
 
 const CART_STORAGE_KEY = "__platform_customer_cart__";
 
-const STEP_LABELS = ["Fulfillment", "Payment", "Review"] as const;
+export const STEP_LABELS = ["Fulfillment", "Payment", "Review"] as const;
 
-const TIP_PRESETS = [
+export const TIP_PRESETS = [
 	{ label: "15%", multiplier: 0.15 },
 	{ label: "18%", multiplier: 0.18 },
 	{ label: "20%", multiplier: 0.20 },
 ] as const;
+
+export function calculateTipCents(selection: string, subtotalCents: number, customCents: number): number {
+	if (selection === "custom") return customCents;
+	const preset = TIP_PRESETS.find((p) => p.label === selection);
+	if (preset) return Math.round(subtotalCents * preset.multiplier);
+	return 0;
+}
+
+export function validateDeliveryAddress(addr: { line1: string; city: string; state: string; zip: string }): boolean {
+	return addr.line1.trim() !== "" &&
+		addr.city.trim() !== "" &&
+		addr.state.trim() !== "" &&
+		addr.zip.trim() !== "";
+}
+
+export function validateNewCard(card: { number: string; expiry: string; cvv: string }): boolean {
+	return card.number.trim() !== "" &&
+		card.expiry.trim() !== "" &&
+		card.cvv.trim() !== "";
+}
 
 // ── Persistence Helpers ──────────────────────────────────────────────────────
 
@@ -700,10 +720,7 @@ export const CheckoutPage = defineComponent({
 		}
 
 		function getTipCents(): number {
-			if (tipSelection.value === "custom") return customTipCents.value;
-			const preset = TIP_PRESETS.find((p) => p.label === tipSelection.value);
-			if (preset) return Math.round(getSubtotalCents() * preset.multiplier);
-			return 0;
+			return calculateTipCents(tipSelection.value, getSubtotalCents(), customTipCents.value);
 		}
 
 		function getSelectedLocation(): LocationRecord | null {
@@ -806,11 +823,7 @@ export const CheckoutPage = defineComponent({
 
 		function validateFulfillmentStep(): boolean {
 			if (fulfillmentMode.value === "delivery") {
-				const addr = deliveryAddress.value;
-				return addr.line1.trim() !== "" &&
-					addr.city.trim() !== "" &&
-					addr.state.trim() !== "" &&
-					addr.zip.trim() !== "";
+				return validateDeliveryAddress(deliveryAddress.value);
 			}
 			// Pickup: location must be selected
 			return selectedLocationId.value !== null && selectedLocationId.value !== "";
@@ -818,9 +831,7 @@ export const CheckoutPage = defineComponent({
 
 		function validatePaymentStep(): boolean {
 			if (useNewCard.value) {
-				return newCard.value.number.trim() !== "" &&
-					newCard.value.expiry.trim() !== "" &&
-					newCard.value.cvv.trim() !== "";
+				return validateNewCard(newCard.value);
 			}
 			return selectedPaymentId.value !== null;
 		}

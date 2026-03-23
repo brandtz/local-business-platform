@@ -16,11 +16,11 @@ import { getAuthViewerState } from "../auth-state";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const CART_STORAGE_KEY = "__platform_customer_cart__";
+export const CART_STORAGE_KEY = "__platform_customer_cart__";
 
 // ── Persistence Helpers ──────────────────────────────────────────────────────
 
-function persistCart(state: CartState): void {
+export function persistCart(state: CartState): void {
 	if (typeof window === "undefined") return;
 	try {
 		window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state));
@@ -29,7 +29,7 @@ function persistCart(state: CartState): void {
 	}
 }
 
-function restoreCart(): CartState {
+export function restoreCart(): CartState {
 	if (typeof window === "undefined") return createInitialCartState();
 	try {
 		const raw = window.localStorage.getItem(CART_STORAGE_KEY);
@@ -45,11 +45,11 @@ function restoreCart(): CartState {
 
 // ── Format Helper ────────────────────────────────────────────────────────────
 
-function formatCents(cents: number): string {
+export function formatCents(cents: number): string {
 	return `$${(cents / 100).toFixed(2)}`;
 }
 
-function recalculateQuoteTotals(quote: PricingQuote): PricingQuote {
+export function recalculateQuoteTotals(quote: PricingQuote): PricingQuote {
 	const subtotal = quote.lineItems.reduce((sum, li) => sum + li.lineTotalCents, 0);
 	return {
 		...quote,
