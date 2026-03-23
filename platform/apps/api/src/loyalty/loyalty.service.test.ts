@@ -1,6 +1,6 @@
 // E11-S2: Loyalty service unit tests
 
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
 	LoyaltyService,
 	LoyaltyValidationError,
