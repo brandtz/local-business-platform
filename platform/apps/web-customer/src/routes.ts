@@ -10,6 +10,7 @@ import { HomePage } from "./pages/home-page";
 import { CatalogPage } from "./pages/catalog-page";
 import { ItemDetailPage } from "./pages/item-detail-page";
 import { ServicesPage, ServiceDetailPage } from "./pages/services-page";
+import { BookingPage } from "./pages/booking-page";
 import { LoginPage, RegisterPage, ForgotPasswordPage } from "./pages/login-page";
 import { ContentPage } from "./pages/content-page";
 import { CartPage } from "./pages/cart-page";
@@ -84,6 +85,11 @@ export function createRoutes(
 			path: "/services/:serviceId",
 			component: ServiceDetailPage,
 			meta: { title: "Service Detail" }
+		},
+		{
+			path: "/book/:serviceId",
+			component: BookingPage,
+			meta: { title: "Book Service" }
 		},
 
 		// ── Auth Pages ─────────────────────────────────────────────────────
