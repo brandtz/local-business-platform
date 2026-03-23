@@ -9,7 +9,6 @@ import {
 	buildDefaultWeekHours,
 	contentTabs,
 	getContentTabLabel,
-	weekdays,
 	type ContentTab,
 	type DayHours,
 	type LocationDisplayRow,
@@ -132,7 +131,6 @@ function renderHoursGrid(
 	hours: DayHours[],
 	onHoursChange: (index: number, field: keyof DayHours, value: string | boolean) => void,
 ) {
-	void weekdays;
 	return h("div", { class: "hours-grid", "data-testid": "hours-grid" },
 		hours.map((day, i) =>
 			h("div", { class: "hours-grid__row", key: day.day }, [

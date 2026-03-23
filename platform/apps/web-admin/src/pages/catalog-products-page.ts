@@ -7,7 +7,6 @@ import { useSdk } from "../composables/use-sdk";
 import {
 	buildProductDisplayRow,
 	catalogTabs,
-	formatPriceCents,
 	generateSlug,
 	getCatalogTabLabel,
 	getProductBulkActionLabel,
@@ -650,5 +649,3 @@ export const CatalogProductsPage = defineComponent({
 		};
 	},
 });
-
-void formatPriceCents;

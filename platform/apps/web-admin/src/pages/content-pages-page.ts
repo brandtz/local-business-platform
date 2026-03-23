@@ -8,7 +8,6 @@ import {
 	buildContentPageDisplayCard,
 	contentTabs,
 	generateSlugFromTitle,
-	getContentPageStatusBadge,
 	getContentTabLabel,
 	type ContentPageDisplayCard,
 	type ContentTab,
@@ -28,6 +27,7 @@ type PageFormData = {
 	seoDescription: string;
 	seoTitle: string;
 	slug: string;
+	status: ContentPageStatus;
 	title: string;
 };
 
@@ -50,6 +50,7 @@ function emptyPageForm(): PageFormData {
 		seoDescription: "",
 		seoTitle: "",
 		slug: "",
+		status: "draft",
 		title: "",
 	};
 }
@@ -254,7 +255,6 @@ function renderPageEditor(
 export const ContentPagesPage = defineComponent({
 	name: "ContentPagesPage",
 	setup() {
-		void getContentPageStatusBadge;
 
 		const state = ref<ContentPagesState>({
 			editTarget: null,
@@ -314,6 +314,7 @@ export const ContentPagesPage = defineComponent({
 					seoDescription: page.seoDescription ?? "",
 					seoTitle: page.seoTitle ?? "",
 					slug: page.slug,
+					status: page.status,
 					title: page.title,
 				},
 				formError: null,
@@ -332,7 +333,8 @@ export const ContentPagesPage = defineComponent({
 			state.value = { ...state.value, formData };
 		}
 
-		async function savePage(status: ContentPageStatus) {
+		async function savePage(targetStatus: ContentPageStatus) {
+			state.value = { ...state.value, formData: { ...state.value.formData, status: targetStatus } };
 			const { formData, editTarget } = state.value;
 			if (!formData.title.trim()) {
 				state.value = { ...state.value, formError: "Title is required" };
@@ -364,7 +366,6 @@ export const ContentPagesPage = defineComponent({
 					await sdk.content.createPage(params);
 				}
 				state.value = { ...state.value, isSaving: false, showEditor: false };
-				void status;
 				await loadPages();
 			} catch (err) {
 				state.value = {

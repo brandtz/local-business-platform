@@ -7,7 +7,6 @@ import { useSdk } from "../composables/use-sdk";
 import {
 	buildCategoryTree,
 	catalogTabs,
-	formatPriceCents,
 	generateSlug,
 	getCatalogTabLabel,
 	getCategoryStatusBadge,
@@ -293,7 +292,6 @@ function renderDeleteConfirm(
 export const CatalogCategoriesPage = defineComponent({
 	name: "CatalogCategoriesPage",
 	setup() {
-		void formatPriceCents;
 
 		const state = ref<CategoryPageState>({
 			categories: [],

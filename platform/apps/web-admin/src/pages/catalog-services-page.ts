@@ -6,10 +6,6 @@ import { defineComponent, h, onMounted, ref } from "vue";
 import { useSdk } from "../composables/use-sdk";
 import {
 	buildServiceDisplayRow,
-	formatDuration,
-	formatPrice,
-	getServiceStatusBadge,
-	buildBookingConfigSummary,
 	type ServiceDisplayRow,
 } from "../services-views";
 import {
@@ -320,10 +316,6 @@ function renderServiceFormPanel(
 export const CatalogServicesPage = defineComponent({
 	name: "CatalogServicesPage",
 	setup() {
-		void formatDuration;
-		void formatPrice;
-		void getServiceStatusBadge;
-		void buildBookingConfigSummary;
 
 		const state = ref<ServicePageState>({
 			editTarget: null,
