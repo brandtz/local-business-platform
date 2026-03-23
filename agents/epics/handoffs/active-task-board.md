@@ -209,6 +209,13 @@ Use this file to track the active execution queue.
 - E11-S3-T4 | owner lane: API Surface Lane | handoff: ./2026-03-22-E11-S3-T4.md
 - E11-S3-T5 | owner lane: API Surface Lane | handoff: ./2026-03-22-E11-S3-T5.md
 - E11-S3-T6 | owner lane: API Surface Lane | handoff: ./2026-03-22-E11-S3-T6.md
+- E11-S2-T1 | owner lane: API Surface Lane | handoff: ./2026-03-22-E11-S2-T1.md
+- E11-S2-T2 | owner lane: API Surface Lane | handoff: ./2026-03-22-E11-S2-T2.md
+- E11-S2-T3 | owner lane: API Surface Lane | handoff: ./2026-03-22-E11-S2-T3.md
+- E11-S2-T4 | owner lane: API Surface Lane | handoff: ./2026-03-22-E11-S2-T4.md
+- E11-S2-T5 | owner lane: API Surface Lane | handoff: ./2026-03-22-E11-S2-T5.md
+- E11-S2-T6 | owner lane: API Surface Lane | handoff: ./2026-03-22-E11-S2-T6.md
+- E11-S2-T7 | owner lane: API Surface Lane | handoff: ./2026-03-22-E11-S2-T7.md
 
 ## Board Rules
 

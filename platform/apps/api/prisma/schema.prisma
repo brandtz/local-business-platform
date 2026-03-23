@@ -109,6 +109,8 @@ model Tenant {
   paymentConnections PaymentConnection[]
   portfolioProjects  PortfolioProject[]
   analyticsAggregations AnalyticsAggregation[]
+  loyaltyProgramConfig  LoyaltyProgramConfig?
+  customerLoyaltyAccounts CustomerLoyaltyAccount[]
 }
 
 model TenantCustomDomain {
@@ -1020,4 +1022,81 @@ model AggregationJob {
 
   @@index([tenantId, status])
   @@index([tenantId, periodType, periodStart])
+}
+
+// ---------------------------------------------------------------------------
+// E11-S2: Customer Loyalty and Rewards Program
+// ---------------------------------------------------------------------------
+
+enum PointAccumulationModeEnum {
+  PER_DOLLAR
+  PER_ORDER
+}
+
+enum PointExpirationPolicyEnum {
+  TIME_BASED
+  ROLLING
+  NEVER
+}
+
+enum LedgerEntryTypeEnum {
+  EARN
+  REDEEM
+  EXPIRE
+  ADJUST
+}
+
+model LoyaltyProgramConfig {
+  id                      String                    @id @default(uuid())
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  tenantId                String                    @unique
+  enabled                 Boolean                   @default(false)
+  tiers                   Json                      @default("[]")
+  accumulationMode        PointAccumulationModeEnum  @default(PER_DOLLAR)
+  pointsPerDollar         Int                       @default(1)
+  pointsPerOrder          Int                       @default(10)
+  pointRedemptionRate     Int                       @default(100)
+  minimumRedemptionPoints Int                       @default(100)
+  expirationPolicy        PointExpirationPolicyEnum @default(ROLLING)
+  expirationDays          Int                       @default(365)
+  tenant                  Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model CustomerLoyaltyAccount {
+  id             String           @id @default(uuid())
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  tenantId       String
+  customerId     String
+  currentTier    String           @default("bronze")
+  pointBalance   Int              @default(0)
+  lifetimePoints Int              @default(0)
+  memberSince    DateTime         @default(now())
+  ledgerEntries  PointLedgerEntry[]
+  tenant         Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, customerId])
+  @@index([tenantId, currentTier])
+  @@index([tenantId, pointBalance])
+}
+
+model PointLedgerEntry {
+  id             String               @id @default(uuid())
+  createdAt      DateTime             @default(now())
+  tenantId       String
+  customerId     String
+  accountId      String
+  type           LedgerEntryTypeEnum
+  points         Int
+  balanceAfter   Int
+  description    String
+  referenceType  String?
+  referenceId    String?
+  expiresAt      DateTime?
+  account        CustomerLoyaltyAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, customerId, createdAt])
+  @@index([tenantId, customerId, type])
+  @@index([expiresAt])
 }
