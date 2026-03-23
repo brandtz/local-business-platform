@@ -3,7 +3,7 @@
 // Fetches data via SDK payments API.
 
 import { defineComponent, h, ref, onMounted, type VNode } from "vue";
-import { RouterLink, useRoute } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 
 import type { PaymentMethodSummary } from "@platform/sdk";
 
@@ -248,6 +248,7 @@ export const AccountPaymentsPage = defineComponent({
 	setup() {
 		const sdk = useSdk();
 		const route = useRoute();
+		const router = useRouter();
 
 		const loading = ref(true);
 		const error = ref<string | null>(null);
@@ -330,8 +331,8 @@ export const AccountPaymentsPage = defineComponent({
 
 		async function setDefault(id: string): Promise<void> {
 			try {
-				// Remove then re-add with default flag (SDK limitation)
-				// In practice the SDK would have a setDefault endpoint
+				// Use the SDK transport to PATCH the payment method as default
+				await sdk.transport.patch(`/payments/methods/${id}`, { isDefault: true });
 				await fetchMethods();
 			} catch {
 				error.value = "Unable to update default payment method.";
@@ -348,7 +349,7 @@ export const AccountPaymentsPage = defineComponent({
 				class: "account-payments-page",
 				"data-testid": "account-payments-page",
 			}, [
-				renderAccountSidebar(route.path),
+				renderAccountSidebar(route.path, (path) => router.push(path)),
 				h("div", { class: "account-payments__content" }, [
 					h("h1", { class: "account-payments__heading" }, "Payment Methods"),
 					error.value

@@ -3,7 +3,7 @@
 // Fetches data via SDK orders API.
 
 import { defineComponent, h, ref, onMounted, type VNode } from "vue";
-import { RouterLink, useRoute } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 
 import type {
 	AdminOrderSummary,
@@ -369,6 +369,7 @@ export const AccountOrdersPage = defineComponent({
 	setup() {
 		const sdk = useSdk();
 		const route = useRoute();
+		const router = useRouter();
 
 		const loading = ref(true);
 		const error = ref<string | null>(null);
@@ -423,7 +424,7 @@ export const AccountOrdersPage = defineComponent({
 				class: "account-orders-page",
 				"data-testid": "account-orders-page",
 			}, [
-				renderAccountSidebar(route.path),
+				renderAccountSidebar(route.path, (path) => router.push(path)),
 				h("div", { class: "account-orders__content" }, [
 					h("h1", { class: "account-orders__heading" }, "Order History"),
 					renderStatusTabs(activeFilter.value, selectFilter),
@@ -448,6 +449,7 @@ export const AccountOrderDetailPage = defineComponent({
 	setup() {
 		const sdk = useSdk();
 		const route = useRoute();
+		const router = useRouter();
 
 		const loading = ref(true);
 		const error = ref<string | null>(null);
@@ -497,7 +499,7 @@ export const AccountOrderDetailPage = defineComponent({
 				class: "account-order-detail-page",
 				"data-testid": "account-order-detail-page",
 			}, [
-				renderAccountSidebar(route.path),
+				renderAccountSidebar(route.path, (path) => router.push(path)),
 				h("div", { class: "account-order-detail__content" }, [
 					h("h1", {
 						class: "account-order-detail__heading",

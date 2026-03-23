@@ -3,7 +3,7 @@
 // Fetches data via SDK bookings API.
 
 import { defineComponent, h, ref, onMounted, type VNode } from "vue";
-import { RouterLink, useRoute } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 
 import type { AdminBookingSummary, AdminBookingDetail, BookingStatus } from "@platform/types";
 
@@ -287,6 +287,7 @@ export const AccountBookingsPage = defineComponent({
 	setup() {
 		const sdk = useSdk();
 		const route = useRoute();
+		const router = useRouter();
 
 		const loading = ref(true);
 		const error = ref<string | null>(null);
@@ -320,7 +321,7 @@ export const AccountBookingsPage = defineComponent({
 					class: "account-bookings-page",
 					"data-testid": "account-bookings-page",
 				}, [
-					renderAccountSidebar(route.path),
+					renderAccountSidebar(route.path, (path) => router.push(path)),
 					h("div", { class: "account-bookings__content" }, [
 						h("h1", { class: "account-bookings__heading" }, "Bookings"),
 						renderEmptyBookings(),
@@ -339,7 +340,7 @@ export const AccountBookingsPage = defineComponent({
 				class: "account-bookings-page",
 				"data-testid": "account-bookings-page",
 			}, [
-				renderAccountSidebar(route.path),
+				renderAccountSidebar(route.path, (path) => router.push(path)),
 				h("div", { class: "account-bookings__content" }, [
 					h("h1", { class: "account-bookings__heading" }, "Bookings"),
 					renderBookingSection("Upcoming", upcoming, "upcoming-bookings"),
@@ -357,6 +358,7 @@ export const AccountBookingDetailPage = defineComponent({
 	setup() {
 		const sdk = useSdk();
 		const route = useRoute();
+		const router = useRouter();
 
 		const loading = ref(true);
 		const error = ref<string | null>(null);
@@ -414,7 +416,7 @@ export const AccountBookingDetailPage = defineComponent({
 				class: "account-booking-detail-page",
 				"data-testid": "account-booking-detail-page",
 			}, [
-				renderAccountSidebar(route.path),
+				renderAccountSidebar(route.path, (path) => router.push(path)),
 				h("div", { class: "account-booking-detail__content" }, [
 					h("h1", {
 						class: "account-booking-detail__heading",

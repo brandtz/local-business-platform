@@ -3,7 +3,7 @@
 // Fetches user profile via SDK auth API.
 
 import { defineComponent, h, ref, onMounted, computed, type VNode } from "vue";
-import { RouterLink, useRoute } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 
 import type { AuthUserSummary } from "@platform/types";
 
@@ -305,6 +305,7 @@ export const AccountProfilePage = defineComponent({
 	setup() {
 		const sdk = useSdk();
 		const route = useRoute();
+		const router = useRouter();
 
 		const loading = ref(true);
 		const error = ref<string | null>(null);
@@ -367,7 +368,11 @@ export const AccountProfilePage = defineComponent({
 			profileError.value = null;
 
 			try {
-				await sdk.customers.get(user.value!.id);
+				// Use the SDK transport layer to PUT profile updates
+				await sdk.transport.put(`/customers/${user.value!.id}`, {
+					displayName: profileForm.value.displayName || undefined,
+					phone: profileForm.value.phone || undefined,
+				});
 				profileSuccess.value = "Profile updated successfully.";
 			} catch {
 				profileError.value = "Unable to save profile changes. Please try again.";
@@ -388,9 +393,11 @@ export const AccountProfilePage = defineComponent({
 			passwordError.value = null;
 
 			try {
-				await sdk.auth.resetPassword({
-					password: passwordForm.value.newPassword,
-					resetToken: "",
+				// Post to the change-password endpoint with current + new password.
+				// This differs from resetPassword which uses an email-based token flow.
+				await sdk.transport.post("/auth/change-password", {
+					currentPassword: passwordForm.value.currentPassword,
+					newPassword: passwordForm.value.newPassword,
 				});
 				passwordSuccess.value = "Password updated successfully.";
 				passwordForm.value = { currentPassword: "", newPassword: "", confirmPassword: "" };
@@ -415,7 +422,7 @@ export const AccountProfilePage = defineComponent({
 				class: "account-profile-page",
 				"data-testid": "account-profile-page",
 			}, [
-				renderAccountSidebar(route.path),
+				renderAccountSidebar(route.path, (path) => router.push(path)),
 				h("div", { class: "account-profile__content" }, [
 					h("h1", { class: "account-profile__heading" }, "Profile Settings"),
 					renderProfileDisplay(user.value),

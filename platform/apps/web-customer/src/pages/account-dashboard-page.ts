@@ -3,7 +3,7 @@
 // Fetches user profile via SDK auth API.
 
 import { defineComponent, h, ref, onMounted, type VNode } from "vue";
-import { RouterLink, useRoute } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 
 import type { AuthUserSummary } from "@platform/types";
 
@@ -146,7 +146,7 @@ function renderQuickLinks(): VNode {
 
 // ── Account Sidebar ─────────────────────────────────────────────────────────
 
-export function renderAccountSidebar(currentPath: string): VNode {
+export function renderAccountSidebar(currentPath: string, onNavigate?: (path: string) => void): VNode {
 	const navItems = getAccountNavigationItems();
 
 	return h("nav", {
@@ -180,8 +180,8 @@ export function renderAccountSidebar(currentPath: string): VNode {
 			value: currentPath,
 			onChange: (e: Event) => {
 				const target = e.target as HTMLSelectElement;
-				if (target.value) {
-					window.location.href = target.value;
+				if (target.value && onNavigate) {
+					onNavigate(target.value);
 				}
 			},
 		},
@@ -196,7 +196,8 @@ export const AccountSidebar = defineComponent({
 	name: "AccountSidebar",
 	setup() {
 		const route = useRoute();
-		return () => renderAccountSidebar(route.path);
+		const router = useRouter();
+		return () => renderAccountSidebar(route.path, (path) => router.push(path));
 	},
 });
 
@@ -207,6 +208,7 @@ export const AccountDashboardPage = defineComponent({
 	setup() {
 		const sdk = useSdk();
 		const route = useRoute();
+		const router = useRouter();
 
 		const loading = ref(true);
 		const error = ref<string | null>(null);
@@ -256,7 +258,7 @@ export const AccountDashboardPage = defineComponent({
 				class: "account-dashboard",
 				"data-testid": "account-dashboard-page",
 			}, [
-				renderAccountSidebar(route.path),
+				renderAccountSidebar(route.path, (path) => router.push(path)),
 				h("div", { class: "account-dashboard__content" }, [
 					renderProfileCard(user.value),
 					renderQuickStats(stats.value),

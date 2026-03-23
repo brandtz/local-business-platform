@@ -3,7 +3,7 @@
 // Fetches data via SDK loyalty API.
 
 import { defineComponent, h, ref, onMounted, type VNode } from "vue";
-import { RouterLink, useRoute } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 
 import type {
 	LoyaltyAccount,
@@ -269,6 +269,7 @@ export const AccountLoyaltyPage = defineComponent({
 	setup() {
 		const sdk = useSdk();
 		const route = useRoute();
+		const router = useRouter();
 
 		const loading = ref(true);
 		const error = ref<string | null>(null);
@@ -276,6 +277,8 @@ export const AccountLoyaltyPage = defineComponent({
 		const config = ref<LoyaltyProgramConfig | null>(null);
 		const rewards = ref<LoyaltyReward[]>([]);
 		const redeeming = ref<string | null>(null);
+		const customerId = ref("");
+		const tenantId = ref("");
 
 		async function fetchLoyaltyData(): Promise<void> {
 			loading.value = true;
@@ -292,6 +295,8 @@ export const AccountLoyaltyPage = defineComponent({
 
 				config.value = loyaltyConfig;
 				rewards.value = rewardsList;
+				customerId.value = profile.id;
+				tenantId.value = account.tenantId;
 
 				// Build tab data using the canonical helper from @platform/types
 				tabData.value = buildLoyaltyTabData(
@@ -321,10 +326,9 @@ export const AccountLoyaltyPage = defineComponent({
 
 			redeeming.value = rewardId;
 			try {
-				const profile = await sdk.auth.me();
 				await sdk.loyalty.redeem({
-					tenantId: "",
-					customerId: profile.id,
+					tenantId: tenantId.value,
+					customerId: customerId.value,
 					pointsToRedeem: reward.pointsCost,
 				});
 				// Refresh data after redemption
@@ -351,7 +355,7 @@ export const AccountLoyaltyPage = defineComponent({
 				class: "account-loyalty-page",
 				"data-testid": "account-loyalty-page",
 			}, [
-				renderAccountSidebar(route.path),
+				renderAccountSidebar(route.path, (path) => router.push(path)),
 				h("div", { class: "account-loyalty__content" }, [
 					h("h1", { class: "account-loyalty__heading" }, "Loyalty & Rewards"),
 					renderPointsBalance(currentTabData),
