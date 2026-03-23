@@ -90,7 +90,8 @@ export class ModuleCapabilityService {
 			content: enabledSet.has("content"),
 			operations: enabledSet.has("operations"),
 			ordering: enabledSet.has("ordering"),
-			portfolio: enabledSet.has("portfolio")
+			portfolio: enabledSet.has("portfolio"),
+			loyalty: enabledSet.has("loyalty")
 		};
 	}
 }

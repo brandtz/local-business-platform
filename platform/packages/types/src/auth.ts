@@ -168,7 +168,8 @@ export const tenantModuleKeys = [
 	"bookings",
 	"content",
 	"operations",
-	"portfolio"
+	"portfolio",
+	"loyalty"
 ] as const;
 
 export type TenantModuleKey = (typeof tenantModuleKeys)[number];
@@ -232,6 +233,13 @@ const moduleRegistry: Record<TenantModuleKey, ModuleRegistryEntry> = {
 		displayName: "Portfolio",
 		key: "portfolio",
 		requiredDependencies: []
+	},
+	loyalty: {
+		category: "commerce",
+		description: "Customer loyalty program with points, tiers, and rewards",
+		displayName: "Loyalty",
+		key: "loyalty",
+		requiredDependencies: ["ordering"]
 	}
 };
 

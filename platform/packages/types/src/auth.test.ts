@@ -310,9 +310,9 @@ describe("auth types contract", () => {
 		expect(isValidModuleKey("nonexistent")).toBe(false);
 
 		const registry = getFullModuleRegistry();
-		expect(registry).toHaveLength(6);
+		expect(registry).toHaveLength(7);
 		expect(registry.map((e) => e.key)).toEqual([
-			"catalog", "ordering", "bookings", "content", "operations", "portfolio"
+			"catalog", "ordering", "bookings", "content", "operations", "portfolio", "loyalty"
 		]);
 
 		const ordering = getModuleRegistryEntry("ordering");

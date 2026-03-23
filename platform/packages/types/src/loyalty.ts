@@ -4,22 +4,9 @@
 // Customer-facing read model is defined in customer.ts; this module
 // provides the engine types that drive the loyalty program.
 
-// Re-export customer read-model types for convenience
-export type {
-	LoyaltyTier,
-	LoyaltyAccount,
-	TierProgressionThreshold,
-	LoyaltyPointsHistoryEntry,
-	LoyaltyPointsHistoryQuery,
-	LoyaltyPointsHistoryResponse,
-} from "./customer";
-
-export {
-	loyaltyTiers,
-	DEFAULT_TIER_THRESHOLDS,
-	computeLoyaltyTier,
-	getNextTierThreshold,
-} from "./customer";
+// Customer-facing read-model types (LoyaltyTier, LoyaltyAccount, etc.)
+// are defined in customer.ts and re-exported through index.ts.
+// Import from "@platform/types" to access both read-model and engine types.
 
 // ── Point Accumulation Mode ─────────────────────────────────────────────────
 
