@@ -14,7 +14,7 @@ import {
 	type ConnectionFormField,
 	type ConnectionFormErrors,
 } from "../payment-connection-management";
-import type { PaymentProvider } from "@platform/types";
+import type { PaymentProvider, StripeCredentials, SquareCredentials, PaymentProviderCredentials } from "@platform/types";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -225,25 +225,30 @@ export const PaymentSettingsPage = defineComponent({
 
 			try {
 				const sdk = useSdk();
+
+				let credentials: PaymentProviderCredentials;
+				if (provider === "stripe") {
+					credentials = {
+						provider: "stripe",
+						publishableKey: state.value.formValues["publishableKey"] ?? "",
+						secretKey: state.value.formValues["secretKey"] ?? "",
+					};
+				} else {
+					credentials = {
+						provider: "square",
+						applicationId: state.value.formValues["applicationId"] ?? "",
+						accessToken: state.value.formValues["accessToken"] ?? "",
+						locationId: state.value.formValues["locationId"] ?? "",
+					};
+				}
+
 				await sdk.payments.createConnection({
+					// tenantId resolved server-side from session context
 					tenantId: "",
 					provider,
 					displayName: state.value.formValues["displayName"] ?? provider,
 					mode: (state.value.formValues["mode"] as "sandbox" | "production") ?? "sandbox",
-					credentials: {
-						provider,
-						...(provider === "stripe"
-							? {
-								publishableKey: state.value.formValues["publishableKey"] ?? "",
-								secretKey: state.value.formValues["secretKey"] ?? "",
-								webhookSecret: state.value.formValues["webhookSecret"] ?? "",
-							}
-							: {
-								applicationId: state.value.formValues["applicationId"] ?? "",
-								accessToken: state.value.formValues["accessToken"] ?? "",
-								locationId: state.value.formValues["locationId"] ?? "",
-							}),
-					} as never,
+					credentials,
 				});
 				state.value = {
 					...state.value,

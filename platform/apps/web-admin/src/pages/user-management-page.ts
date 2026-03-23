@@ -310,7 +310,7 @@ export const UserManagementPage = defineComponent({
 				const sdk = useSdk();
 				await sdk.staff.invite({
 					email: state.value.inviteEmail,
-					name: state.value.inviteEmail.split("@")[0] ?? "",
+					name: state.value.inviteEmail.split("@")[0],
 					role: state.value.inviteRole,
 				});
 				state.value = {

@@ -55,7 +55,7 @@ describe("activity log page helpers", () => {
 		};
 
 		expect(record.id).toBe("evt-1");
-		expect(record.kind).toBe("login_success");
+		expect(record.kind).toBe("auth.login_succeeded");
 		expect(record.severity).toBe("info");
 		expect(record.actorType).toBe("tenant");
 		expect(Object.keys(record.context)).toContain("ip");
