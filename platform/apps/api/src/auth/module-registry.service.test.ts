@@ -11,7 +11,7 @@ describe("module registry service", () => {
 	it("returns the full registry with metadata for every supported module key", () => {
 		const registry = service.getRegistry();
 
-		expect(registry).toHaveLength(7);
+		expect(registry).toHaveLength(8);
 		expect(registry.map((entry) => entry.key)).toEqual([
 			"catalog",
 			"ordering",
@@ -19,7 +19,8 @@ describe("module registry service", () => {
 			"content",
 			"operations",
 			"portfolio",
-			"loyalty"
+			"loyalty",
+			"quotes"
 		]);
 
 		const ordering = service.getEntry("ordering");
