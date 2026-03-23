@@ -131,7 +131,8 @@ export function createRoutes(
 		{
 			path: "/bookings/:bookingId/confirmation",
 			component: BookingConfirmationPage,
-			meta: { title: "Booking Confirmation" }
+			beforeEnter: authGuard,
+			meta: { title: "Booking Confirmation", requiresAuth: true }
 		},
 		{
 			path: "/account",
