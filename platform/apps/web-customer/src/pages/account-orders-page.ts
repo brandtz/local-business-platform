@@ -344,7 +344,7 @@ function renderDetailReceipt(order: AdminOrderDetail): VNode {
 	]);
 }
 
-function renderDetailActions(orderId: string): VNode {
+function renderDetailActions(): VNode {
 	return h("section", {
 		class: "account-order-detail__actions",
 		"data-testid": "order-actions",
@@ -522,7 +522,7 @@ export const AccountOrderDetailPage = defineComponent({
 					]),
 					renderDetailTimeline(steps),
 					renderDetailReceipt(currentOrder),
-					renderDetailActions(currentOrder.id),
+					renderDetailActions(),
 				]),
 			]);
 		};

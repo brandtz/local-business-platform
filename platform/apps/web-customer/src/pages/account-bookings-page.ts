@@ -5,7 +5,7 @@
 import { defineComponent, h, ref, onMounted, type VNode } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 
-import type { AdminBookingSummary, AdminBookingDetail, BookingStatus } from "@platform/types";
+import type { AdminBookingSummary, AdminBookingDetail } from "@platform/types";
 
 import { useSdk } from "../composables/use-sdk";
 import { renderAccountSidebar } from "./account-dashboard-page";

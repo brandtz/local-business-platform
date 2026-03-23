@@ -6,7 +6,6 @@ import { defineComponent, h, ref, onMounted, type VNode } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 
 import type {
-	LoyaltyAccount,
 	LoyaltyProgramConfig,
 	LoyaltyTierDefinition,
 	PointLedgerEntry,
