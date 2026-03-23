@@ -128,6 +128,11 @@ export function createRoutes(
 			meta: { title: "Order Confirmation", requiresAuth: true }
 		},
 		{
+			path: "/bookings/:bookingId/confirmation",
+			component: createPage("Booking Confirmation", "Your booking has been confirmed."),
+			meta: { title: "Booking Confirmation" }
+		},
+		{
 			path: "/account",
 			component: createPage("Account", "Account overview — coming in E13-S4"),
 			beforeEnter: authGuard,
