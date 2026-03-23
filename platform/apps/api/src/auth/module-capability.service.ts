@@ -91,7 +91,8 @@ export class ModuleCapabilityService {
 			operations: enabledSet.has("operations"),
 			ordering: enabledSet.has("ordering"),
 			portfolio: enabledSet.has("portfolio"),
-			loyalty: enabledSet.has("loyalty")
+			loyalty: enabledSet.has("loyalty"),
+			quotes: enabledSet.has("quotes")
 		};
 	}
 }
