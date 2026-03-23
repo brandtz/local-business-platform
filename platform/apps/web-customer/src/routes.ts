@@ -12,6 +12,7 @@ import { ItemDetailPage } from "./pages/item-detail-page";
 import { ServicesPage, ServiceDetailPage } from "./pages/services-page";
 import { LoginPage, RegisterPage, ForgotPasswordPage } from "./pages/login-page";
 import { ContentPage } from "./pages/content-page";
+import { CartPage } from "./pages/cart-page";
 import type { WebCustomerRuntimeConfig } from "./runtime-config";
 import type { TenantFrontendContext } from "./tenant-bootstrap";
 
@@ -103,7 +104,7 @@ export function createRoutes(
 		// ── Protected Routes (account, checkout) ───────────────────────────
 		{
 			path: "/cart",
-			component: createPage("Cart", "Shopping cart — coming in E13-S3"),
+			component: CartPage,
 			meta: { title: "Cart" }
 		},
 		{
