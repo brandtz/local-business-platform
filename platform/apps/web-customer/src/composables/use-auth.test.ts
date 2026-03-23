@@ -1,12 +1,11 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
 	createInitialAuthState,
-	evaluatePasswordStrength,
 } from "./use-auth";
 
 import {
-	evaluatePasswordStrength as evaluatePasswordStrengthFromPages,
+	evaluatePasswordStrength,
 } from "../pages/login-page";
 
 describe("createInitialAuthState", () => {
@@ -21,19 +20,19 @@ describe("createInitialAuthState", () => {
 
 describe("evaluatePasswordStrength (from login-page)", () => {
 	it("returns weak for short passwords", () => {
-		expect(evaluatePasswordStrengthFromPages("abc")).toBe("weak");
-		expect(evaluatePasswordStrengthFromPages("12345")).toBe("weak");
+		expect(evaluatePasswordStrength("abc")).toBe("weak");
+		expect(evaluatePasswordStrength("12345")).toBe("weak");
 	});
 
 	it("returns weak for simple 8-character passwords with no variety", () => {
-		expect(evaluatePasswordStrengthFromPages("abcdefgh")).toBe("weak");
+		expect(evaluatePasswordStrength("abcdefgh")).toBe("weak");
 	});
 
 	it("returns fair for passwords with length and one character type", () => {
-		expect(evaluatePasswordStrengthFromPages("Abcdefgh")).toBe("fair");
+		expect(evaluatePasswordStrength("Abcdefgh")).toBe("fair");
 	});
 
 	it("returns strong for passwords meeting all criteria", () => {
-		expect(evaluatePasswordStrengthFromPages("Abcdefgh12!@")).toBe("strong");
+		expect(evaluatePasswordStrength("Abcdefgh12!@")).toBe("strong");
 	});
 });

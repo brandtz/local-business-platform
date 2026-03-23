@@ -5,8 +5,6 @@
 import { defineComponent, h, type Component } from "vue";
 import type { RouteRecordRaw, NavigationGuardWithThis } from "vue-router";
 
-import type { AuthViewerState } from "@platform/types";
-
 import { getAuthViewerState } from "./auth-state";
 import { HomePage } from "./pages/home-page";
 import { CatalogPage } from "./pages/catalog-page";
@@ -56,12 +54,6 @@ export function createRoutes(
 	const tenantLabel = tenantContext
 		? `${tenantContext.displayName} (${tenantContext.slug})`
 		: "no tenant context";
-
-	const modulesLabel = tenantContext
-		? tenantContext.enabledModules.join(", ") || "none"
-		: "unknown";
-
-	const authViewerState = getAuthViewerState();
 
 	return [
 		// ── Storefront Pages ───────────────────────────────────────────────
@@ -156,8 +148,4 @@ export function createRoutes(
 			meta: { title: "Not Found" }
 		}
 	];
-}
-
-function describeAuthViewerState(authViewerState: AuthViewerState): string {
-	return `${authViewerState.status} (${authViewerState.sessionScope ?? "unknown"} scope)`;
 }

@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import {
 	createDefaultFilters,
 	sortOptions,
-	type CatalogFilters,
 } from "./catalog-page";
 
 describe("createDefaultFilters", () => {

@@ -4,10 +4,8 @@
 import { defineComponent, h, ref, type VNode } from "vue";
 import { RouterLink, useRouter, useRoute } from "vue-router";
 
-import type { AuthApi, RegisterParams } from "@platform/sdk";
-
 import { useSdk } from "../composables/use-sdk";
-import { useAuth, type UseAuthReturn } from "../composables/use-auth";
+import { useAuth } from "../composables/use-auth";
 import { useTenantContext } from "../tenant-context-consumer";
 
 // ── Shared Render Helpers ────────────────────────────────────────────────────

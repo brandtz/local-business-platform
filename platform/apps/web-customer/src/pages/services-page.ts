@@ -49,28 +49,6 @@ function renderServicesGrid(services: ServiceRecord[]): VNode {
 	);
 }
 
-function renderCategoryFilter(
-	categories: string[],
-	selected: string,
-	onChange: (value: string) => void,
-): VNode | null {
-	if (categories.length === 0) return null;
-
-	return h("div", { class: "services-filter", "data-testid": "services-filter" }, [
-		h("select", {
-			class: "services-filter__select",
-			value: selected,
-			"aria-label": "Filter by category",
-			onChange: (e: Event) => onChange((e.target as HTMLSelectElement).value),
-		}, [
-			h("option", { value: "" }, "All Categories"),
-			...categories.map((cat) =>
-				h("option", { value: cat, key: cat }, cat)
-			),
-		]),
-	]);
-}
-
 function renderLoading(message: string): VNode {
 	return h("div", {
 		class: "page-loading",

@@ -2,7 +2,7 @@
 // modifier group selectors, quantity selector, add to cart, related items.
 // Fetches item data via SDK catalog API.
 
-import { defineComponent, h, ref, computed, onMounted, type PropType, type VNode } from "vue";
+import { defineComponent, h, ref, onMounted, type VNode } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 
 import type { CatalogItemRecord, CatalogListResponse } from "@platform/types";

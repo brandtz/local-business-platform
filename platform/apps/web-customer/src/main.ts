@@ -4,13 +4,13 @@
 // Security: failure shells must NOT expose tenant identifiers or configuration.
 
 import { createApp, defineComponent, h, ref } from "vue";
-import { createRouter, createWebHistory, RouterLink, RouterView } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
 import type { ShellStateDescriptor } from "@platform/ui";
 import { createApiClientConfig } from "@platform/sdk";
 
 import { SDK_CLIENT_KEY, createCustomerSdkClient } from "./composables/use-sdk";
-import { useAuth, createInitialAuthState } from "./composables/use-auth";
+import { createInitialAuthState } from "./composables/use-auth";
 import { CustomerLayout } from "./layout/customer-layout";
 import { createInitialCartState } from "./cart-state";
 import { createRoutes } from "./routes";

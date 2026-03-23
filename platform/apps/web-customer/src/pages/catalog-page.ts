@@ -1,7 +1,7 @@
 // E13-S2-T2: Catalog / Menu Browse page — product grid with category filter,
 // search, sort, pagination. Fetches data via SDK catalog API.
 
-import { defineComponent, h, ref, computed, onMounted, watch, type VNode } from "vue";
+import { defineComponent, h, ref, onMounted, type VNode } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 
 import type { CatalogItemRecord, Category, CatalogListResponse } from "@platform/types";

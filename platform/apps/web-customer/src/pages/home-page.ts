@@ -91,7 +91,7 @@ function renderFeaturedItems(items: CatalogItemRecord[]): VNode {
 	]);
 }
 
-function renderTrustBar(displayName: string): VNode {
+function renderTrustBar(): VNode {
 	return h("section", { class: "home-trust-bar", "data-testid": "home-trust-bar" }, [
 		h("div", { class: "home-trust-bar__items" }, [
 			h("div", { class: "home-trust-bar__item" }, [
@@ -168,7 +168,7 @@ export const HomePage = defineComponent({
 
 			return h("div", { class: "home-page", "data-testid": "home-page" }, [
 				renderHero(tenantContext.displayName),
-				renderTrustBar(tenantContext.displayName),
+				renderTrustBar(),
 				renderCategories(categories.value),
 				renderFeaturedItems(featuredItems.value),
 			]);
