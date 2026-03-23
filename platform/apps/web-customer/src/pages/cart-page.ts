@@ -4,7 +4,7 @@
 import { defineComponent, h, ref, onMounted, watch, type VNode } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 
-import type { CartItemResponse, PricingLineItemOutput } from "@platform/types";
+import type { CartItemResponse, PricingLineItemOutput, PricingQuote } from "@platform/types";
 
 import {
 	createInitialCartState,
@@ -47,6 +47,15 @@ function restoreCart(): CartState {
 
 function formatCents(cents: number): string {
 	return `$${(cents / 100).toFixed(2)}`;
+}
+
+function recalculateQuoteTotals(quote: PricingQuote): PricingQuote {
+	const subtotal = quote.lineItems.reduce((sum, li) => sum + li.lineTotalCents, 0);
+	return {
+		...quote,
+		subtotalCents: subtotal,
+		totalCents: subtotal + quote.taxCents + quote.deliveryFeeCents - quote.discountCents + quote.tipCents,
+	};
 }
 
 // ── Render Helpers ───────────────────────────────────────────────────────────
@@ -247,7 +256,7 @@ export const CartPage = defineComponent({
 
 			// Also update line items in quote if present
 			const quote = cartState.value.quote
-				? {
+				? recalculateQuoteTotals({
 					...cartState.value.quote,
 					lineItems: cartState.value.quote.lineItems.map((li) => {
 						const matchingItem = items.find((i) => i.id === li.cartItemId);
@@ -255,17 +264,11 @@ export const CartPage = defineComponent({
 						return {
 							...li,
 							quantity: matchingItem.quantity,
-							lineTotalCents: li.unitPriceCents * matchingItem.quantity + li.modifiersTotalCents * matchingItem.quantity,
+							lineTotalCents: (li.unitPriceCents + li.modifiersTotalCents) * matchingItem.quantity,
 						};
 					}),
-				}
+				})
 				: null;
-
-			if (quote) {
-				const subtotal = quote.lineItems.reduce((sum, li) => sum + li.lineTotalCents, 0);
-				quote.subtotalCents = subtotal;
-				quote.totalCents = subtotal + quote.taxCents + quote.deliveryFeeCents - quote.discountCents + quote.tipCents;
-			}
 
 			cartState.value = { ...cartState.value, items, quote };
 		}
@@ -273,17 +276,11 @@ export const CartPage = defineComponent({
 		function removeItem(itemId: string): void {
 			const items = cartState.value.items.filter((item) => item.id !== itemId);
 			const quote = cartState.value.quote
-				? {
+				? recalculateQuoteTotals({
 					...cartState.value.quote,
 					lineItems: cartState.value.quote.lineItems.filter((li) => li.cartItemId !== itemId),
-				}
+				})
 				: null;
-
-			if (quote) {
-				const subtotal = quote.lineItems.reduce((sum, li) => sum + li.lineTotalCents, 0);
-				quote.subtotalCents = subtotal;
-				quote.totalCents = subtotal + quote.taxCents + quote.deliveryFeeCents - quote.discountCents + quote.tipCents;
-			}
 
 			cartState.value = { ...cartState.value, items, quote };
 		}
