@@ -4,6 +4,7 @@ import {
 	formatBookingTime,
 	isUpcomingBooking,
 	getBookingStatusLabel,
+	isTerminalBookingStatus,
 } from "./account-bookings-page";
 
 describe("account-bookings-page helpers", () => {
@@ -75,6 +76,28 @@ describe("account-bookings-page helpers", () => {
 
 		it("capitalizes first letter of unknown status", () => {
 			expect(getBookingStatusLabel("custom")).toBe("Custom");
+		});
+	});
+
+	describe("isTerminalBookingStatus", () => {
+		it("returns true for completed", () => {
+			expect(isTerminalBookingStatus("completed")).toBe(true);
+		});
+
+		it("returns true for cancelled", () => {
+			expect(isTerminalBookingStatus("cancelled")).toBe(true);
+		});
+
+		it("returns true for no-show", () => {
+			expect(isTerminalBookingStatus("no-show")).toBe(true);
+		});
+
+		it("returns false for confirmed", () => {
+			expect(isTerminalBookingStatus("confirmed")).toBe(false);
+		});
+
+		it("returns false for requested", () => {
+			expect(isTerminalBookingStatus("requested")).toBe(false);
 		});
 	});
 });

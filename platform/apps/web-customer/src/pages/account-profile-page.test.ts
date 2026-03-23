@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
 	validatePasswordStrength,
 	validatePasswordMatch,
+	canSubmitPasswordChange,
 } from "./account-profile-page";
 
 describe("account-profile-page helpers", () => {
@@ -69,6 +70,48 @@ describe("account-profile-page helpers", () => {
 
 		it("returns false when password is empty but confirm has value", () => {
 			expect(validatePasswordMatch("", "password123")).toBe(false);
+		});
+	});
+
+	describe("canSubmitPasswordChange", () => {
+		it("returns false when saving", () => {
+			expect(canSubmitPasswordChange({
+				currentPassword: "old",
+				newPassword: "Abcdefgh1!",
+				confirmPassword: "Abcdefgh1!",
+			}, true)).toBe(false);
+		});
+
+		it("returns false when current password is empty", () => {
+			expect(canSubmitPasswordChange({
+				currentPassword: "",
+				newPassword: "Abcdefgh1!",
+				confirmPassword: "Abcdefgh1!",
+			}, false)).toBe(false);
+		});
+
+		it("returns false when new password is too weak", () => {
+			expect(canSubmitPasswordChange({
+				currentPassword: "old",
+				newPassword: "abc",
+				confirmPassword: "abc",
+			}, false)).toBe(false);
+		});
+
+		it("returns false when passwords do not match", () => {
+			expect(canSubmitPasswordChange({
+				currentPassword: "old",
+				newPassword: "Abcdefgh1!",
+				confirmPassword: "different",
+			}, false)).toBe(false);
+		});
+
+		it("returns true when all conditions are met", () => {
+			expect(canSubmitPasswordChange({
+				currentPassword: "old",
+				newPassword: "Abcdefgh1!",
+				confirmPassword: "Abcdefgh1!",
+			}, false)).toBe(true);
 		});
 	});
 });

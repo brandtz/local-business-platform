@@ -61,6 +61,17 @@ export function validatePasswordMatch(password: string, confirm: string): boolea
 	return password.length > 0 && password === confirm;
 }
 
+export function canSubmitPasswordChange(
+	form: { currentPassword: string; newPassword: string; confirmPassword: string },
+	saving: boolean,
+): boolean {
+	if (saving) return false;
+	if (form.currentPassword.length === 0) return false;
+	const strength = validatePasswordStrength(form.newPassword);
+	if (strength.score < 1) return false;
+	return validatePasswordMatch(form.newPassword, form.confirmPassword);
+}
+
 // ── Render Helpers ──────────────────────────────────────────────────────────
 
 function renderLoading(): VNode {
@@ -252,7 +263,7 @@ function renderPasswordForm(
 		h("button", {
 			class: "account-profile__save-btn",
 			"data-testid": "btn-change-password",
-			disabled: saving || !passwordsMatch || strength.score < 1 || form.currentPassword.length === 0,
+			disabled: !canSubmitPasswordChange(form, saving),
 			onClick: onSubmit,
 		}, saving ? "Updating..." : "Update Password"),
 	]);

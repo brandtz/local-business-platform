@@ -38,6 +38,12 @@ export function isUpcomingBooking(dateStr: string): boolean {
 	return date.getTime() > Date.now();
 }
 
+const terminalBookingStatuses = new Set(["completed", "cancelled", "no-show"]);
+
+export function isTerminalBookingStatus(status: string): boolean {
+	return terminalBookingStatuses.has(status);
+}
+
 export function getBookingStatusLabel(status: string): string {
 	const labels: Record<string, string> = {
 		requested: "Requested",
@@ -330,10 +336,10 @@ export const AccountBookingsPage = defineComponent({
 			}
 
 			const upcoming = bookings.value.filter((b) =>
-				isUpcomingBooking(b.startTime) && b.status !== "cancelled" && b.status !== "completed" && b.status !== "no-show"
+				isUpcomingBooking(b.startTime) && !isTerminalBookingStatus(b.status)
 			);
 			const past = bookings.value.filter((b) =>
-				!isUpcomingBooking(b.startTime) || b.status === "completed" || b.status === "cancelled" || b.status === "no-show"
+				!isUpcomingBooking(b.startTime) || isTerminalBookingStatus(b.status)
 			);
 
 			return h("div", {
