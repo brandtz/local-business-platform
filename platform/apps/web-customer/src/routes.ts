@@ -16,6 +16,7 @@ import { ContentPage } from "./pages/content-page";
 import { CartPage } from "./pages/cart-page";
 import { CheckoutPage } from "./pages/checkout-page";
 import { OrderConfirmationPage } from "./pages/order-confirmation-page";
+import { BookingConfirmationPage } from "./pages/booking-confirmation-page";
 import type { WebCustomerRuntimeConfig } from "./runtime-config";
 import type { TenantFrontendContext } from "./tenant-bootstrap";
 
@@ -129,7 +130,7 @@ export function createRoutes(
 		},
 		{
 			path: "/bookings/:bookingId/confirmation",
-			component: createPage("Booking Confirmation", "Your booking has been confirmed."),
+			component: BookingConfirmationPage,
 			meta: { title: "Booking Confirmation" }
 		},
 		{
