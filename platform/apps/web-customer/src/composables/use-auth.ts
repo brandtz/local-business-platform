@@ -6,6 +6,8 @@ import { ref, computed, type Ref, type ComputedRef } from "vue";
 import type { AuthApi, RegisterParams, RegisterResponse } from "@platform/sdk";
 import type { AuthUserSummary, PasswordLoginRequest, PasswordLoginResponse } from "@platform/types";
 
+import { getAuthViewerState } from "../auth-state";
+
 export type AuthState = {
 	isAuthenticated: boolean;
 	user: AuthUserSummary | null;
@@ -47,6 +49,19 @@ function clearStoredToken(): void {
 }
 
 export function createInitialAuthState(): AuthState {
+	// Check the auth viewer state override (used in e2e tests and preview modes)
+	const viewerState = getAuthViewerState();
+	if (viewerState.isAuthenticated) {
+		return {
+			isAuthenticated: true,
+			user: null,
+			token: null,
+			isLoading: false,
+			error: null,
+		};
+	}
+
+	// Fall back to persisted token from localStorage
 	const token = readStoredToken();
 	return {
 		isAuthenticated: token !== null,

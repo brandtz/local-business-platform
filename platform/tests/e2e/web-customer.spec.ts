@@ -12,9 +12,8 @@ test.describe("web customer shell", () => {
 		await page.goto("http://127.0.0.1:4175/");
 
 		await expect(page).toHaveURL("http://127.0.0.1:4175/");
-		await expect(page.getByRole("heading", { name: "Customer Portal" })).toBeVisible();
-		await expect(page.getByRole("heading", { name: "Storefront Shell" })).toBeVisible();
-		await expect(page.getByText(/anonymous \(customer scope\)/)).toBeVisible();
+		await expect(page.getByRole("heading", { name: /Welcome to Customer Portal/ })).toBeVisible();
+		await expect(page.getByRole("link", { name: "Sign In" })).toBeVisible();
 	});
 
 	test("renders authenticated customer context when seeded", async ({ page }) => {
@@ -30,7 +29,7 @@ test.describe("web customer shell", () => {
 
 		await page.goto("http://127.0.0.1:4175/");
 
-		await expect(page.getByText(/authenticated \(customer scope\)/)).toBeVisible();
+		await expect(page.getByRole("link", { name: "Account" })).toBeVisible();
 	});
 
 	test("exposes the runtime status route", async ({ page }) => {
