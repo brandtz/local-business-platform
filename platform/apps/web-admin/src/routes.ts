@@ -24,6 +24,14 @@ import { CatalogServicesPage } from "./pages/catalog-services-page";
 import { ContentLocationsPage } from "./pages/content-locations-page";
 import { ContentPagesPage } from "./pages/content-pages-page";
 import { ContentAnnouncementsPage } from "./pages/content-announcements-page";
+import { OrdersPage } from "./pages/orders-page";
+import { OrderDetailPage } from "./pages/order-detail-page";
+import { BookingsCalendarPage } from "./pages/bookings-calendar-page";
+import { BookingDetailPage } from "./pages/booking-detail-page";
+import { CustomersPage } from "./pages/customers-page";
+import { StaffPage } from "./pages/staff-page";
+import { LoyaltyPage } from "./pages/loyalty-page";
+import { AnalyticsPage } from "./pages/analytics-page";
 
 // ── Placeholder page factory ─────────────────────────────────────────────────
 
@@ -101,22 +109,27 @@ export function createRoutes(
       meta: { requiresAuth: true },
     },
 
-    // ── Ordering (placeholder) ─────────────────────────────────────────────
+    // ── Ordering ───────────────────────────────────────────────────────────
     {
       path: "/ordering",
-      component: createPage("Orders", "Track and manage customer orders."),
+      component: OrdersPage,
       meta: { requiresAuth: true },
     },
     {
-      path: "/ordering/new",
-      component: createPage("New Order", "Create a new order."),
+      path: "/ordering/:orderId",
+      component: OrderDetailPage,
       meta: { requiresAuth: true },
     },
 
-    // ── Bookings (placeholder) ─────────────────────────────────────────────
+    // ── Bookings ────────────────────────────────────────────────────────────
     {
       path: "/bookings",
-      component: createPage("Bookings", "View and manage appointments."),
+      component: BookingsCalendarPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/bookings/:bookingId",
+      component: BookingDetailPage,
       meta: { requiresAuth: true },
     },
 
@@ -149,34 +162,34 @@ export function createRoutes(
       meta: { requiresAuth: true },
     },
 
-    // ── Users (placeholder) ────────────────────────────────────────────────
+    // ── Users ────────────────────────────────────────────────────────────
     {
       path: "/users",
-      component: createPage("Users", "Manage customers and staff."),
+      redirect: "/users/customers",
       meta: { requiresAuth: true },
     },
     {
       path: "/users/customers",
-      component: createPage("Customers", "Manage your customers."),
+      component: CustomersPage,
       meta: { requiresAuth: true },
     },
     {
       path: "/users/staff",
-      component: createPage("Staff", "Manage your team."),
+      component: StaffPage,
       meta: { requiresAuth: true },
     },
 
-    // ── Analytics (placeholder) ────────────────────────────────────────────
+    // ── Analytics ──────────────────────────────────────────────────────────
     {
       path: "/analytics",
-      component: createPage("Analytics", "Business analytics and reports."),
+      component: AnalyticsPage,
       meta: { requiresAuth: true },
     },
 
-    // ── Loyalty (placeholder) ──────────────────────────────────────────────
+    // ── Loyalty ────────────────────────────────────────────────────────────
     {
       path: "/loyalty",
-      component: createPage("Loyalty", "Manage loyalty programs."),
+      component: LoyaltyPage,
       meta: { requiresAuth: true },
     },
 
