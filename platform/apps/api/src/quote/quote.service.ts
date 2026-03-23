@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import type {
 	QuoteRecord,
 	QuoteLineItemRecord,
-	QuoteStatus,
 	CreateQuoteRequest,
 	UpdateQuoteRequest,
 	AdminQuoteListQuery,
@@ -18,9 +17,7 @@ import type {
 	CustomerQuoteRevisionRequest,
 	QuoteToOrderConversionInput,
 	QuoteToOrderConversionResult,
-	QuoteNotificationPayload,
 	PricingInput,
-	PricingQuote,
 } from "@platform/types";
 import {
 	generateShareToken,
@@ -405,7 +402,7 @@ export class QuoteService {
 			deliveryFee: null,
 		};
 
-		const pricingQuote = this.pricingEngine.computeQuote(pricingInput);
+		this.pricingEngine.computeQuote(pricingInput);
 
 		// NOTE: Actual order creation would require OrderService integration;
 		// for now, generate orderId and record it on the quote.

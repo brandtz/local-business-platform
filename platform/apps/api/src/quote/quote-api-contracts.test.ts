@@ -14,6 +14,12 @@ import {
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
+function omit<T extends Record<string, unknown>>(obj: T, key: string): Record<string, unknown> {
+	const result = { ...obj };
+	delete result[key];
+	return result;
+}
+
 function validLineItem(overrides: Record<string, unknown> = {}) {
 	return { description: "Widget", quantity: 2, unitPriceCents: 1500, ...overrides };
 }
@@ -43,8 +49,7 @@ describe("assertCreateQuoteRequest", () => {
 	});
 
 	it("rejects missing customerName", () => {
-		const { customerName: _, ...body } = validCreateBody();
-		expect(() => assertCreateQuoteRequest(body)).toThrow("customerName");
+		expect(() => assertCreateQuoteRequest(omit(validCreateBody(), "customerName"))).toThrow("customerName");
 	});
 
 	it("rejects empty customerName", () => {
@@ -52,8 +57,7 @@ describe("assertCreateQuoteRequest", () => {
 	});
 
 	it("rejects missing customerEmail", () => {
-		const { customerEmail: _, ...body } = validCreateBody();
-		expect(() => assertCreateQuoteRequest(body)).toThrow("customerEmail");
+		expect(() => assertCreateQuoteRequest(omit(validCreateBody(), "customerEmail"))).toThrow("customerEmail");
 	});
 
 	it("rejects invalid customerEmail without @", () => {
@@ -61,8 +65,7 @@ describe("assertCreateQuoteRequest", () => {
 	});
 
 	it("rejects missing lineItems", () => {
-		const { lineItems: _, ...body } = validCreateBody();
-		expect(() => assertCreateQuoteRequest(body)).toThrow("lineItems");
+		expect(() => assertCreateQuoteRequest(omit(validCreateBody(), "lineItems"))).toThrow("lineItems");
 	});
 
 	it("rejects empty lineItems array", () => {
@@ -328,7 +331,7 @@ describe("assertShareToken", () => {
 	});
 
 	it("rejects non-string input", () => {
-		expect(() => assertShareToken(12345678901234567890)).toThrow();
+		expect(() => assertShareToken(12345)).toThrow();
 	});
 
 	it("rejects whitespace-only string", () => {
@@ -508,8 +511,7 @@ describe("assertQuoteToOrderConversionInput", () => {
 	});
 
 	it("rejects missing quoteId", () => {
-		const { quoteId: _, ...body } = validConversion;
-		expect(() => assertQuoteToOrderConversionInput(body)).toThrow("quoteId");
+		expect(() => assertQuoteToOrderConversionInput(omit(validConversion, "quoteId"))).toThrow("quoteId");
 	});
 
 	it("rejects empty quoteId", () => {
@@ -517,8 +519,7 @@ describe("assertQuoteToOrderConversionInput", () => {
 	});
 
 	it("rejects missing tenantId", () => {
-		const { tenantId: _, ...body } = validConversion;
-		expect(() => assertQuoteToOrderConversionInput(body)).toThrow("tenantId");
+		expect(() => assertQuoteToOrderConversionInput(omit(validConversion, "tenantId"))).toThrow("tenantId");
 	});
 
 	it("rejects empty tenantId", () => {
@@ -526,8 +527,7 @@ describe("assertQuoteToOrderConversionInput", () => {
 	});
 
 	it("rejects missing preserveQuotedPrices", () => {
-		const { preserveQuotedPrices: _, ...body } = validConversion;
-		expect(() => assertQuoteToOrderConversionInput(body)).toThrow("preserveQuotedPrices");
+		expect(() => assertQuoteToOrderConversionInput(omit(validConversion, "preserveQuotedPrices"))).toThrow("preserveQuotedPrices");
 	});
 
 	it("rejects non-boolean preserveQuotedPrices", () => {
