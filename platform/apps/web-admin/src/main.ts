@@ -1,7 +1,7 @@
 import { createApp, defineComponent, h, ref, onMounted } from "vue";
 import { createRouter, createWebHistory, RouterView } from "vue-router";
 
-import type { TenantModuleKey, TenantActorRole } from "@platform/types";
+import { describeImpersonationIndicator, type TenantModuleKey, type TenantActorRole } from "@platform/types";
 
 import { SDK_CLIENT_KEY, createAdminSdkClient } from "./composables/use-sdk";
 import { AdminLayout, type AdminSidebarItem } from "./layout/admin-layout";
@@ -103,11 +103,10 @@ const AppShell = defineComponent({
 		const isSidebarOpen = ref(false);
 		const isImpersonating = ref(!!authViewerState.impersonationSession);
 		const impersonationLabel = ref(
-			authViewerState.impersonationSession
-				? `Impersonating as ${authViewerState.displayName ?? "tenant admin"}`
-				: "",
+			describeImpersonationIndicator(authViewerState) ?? "",
 		);
 		const isLoginRoute = ref(false);
+		const authDescription = ref("");
 
 		onMounted(async () => {
 			try {
@@ -120,10 +119,12 @@ const AppShell = defineComponent({
 
 			// Check if current route is login
 			isLoginRoute.value = router.currentRoute.value.path === "/login";
+			authDescription.value = (router.currentRoute.value.meta?.authDescription as string) ?? "";
 		});
 
 		router.afterEach((to) => {
 			isLoginRoute.value = to.path === "/login";
+			authDescription.value = (to.meta?.authDescription as string) ?? "";
 		});
 
 		function toggleSidebar() {
@@ -151,6 +152,7 @@ const AppShell = defineComponent({
 				isSidebarOpen: isSidebarOpen.value,
 				isImpersonating: isImpersonating.value,
 				impersonationLabel: impersonationLabel.value,
+				authDescription: authDescription.value,
 				onToggleSidebar: toggleSidebar,
 				onSignOut: handleSignOut,
 			});

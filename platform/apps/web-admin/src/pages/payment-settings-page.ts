@@ -14,7 +14,7 @@ import {
 	type ConnectionFormField,
 	type ConnectionFormErrors,
 } from "../payment-connection-management";
-import type { PaymentProvider, StripeCredentials, SquareCredentials, PaymentProviderCredentials } from "@platform/types";
+import type { PaymentProvider, PaymentProviderCredentials } from "@platform/types";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -264,7 +264,8 @@ export const PaymentSettingsPage = defineComponent({
 			}
 		}
 
-		function handleDisconnect(_id: string) {
+		function handleDisconnect(connectionId: string) {
+			void connectionId;
 			// Disconnect handled via confirmation flow
 		}
 

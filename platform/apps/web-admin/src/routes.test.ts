@@ -21,10 +21,11 @@ describe("web admin routes", () => {
     expect(paths).toContain("/settings/users");
     expect(paths).toContain("/settings/activity");
     expect(paths).toContain("/status");
+    expect(paths).toContain("/auth-required");
     expect(paths).toContain("/access-denied");
   });
 
-  it("redirects anonymous viewers to login", () => {
+  it("redirects anonymous viewers to auth-required", () => {
     const routes = createRoutes(
       resolveRuntimeConfig({}),
       createAnonymousAuthViewerState("tenant")
@@ -33,7 +34,7 @@ describe("web admin routes", () => {
     const homeRoute = routes.find((r) => r.path === "/");
     expect(homeRoute).toMatchObject({
       path: "/",
-      redirect: "/login"
+      redirect: "/auth-required"
     });
   });
 

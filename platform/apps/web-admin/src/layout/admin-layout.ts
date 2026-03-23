@@ -189,6 +189,14 @@ export const AdminLayout = defineComponent({
 			type: String as PropType<string>,
 			default: "",
 		},
+		shellTitle: {
+			type: String as PropType<string>,
+			default: "Admin Shell",
+		},
+		authDescription: {
+			type: String as PropType<string>,
+			default: "",
+		},
 		onToggleSidebar: {
 			type: Function as PropType<() => void>,
 			required: true,
@@ -208,6 +216,10 @@ export const AdminLayout = defineComponent({
 				h("div", { class: "admin-layout__body" }, [
 					renderSidebar(props.sidebarItems, props.isSidebarOpen),
 					h("main", { class: "admin-layout__main", "data-testid": "admin-main" }, [
+						h("h2", { class: "admin-layout__shell-title" }, props.shellTitle),
+						props.authDescription
+							? h("p", { class: "admin-layout__auth-description" }, props.authDescription)
+							: null,
 						h(RouterView),
 					]),
 				]),

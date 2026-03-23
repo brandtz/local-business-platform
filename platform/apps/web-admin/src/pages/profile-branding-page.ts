@@ -1,7 +1,7 @@
 // E13-S5-T3: Business Profile and Branding settings page — profile form,
 // branding configuration (logo, colors), and live preview panel.
 
-import { defineComponent, h, onMounted, ref, computed } from "vue";
+import { defineComponent, h, onMounted, ref } from "vue";
 
 import { useSdk } from "../composables/use-sdk";
 import {
@@ -12,9 +12,6 @@ import {
 } from "../tenant-profile";
 import {
 	createEmptyBrandConfig,
-	validateBrandAssetUpload,
-	validateThemeConfig,
-	type BrandAssetReference,
 	type TenantBrandConfig,
 	type TenantThemeConfig,
 } from "../tenant-branding";

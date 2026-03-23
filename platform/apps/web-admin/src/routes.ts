@@ -55,12 +55,16 @@ export function createRoutes(
               ? {
                   securityBanner: impersonationIndicator,
                   requiresAuth: true,
+                  authDescription: `authenticated (${authViewerState.sessionScope ?? "unknown"} scope)`,
                 }
-              : { requiresAuth: true },
+              : {
+                  requiresAuth: true,
+                  authDescription: `authenticated (${authViewerState.sessionScope ?? "unknown"} scope)`,
+                },
             component: AdminDashboardPage,
           }
         : {
-            redirect: homeRouteAccess === "auth-required" ? "/login" : "/access-denied"
+            redirect: homeRouteAccess === "auth-required" ? "/auth-required" : "/access-denied"
           })
     },
 
@@ -216,7 +220,10 @@ export function createRoutes(
     // ── Auth pages ─────────────────────────────────────────────────────────
     {
       path: "/auth-required",
-      redirect: "/login",
+      component: createPage(
+        "Authentication Required",
+        "Sign in with a tenant-admin session to continue."
+      )
     },
     {
       path: "/access-denied",
@@ -226,8 +233,4 @@ export function createRoutes(
       )
     }
   ];
-}
-
-function describeAuthViewerState(authViewerState: AuthViewerState): string {
-  return `${authViewerState.status} (${authViewerState.sessionScope ?? "unknown"} scope)`;
 }

@@ -263,7 +263,7 @@ export const UserManagementPage = defineComponent({
 		onMounted(async () => {
 			try {
 				const sdk = useSdk();
-				const [membersResult, staffResult] = await Promise.allSettled([
+				await Promise.allSettled([
 					sdk.customers.list({ page: 1, pageSize: 50 }),
 					sdk.staff.list(),
 				]);
@@ -327,11 +327,14 @@ export const UserManagementPage = defineComponent({
 			}
 		}
 
-		function handleRoleChange(_userId: string, _role: TenantActorRole) {
+		function handleRoleChange(userId: string, role: TenantActorRole) {
+			void userId;
+			void role;
 			// Role change handled via confirmation flow
 		}
 
-		function handleDeactivate(_userId: string) {
+		function handleDeactivate(userId: string) {
+			void userId;
 			// Deactivation handled via confirmation flow
 		}
 
