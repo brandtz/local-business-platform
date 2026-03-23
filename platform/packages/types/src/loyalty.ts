@@ -285,7 +285,9 @@ export function deriveCustomerTags(
 ): CustomerTag[] {
 	const tags: CustomerTag[] = [];
 
-	if (currentTier === "platinum" || currentTier === "gold") {
+	const normalizedTier = currentTier.toLowerCase();
+
+	if (normalizedTier === "platinum" || normalizedTier === "gold") {
 		tags.push({ type: "vip", label: "VIP" });
 	}
 
