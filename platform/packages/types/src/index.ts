@@ -7,6 +7,7 @@ export * from "./cart";
 export * from "./catalog";
 export * from "./content";
 export * from "./customer";
+export * from "./loyalty";
 export * from "./domain-activation";
 export * from "./domain-events";
 export * from "./import";
