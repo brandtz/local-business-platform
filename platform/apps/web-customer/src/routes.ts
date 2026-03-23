@@ -14,6 +14,7 @@ import { LoginPage, RegisterPage, ForgotPasswordPage } from "./pages/login-page"
 import { ContentPage } from "./pages/content-page";
 import { CartPage } from "./pages/cart-page";
 import { CheckoutPage } from "./pages/checkout-page";
+import { OrderConfirmationPage } from "./pages/order-confirmation-page";
 import type { WebCustomerRuntimeConfig } from "./runtime-config";
 import type { TenantFrontendContext } from "./tenant-bootstrap";
 
@@ -113,6 +114,12 @@ export function createRoutes(
 			component: CheckoutPage,
 			beforeEnter: authGuard,
 			meta: { title: "Checkout", requiresAuth: true }
+		},
+		{
+			path: "/orders/:orderId/confirmation",
+			component: OrderConfirmationPage,
+			beforeEnter: authGuard,
+			meta: { title: "Order Confirmation", requiresAuth: true }
 		},
 		{
 			path: "/account",
