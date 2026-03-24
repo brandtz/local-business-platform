@@ -9,8 +9,6 @@ import {
 
 import { getAuthViewerState } from "./auth-state";
 import type { WebPlatformAdminRuntimeConfig } from "./runtime-config";
-import { TenantListPage } from "./tenant-list-page";
-import { TenantDetailPage } from "./tenant-detail-page";
 import {
   resolveListAccessState,
   resolveDetailAccessState

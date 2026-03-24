@@ -1,10 +1,10 @@
 // Platform Audit Trail page (PA-13) — security event log with filtering,
 // pagination, expandable detail panel, and error tracking placeholder.
 
-import { defineComponent, h, ref, computed, onMounted, watch, type VNode } from "vue";
+import { defineComponent, h, ref, computed, onMounted, type VNode } from "vue";
 import { useSdk } from "../composables/use-sdk";
 import type { SecurityEventRecord } from "@platform/types";
-import type { AuditListParams } from "@platform/sdk/src/domains/audit";
+import type { AuditListParams } from "@platform/sdk";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 

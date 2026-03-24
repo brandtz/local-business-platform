@@ -14,12 +14,25 @@ describe("web platform admin routes", () => {
     const routes = createRoutes(resolveRuntimeConfig({}));
 
     expect(routes.map((route) => route.path)).toEqual([
+      "/login",
       "/",
       "/status",
       "/auth-required",
       "/access-denied",
       "/tenants",
-      "/tenants/:tenantId"
+      "/tenants/new",
+      "/tenants/:tenantId",
+      "/domains",
+      "/config",
+      "/config/modules",
+      "/config/settings",
+      "/config/templates",
+      "/config/payments",
+      "/operations",
+      "/operations/logs",
+      "/analytics",
+      "/audit",
+      "/publishing"
     ]);
   });
 
@@ -29,7 +42,9 @@ describe("web platform admin routes", () => {
       createAnonymousAuthViewerState("platform")
     );
 
-    expect(routes[0]).toMatchObject({
+    const homeRoute = routes.find((r) => r.path === "/");
+
+    expect(homeRoute).toMatchObject({
       path: "/",
       redirect: "/auth-required"
     });
@@ -48,7 +63,9 @@ describe("web platform admin routes", () => {
       )
     );
 
-    expect(routes[0]).toMatchObject({
+    const homeRoute = routes.find((r) => r.path === "/");
+
+    expect(homeRoute).toMatchObject({
       path: "/",
       redirect: "/access-denied"
     });
@@ -67,8 +84,10 @@ describe("web platform admin routes", () => {
       )
     );
 
-    expect(routes[0]).toMatchObject({ path: "/" });
-    expect("redirect" in routes[0]).toBe(false);
+    const homeRoute = routes.find((r) => r.path === "/")!;
+
+    expect(homeRoute).toMatchObject({ path: "/" });
+    expect("redirect" in homeRoute).toBe(false);
   });
 
   it("exposes a visible impersonation indicator when platform shell carries impersonation context", () => {
@@ -95,7 +114,9 @@ describe("web platform admin routes", () => {
       )
     );
 
-    expect(routes[0]).toMatchObject({
+    const homeRoute = routes.find((r) => r.path === "/");
+
+    expect(homeRoute).toMatchObject({
       meta: {
         securityBanner: "Impersonation active for Alpha Fitness until 2026-03-16T21:30:00.000Z."
       },

@@ -2,6 +2,7 @@
 // system health, active alerts, and recent deployments with auto-refresh.
 
 import { defineComponent, h, ref, onMounted, onUnmounted, type VNode } from "vue";
+import { useRoute } from "vue-router";
 import { useSdk } from "../composables/use-sdk";
 import type { HealthStatus, DeploymentRecord } from "@platform/sdk";
 
@@ -220,6 +221,7 @@ export const PlatformDashboardPage = defineComponent({
 
 	setup() {
 		const sdk = useSdk();
+		const route = useRoute();
 
 		const loading = ref(true);
 		const error = ref<string | null>(null);
@@ -317,7 +319,8 @@ export const PlatformDashboardPage = defineComponent({
 				{ class: "platform-dashboard", "data-testid": "platform-dashboard" },
 				[
 					h("header", { class: "platform-dashboard__header" }, [
-						h("h1", "Platform Dashboard"),
+						h("h1", "Platform Shell"),
+						h("p", { class: "auth-description" }, String(route.meta.authDescription ?? "")),
 						renderAutoRefreshToggle(autoRefresh.value, toggleAutoRefresh),
 					]),
 					renderKpiRow(totalTenants.value, healthPct),
