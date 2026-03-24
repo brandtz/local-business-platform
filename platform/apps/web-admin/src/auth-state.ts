@@ -1,9 +1,20 @@
-import { createAnonymousAuthViewerState, type AuthViewerState } from "@platform/types";
+import { createAnonymousAuthViewerState, createAuthenticatedAuthViewerState, type AuthViewerState } from "@platform/types";
 
 const AUTH_VIEWER_STATE_OVERRIDE_KEY = "__platform_test_web_admin_auth_viewer__";
 
 export function getAuthViewerState(): AuthViewerState {
-  return readAuthViewerStateOverride() || createAnonymousAuthViewerState("tenant");
+  const override = readAuthViewerStateOverride();
+  if (override) return override;
+
+  // In dev mode, default to an authenticated tenant-admin so the full UI is accessible
+  if (import.meta.env.DEV) {
+    return createAuthenticatedAuthViewerState(
+      { actorType: "tenant", displayName: "Dev Admin", id: "dev-admin-001" },
+      "tenant"
+    );
+  }
+
+  return createAnonymousAuthViewerState("tenant");
 }
 
 export function readAuthViewerStateOverride(

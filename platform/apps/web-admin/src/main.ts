@@ -1,3 +1,5 @@
+import "./styles.css";
+
 import { createApp, defineComponent, h, ref, onMounted } from "vue";
 import { createRouter, createWebHistory, RouterView } from "vue-router";
 

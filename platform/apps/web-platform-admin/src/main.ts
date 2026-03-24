@@ -1,3 +1,5 @@
+import "./styles.css";
+
 import { createApp, defineComponent, h } from "vue";
 import { createRouter, createWebHistory, RouterLink, RouterView } from "vue-router";
 

@@ -3,6 +3,8 @@
 // on failure a shell state renders based on the bootstrap outcome.
 // Security: failure shells must NOT expose tenant identifiers or configuration.
 
+import "./styles.css";
+
 import { createApp, defineComponent, h, ref } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -39,6 +41,24 @@ const runtimeConfig = getRuntimeConfig();
 
 document.title = runtimeConfig.appTitle;
 
+// ── Dev Mode Mock Context ────────────────────────────────────────────────────
+
+function isDevMode(): boolean {
+	return import.meta.env.DEV && !import.meta.env.VITE_API_BASE_URL;
+}
+
+function createDevTenantContext(): TenantFrontendContext {
+	return {
+		tenantId: "dev-tenant-001",
+		displayName: runtimeConfig.appTitle || "Dev Storefront",
+		slug: "dev-store",
+		status: "active",
+		previewSubdomain: "dev-store",
+		templateKey: "food-drink",
+		enabledModules: ["catalog", "ordering", "bookings", "content", "operations"],
+	};
+}
+
 // ── Bootstrap Gate ───────────────────────────────────────────────────────────
 
 function resolveBootstrapDataSource() {
@@ -50,6 +70,14 @@ function resolveBootstrapDataSource() {
 }
 
 async function bootstrap(): Promise<void> {
+	// In dev mode without an API, use a mock tenant context directly
+	if (isDevMode()) {
+		const devContext = createDevTenantContext();
+		const devResult: BootstrapResult = { phase: "resolved", context: devContext };
+		mountApp(devContext, devResult);
+		return;
+	}
+
 	const result = await executeTenantBootstrap({
 		host: window.location.hostname,
 		managedPreviewDomains: readManagedPreviewDomains(
