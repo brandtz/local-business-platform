@@ -16,6 +16,24 @@ import {
   resolveDetailAccessState
 } from "./tenant-dashboard";
 
+// ── Page imports ─────────────────────────────────────────────────────────────
+
+import { PlatformLoginPage } from "./pages/platform-login-page";
+import { PlatformDashboardPage } from "./pages/platform-dashboard-page";
+import { PlatformTenantsPage } from "./pages/platform-tenants-page";
+import { PlatformTenantDetailPage } from "./pages/platform-tenant-detail-page";
+import { PlatformTenantProvisionPage } from "./pages/platform-tenant-provision-page";
+import { PlatformDomainsPage } from "./pages/platform-domains-page";
+import { PlatformModulesPage } from "./pages/platform-modules-page";
+import { PlatformSettingsPage } from "./pages/platform-settings-page";
+import { PlatformTemplatesPage } from "./pages/platform-templates-page";
+import { PlatformPaymentsConfigPage } from "./pages/platform-payments-page";
+import { PlatformHealthPage } from "./pages/platform-health-page";
+import { PlatformLogsPage } from "./pages/platform-logs-page";
+import { PlatformAnalyticsPage } from "./pages/platform-analytics-page";
+import { PlatformAuditPage } from "./pages/platform-audit-page";
+import { PlatformPublishingPage } from "./pages/platform-publishing-page";
+
 function createPage(title: string, description: string): Component {
   return defineComponent({
     name: `${title.replace(/\s+/g, "")}Page`,
@@ -37,24 +55,36 @@ export function createRoutes(
   const impersonationIndicator = describeImpersonationIndicator(authViewerState);
 
   return [
+    // ── Login (no auth guard) ──────────────────────────────────────────────
+    {
+      path: "/login",
+      component: PlatformLoginPage,
+      meta: { requiresAuth: false },
+    },
+
+    // ── Dashboard ──────────────────────────────────────────────────────────
     {
       path: "/",
       ...(homeRouteAccess === "allow"
         ? {
             meta: impersonationIndicator
               ? {
-                  securityBanner: impersonationIndicator
+                  securityBanner: impersonationIndicator,
+                  requiresAuth: true,
+                  authDescription: `authenticated (${authViewerState.sessionScope ?? "unknown"} scope)`,
                 }
-              : undefined,
-            component: createPage(
-              "Platform Shell",
-              `${runtimeConfig.appTitle} is ready for cross-tenant operator workflows. Auth state: ${describeAuthViewerState(authViewerState)}.${impersonationIndicator ? ` ${impersonationIndicator}` : ""}`
-            )
+              : {
+                  requiresAuth: true,
+                  authDescription: `authenticated (${authViewerState.sessionScope ?? "unknown"} scope)`,
+                },
+            component: PlatformDashboardPage,
           }
         : {
             redirect: homeRouteAccess === "auth-required" ? "/auth-required" : "/access-denied"
           })
     },
+
+    // ── Status ─────────────────────────────────────────────────────────────
     {
       path: "/status",
       component: createPage(
@@ -62,6 +92,8 @@ export function createRoutes(
         `Application ${runtimeConfig.appId} bootstrapped successfully.`
       )
     },
+
+    // ── Auth pages ─────────────────────────────────────────────────────────
     {
       path: "/auth-required",
       component: createPage(
@@ -76,7 +108,76 @@ export function createRoutes(
         "This route requires a platform-admin session."
       )
     },
-    ...createTenantDashboardRoutes(authViewerState)
+
+    // ── Tenant management ──────────────────────────────────────────────────
+    ...createTenantDashboardRoutes(authViewerState),
+
+    // ── Domains ────────────────────────────────────────────────────────────
+    {
+      path: "/domains",
+      component: PlatformDomainsPage,
+      meta: { requiresAuth: true },
+    },
+
+    // ── Configuration ──────────────────────────────────────────────────────
+    {
+      path: "/config",
+      redirect: "/config/modules",
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/config/modules",
+      component: PlatformModulesPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/config/settings",
+      component: PlatformSettingsPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/config/templates",
+      component: PlatformTemplatesPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/config/payments",
+      component: PlatformPaymentsConfigPage,
+      meta: { requiresAuth: true },
+    },
+
+    // ── Operations ─────────────────────────────────────────────────────────
+    {
+      path: "/operations",
+      component: PlatformHealthPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/operations/logs",
+      component: PlatformLogsPage,
+      meta: { requiresAuth: true },
+    },
+
+    // ── Analytics ──────────────────────────────────────────────────────────
+    {
+      path: "/analytics",
+      component: PlatformAnalyticsPage,
+      meta: { requiresAuth: true },
+    },
+
+    // ── Audit Trail ────────────────────────────────────────────────────────
+    {
+      path: "/audit",
+      component: PlatformAuditPage,
+      meta: { requiresAuth: true },
+    },
+
+    // ── Publishing ─────────────────────────────────────────────────────────
+    {
+      path: "/publishing",
+      component: PlatformPublishingPage,
+      meta: { requiresAuth: true },
+    },
   ];
 }
 
@@ -97,15 +198,22 @@ function createTenantDashboardRoutes(
                 : "/access-denied"
           }
         : {
-            component: defineComponent({
-              name: "TenantListRoute",
-              setup() {
-                return () =>
-                  h(TenantListPage, {
-                    viewState: { kind: "loading" }
-                  });
-              }
-            })
+            component: PlatformTenantsPage,
+            meta: { requiresAuth: true },
+          })
+    },
+    {
+      path: "/tenants/new",
+      ...(listAccess
+        ? {
+            redirect:
+              listAccess.kind === "auth-required"
+                ? "/auth-required"
+                : "/access-denied"
+          }
+        : {
+            component: PlatformTenantProvisionPage,
+            meta: { requiresAuth: true },
           })
     },
     {
@@ -118,20 +226,10 @@ function createTenantDashboardRoutes(
                 : "/access-denied"
           }
         : {
-            component: defineComponent({
-              name: "TenantDetailRoute",
-              setup() {
-                return () =>
-                  h(TenantDetailPage, {
-                    viewState: { kind: "loading" }
-                  });
-              }
-            })
+            component: PlatformTenantDetailPage,
+            meta: { requiresAuth: true },
           })
     }
   ];
 }
 
-function describeAuthViewerState(authViewerState: AuthViewerState): string {
-  return `${authViewerState.status} (${authViewerState.sessionScope ?? "unknown"} scope)`;
-}
