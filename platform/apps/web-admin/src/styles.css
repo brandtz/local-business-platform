@@ -599,6 +599,592 @@ section > p {
   font-size: 0.8125rem;
 }
 
+/* ── Admin Page ─────────────────────────────────────────────────────────── */
+.admin-page {
+  max-width: 1200px;
+}
+
+.admin-page--loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: #6b7280;
+}
+
+.admin-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.admin-page__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ── Tab Bar ────────────────────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.tab-bar__tab {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  background: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 150ms, border-color 150ms;
+}
+
+.tab-bar__tab:hover {
+  color: #374151;
+}
+
+.tab-bar__tab--active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+/* ── Search Toolbar ─────────────────────────────────────────────────────── */
+.search-toolbar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.search-toolbar__input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.9375rem;
+  color: #111827;
+  background: #fff;
+  min-width: 200px;
+}
+
+.search-toolbar__input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2);
+}
+
+.search-toolbar__filter {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.9375rem;
+  color: #111827;
+  background: #fff;
+  cursor: pointer;
+}
+
+.search-toolbar__filter:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.2);
+}
+
+/* ── Slide Panel ────────────────────────────────────────────────────────── */
+.slide-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.4);
+  z-index: 200;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.slide-panel {
+  width: 480px;
+  max-width: 90vw;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: -4px 0 16px rgb(0 0 0 / 0.1);
+  animation: slide-in 200ms ease-out;
+}
+
+@keyframes slide-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.slide-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.slide-panel__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.slide-panel__close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.slide-panel__close:hover {
+  color: #111827;
+}
+
+.slide-panel__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+.slide-panel__footer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  justify-content: flex-end;
+}
+
+/* ── Form Section ───────────────────────────────────────────────────────── */
+.form-section {
+  margin-bottom: 1.5rem;
+}
+
+.form-section__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* ── Table Actions ──────────────────────────────────────────────────────── */
+.table-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* ── Button variants ────────────────────────────────────────────────────── */
+.btn--sm {
+  padding: 0.25rem 0.625rem;
+  font-size: 0.8125rem;
+}
+
+.btn--danger {
+  background: #dc2626;
+  color: #fff;
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+/* ── Loading Spinner ────────────────────────────────────────────────────── */
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-bottom: 0.75rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Empty State ────────────────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #6b7280;
+}
+
+.empty-state__hint {
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  color: #9ca3af;
+}
+
+/* ── Confirm Dialog ─────────────────────────────────────────────────────── */
+.confirm-dialog {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.4);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-dialog__card {
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.15);
+}
+
+.confirm-dialog__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.confirm-dialog__message {
+  color: #6b7280;
+  font-size: 0.9375rem;
+  margin-bottom: 1.25rem;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* ── Card Grid ──────────────────────────────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.card-grid__card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: box-shadow 150ms;
+}
+
+.card-grid__card:hover {
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+}
+
+.card-grid__card-title {
+  font-weight: 600;
+  margin-bottom: 0.375rem;
+}
+
+.card-grid__card-meta {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+/* ── Staff Card ─────────────────────────────────────────────────────────── */
+.staff-card {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: box-shadow 150ms;
+}
+
+.staff-card:hover {
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+}
+
+.staff-card__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.staff-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.staff-card__name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.staff-card__role {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+/* ── Data Table wrapper ─────────────────────────────────────────────────── */
+.data-table-wrapper {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.data-table-wrapper .data-table {
+  border: none;
+}
+
+/* ── Calendar Components ────────────────────────────────────────────────── */
+.calendar-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-day {
+  min-height: 400px;
+}
+
+.calendar-day.empty-state {
+  min-height: auto;
+}
+
+.calendar-day__grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-day__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.calendar-day__time {
+  width: 60px;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  flex-shrink: 0;
+  padding-top: 0.25rem;
+}
+
+.calendar-day__blocks {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.calendar-week__day {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  min-height: 120px;
+  font-size: 0.8125rem;
+}
+
+.calendar-week__blocks {
+  margin-top: 0.375rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.calendar-month {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.calendar-month__cell {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.25rem;
+  padding: 0.375rem;
+  min-height: 80px;
+  font-size: 0.8125rem;
+}
+
+.calendar-month__date {
+  font-weight: 600;
+  color: #374151;
+}
+
+.calendar-month__count {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* ── Booking Card ───────────────────────────────────────────────────────── */
+.booking-card {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.8125rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.booking-card__service {
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+.booking-card__customer,
+.booking-card__time,
+.booking-card__staff {
+  color: #374151;
+  font-size: 0.75rem;
+}
+
+/* ── Booking Detail Page ────────────────────────────────────────────────── */
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.booking-header__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.booking-header__meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.booking-notes {
+  margin-top: 1.5rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 1rem;
+}
+
+/* ── Analytics Controls ─────────────────────────────────────────────────── */
+.analytics-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.period-selector {
+  display: flex;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.period-selector__btn {
+  padding: 0.375rem 0.75rem;
+  border: none;
+  background: #fff;
+  font-size: 0.8125rem;
+  color: #374151;
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.period-selector__btn + .period-selector__btn {
+  border-left: 1px solid #d1d5db;
+}
+
+.period-selector__btn:hover {
+  background: #f3f4f6;
+}
+
+.period-selector__btn--active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.period-selector__btn--active:hover {
+  background: #1d4ed8;
+}
+
+.date-range-selector {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.date-range-selector input[type="date"] {
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+/* ── Checkbox Field ─────────────────────────────────────────────────────── */
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+}
+
+/* ── Page Actions ───────────────────────────────────────────────────────── */
+.page-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+/* ── Badge ──────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-info {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
 /* ── Loading & Empty States ─────────────────────────────────────────────── */
 .loading {
   display: flex;

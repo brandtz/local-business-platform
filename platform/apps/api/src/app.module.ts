@@ -1,6 +1,10 @@
 import { Module } from "@nestjs/common";
 
 import { AdminTenantController } from "./admin-tenant.controller";
+import { AnalyticsController } from "./analytics/analytics.controller";
+import { ConfigController } from "./auth/config.controller";
+import { BookingController } from "./booking/booking.controller";
+import { CatalogController } from "./catalog/catalog.controller";
 import { CatalogRepository } from "./catalog/catalog.repository";
 import { CatalogService } from "./catalog/catalog.service";
 import { AnnouncementService } from "./content/announcement.service";
@@ -43,11 +47,16 @@ import { CatalogItemService } from "./catalog/catalog-item.service";
 import { CatalogModifierService } from "./catalog/catalog-modifier.service";
 import { CatalogStorefrontService } from "./catalog/catalog-storefront.service";
 import { StorefrontCatalogService } from "./catalog/storefront-catalog.service";
+import { ContentController } from "./content/content.controller";
+import { CustomerController } from "./customer/customer.controller";
 import { HealthController } from "./health.controller";
+import { OrderController } from "./order/order.controller";
 import { PlatformTenantsController } from "./platform-tenants.controller";
 import { PrismaService } from "./prisma.service";
 import { ServiceManagementService } from "./services/service-management.service";
+import { ServicesController } from "./services/services.controller";
 import { StaffAssignmentService } from "./staff/staff-assignment.service";
+import { StaffController } from "./staff/staff.controller";
 import { StaffManagementService } from "./staff/staff-management.service";
 import { StaffScheduleService } from "./staff/staff-schedule.service";
 import { TenantDirectoryQueryService } from "./tenant-directory-query.service";
@@ -57,7 +66,20 @@ import { VerticalDomainMappingService } from "./vertical/vertical-domain-mapping
 import { VerticalTemplateService } from "./vertical/vertical-template.service";
 
 @Module({
-  controllers: [AdminTenantController, HealthController, PlatformTenantsController],
+  controllers: [
+    AdminTenantController,
+    AnalyticsController,
+    BookingController,
+    CatalogController,
+    ConfigController,
+    ContentController,
+    CustomerController,
+    HealthController,
+    OrderController,
+    PlatformTenantsController,
+    ServicesController,
+    StaffController,
+  ],
   providers: [
     PrismaService,
     AnnouncementService,
