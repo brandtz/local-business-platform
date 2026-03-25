@@ -5,6 +5,25 @@ import { assertValidCatalogListQuery, assertValidCreateCategoryRequest, assertVa
 
 const DEV_TENANT_ID = "dev-tenant-001";
 
+// Seed prices for dev items (maps item ID → price in cents)
+const seedPrices: Record<string, number> = {
+	"item-1": 895, "item-2": 695, "item-3": 2495, "item-4": 1895,
+	"item-5": 3495, "item-6": 995, "item-7": 1195, "item-8": 495, "item-9": 595,
+};
+
+function enrichItem(item: Record<string, unknown>): Record<string, unknown> {
+	const id = item.id as string;
+	return {
+		...item,
+		price: item.price ?? seedPrices[id] ?? 0,
+		compareAtPrice: item.compareAtPrice ?? null,
+		sortOrder: item.sortOrder ?? item.displayOrder ?? 0,
+		visibility: item.visibility ?? "published",
+		stockQuantity: item.stockQuantity ?? null,
+		lowStockThreshold: item.lowStockThreshold ?? null,
+	};
+}
+
 @Controller("catalog")
 export class CatalogController {
 	private readonly catalogService = new CatalogService();
@@ -70,7 +89,8 @@ export class CatalogController {
 			const validated = query && Object.keys(query).length > 0
 				? (() => { assertValidCatalogListQuery(query); return query; })()
 				: undefined;
-			return this.catalogService.listItems(DEV_TENANT_ID, validated);
+			const result = this.catalogService.listItems(DEV_TENANT_ID, validated);
+			return { ...result, items: result.items.map((i: any) => enrichItem(i)) };
 		} catch (err) {
 			throw mapError(err);
 		}
@@ -79,7 +99,7 @@ export class CatalogController {
 	@Get("items/:id")
 	getItem(@Param("id") id: string) {
 		try {
-			return this.catalogService.getItem(DEV_TENANT_ID, id);
+			return enrichItem(this.catalogService.getItem(DEV_TENANT_ID, id) as any);
 		} catch (err) {
 			throw mapError(err);
 		}

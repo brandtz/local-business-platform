@@ -4,9 +4,14 @@ import type { ServiceRecord, ServiceListFilter, ServiceStatus } from "@platform/
 
 const DEV_TENANT_ID = "dev-tenant-001";
 
-// In-memory store for services (no persistence layer exists yet)
-const services: ServiceRecord[] = [];
-let nextSortOrder = 0;
+// In-memory store for services with seed data
+const services: ServiceRecord[] = [
+	{ id: "svc-1", tenantId: DEV_TENANT_ID, name: "Haircut & Style", slug: "haircut-style", description: "Professional haircut and styling by our expert stylists", price: 4500, durationMinutes: 45, bufferMinutes: 15, isBookable: true, maxAdvanceDays: 30, minAdvanceHours: 2, sortOrder: 1, status: "active" as ServiceRecord["status"] },
+	{ id: "svc-2", tenantId: DEV_TENANT_ID, name: "Deep Tissue Massage", slug: "deep-tissue-massage", description: "Therapeutic massage targeting muscle tension and knots", price: 8500, durationMinutes: 60, bufferMinutes: 15, isBookable: true, maxAdvanceDays: 30, minAdvanceHours: 4, sortOrder: 2, status: "active" as ServiceRecord["status"] },
+	{ id: "svc-3", tenantId: DEV_TENANT_ID, name: "Manicure & Pedicure", slug: "manicure-pedicure", description: "Complete nail care with polish of your choice", price: 6000, durationMinutes: 75, bufferMinutes: 10, isBookable: true, maxAdvanceDays: 14, minAdvanceHours: 2, sortOrder: 3, status: "active" as ServiceRecord["status"] },
+	{ id: "svc-4", tenantId: DEV_TENANT_ID, name: "Facial Treatment", slug: "facial-treatment", description: "Rejuvenating facial with cleansing, exfoliation, and hydration", price: 7500, durationMinutes: 50, bufferMinutes: 10, isBookable: true, maxAdvanceDays: 21, minAdvanceHours: 3, sortOrder: 4, status: "active" as ServiceRecord["status"] },
+];
+let nextSortOrder = 5;
 
 function generateId(): string {
 	return `svc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
