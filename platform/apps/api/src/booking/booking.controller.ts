@@ -3,7 +3,7 @@ import { Controller, Get, Post, Patch, Param, Query, Body, HttpException, HttpSt
 import { BookingService, BookingNotFoundError, BookingTransitionError, BookingValidationError } from "./booking.service";
 import { assertValidCreateBookingRequest, parseAdminBookingListQuery, BookingApiContractError } from "./booking-api-contracts";
 
-const DEV_TENANT_ID = "dev-tenant-001";
+const DEV_TENANT_ID = "pilot-superior-exteriors";
 
 @Controller("bookings")
 export class BookingController {

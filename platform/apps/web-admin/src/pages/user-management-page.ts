@@ -260,9 +260,10 @@ export const UserManagementPage = defineComponent({
 			isInviting: false,
 		});
 
+		const sdk = useSdk();
+
 		onMounted(async () => {
 			try {
-				const sdk = useSdk();
 				await Promise.allSettled([
 					sdk.customers.list({ page: 1, pageSize: 50 }),
 					sdk.staff.list(),
@@ -307,7 +308,6 @@ export const UserManagementPage = defineComponent({
 
 			state.value = { ...state.value, isInviting: true, inviteError: null };
 			try {
-				const sdk = useSdk();
 				await sdk.staff.invite({
 					email: state.value.inviteEmail,
 					name: state.value.inviteEmail.split("@")[0],

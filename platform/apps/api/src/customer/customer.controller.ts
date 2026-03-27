@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query, HttpException, HttpStatus } from "@nestj
 
 import { CustomerService, CustomerNotFoundError } from "./customer.service";
 
-const DEV_TENANT_ID = "dev-tenant-001";
+const DEV_TENANT_ID = "pilot-superior-exteriors";
 
 @Controller("customers")
 export class CustomerController {

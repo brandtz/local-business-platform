@@ -2,6 +2,7 @@
 // create/edit SlidePanel, drag-reorder, and delete confirmation.
 
 import { defineComponent, h, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import { useSdk } from "../composables/use-sdk";
 import {
@@ -293,6 +294,8 @@ export const CatalogCategoriesPage = defineComponent({
 	name: "CatalogCategoriesPage",
 	setup() {
 
+		const sdk = useSdk();
+		const router = useRouter();
 		const state = ref<CategoryPageState>({
 			categories: [],
 			rawCategories: [],
@@ -309,7 +312,6 @@ export const CatalogCategoriesPage = defineComponent({
 
 		async function loadCategories() {
 			try {
-				const sdk = useSdk();
 				const result = await sdk.catalog.listCategories();
 				const rawCategories = result.items;
 				const categories = buildCategoryTree(rawCategories);
@@ -381,7 +383,6 @@ export const CatalogCategoriesPage = defineComponent({
 
 			state.value = { ...state.value, isSaving: true, formError: null };
 			try {
-				const sdk = useSdk();
 				if (editTarget) {
 					const params: UpdateCategoryRequest = {
 						description: formData.description || undefined,
@@ -426,7 +427,6 @@ export const CatalogCategoriesPage = defineComponent({
 			const { deleteTarget } = state.value;
 			if (!deleteTarget) return;
 			try {
-				const sdk = useSdk();
 				await sdk.catalog.deleteCategory(deleteTarget.id);
 				closeDeleteConfirm();
 				await loadCategories();
@@ -462,7 +462,7 @@ export const CatalogCategoriesPage = defineComponent({
 				s.error
 					? h("div", { class: "alert alert--error", role: "alert" }, s.error)
 					: null,
-				renderCatalogTabBar("categories", () => { /* tab navigation handled by router */ }),
+				renderCatalogTabBar("categories", (tab) => { router.push(`/catalog/${tab}`); }),
 				renderCategoryTable(s.categories, openEdit, openDeleteConfirm),
 				s.showPanel
 					? renderCategoryFormPanel(

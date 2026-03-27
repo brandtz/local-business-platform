@@ -3,13 +3,10 @@ import { Controller, Get, Post, Put, Delete, Param, Query, Body, HttpCode, HttpE
 import { CatalogService, CatalogNotFoundError, CatalogValidationError, CatalogSlugConflictError } from "./catalog.service";
 import { assertValidCatalogListQuery, assertValidCreateCategoryRequest, assertValidUpdateCategoryRequest, assertValidCreateItemRequest, assertValidUpdateItemRequest, CatalogApiContractError } from "./catalog-api-contracts";
 
-const DEV_TENANT_ID = "dev-tenant-001";
+const DEV_TENANT_ID = "pilot-superior-exteriors";
 
 // Seed prices for dev items (maps item ID → price in cents)
-const seedPrices: Record<string, number> = {
-	"item-1": 895, "item-2": 695, "item-3": 2495, "item-4": 1895,
-	"item-5": 3495, "item-6": 995, "item-7": 1195, "item-8": 495, "item-9": 595,
-};
+const seedPrices: Record<string, number> = {};
 
 function enrichItem(item: Record<string, unknown>): Record<string, unknown> {
 	const id = item.id as string;

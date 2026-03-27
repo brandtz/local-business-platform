@@ -2,6 +2,7 @@
 // create/edit SlidePanel with scheduling and visibility settings.
 
 import { defineComponent, h, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import { useSdk } from "../composables/use-sdk";
 import {
@@ -270,9 +271,11 @@ export const ContentAnnouncementsPage = defineComponent({
 			showPanel: false,
 		});
 
+		const sdk = useSdk();
+		const router = useRouter();
+
 		async function loadAnnouncements() {
 			try {
-				const sdk = useSdk();
 				const result = await sdk.content.listAnnouncements();
 				const rawAnnouncements = result.data;
 				state.value = {
@@ -340,7 +343,6 @@ export const ContentAnnouncementsPage = defineComponent({
 
 			state.value = { ...state.value, isSaving: true, formError: null };
 			try {
-				const sdk = useSdk();
 				if (editTarget) {
 					const params: UpdateAnnouncementRequest = {
 						body: formData.body,
@@ -376,7 +378,6 @@ export const ContentAnnouncementsPage = defineComponent({
 
 		async function toggleActive(id: string, isActive: boolean) {
 			try {
-				const sdk = useSdk();
 				await sdk.content.updateAnnouncement(id, { isActive });
 				await loadAnnouncements();
 			} catch (err) {
@@ -389,7 +390,6 @@ export const ContentAnnouncementsPage = defineComponent({
 
 		async function handleDelete(id: string) {
 			try {
-				const sdk = useSdk();
 				await sdk.content.deleteAnnouncement(id);
 				await loadAnnouncements();
 			} catch (err) {
@@ -423,7 +423,7 @@ export const ContentAnnouncementsPage = defineComponent({
 				s.error
 					? h("div", { class: "alert alert--error", role: "alert" }, s.error)
 					: null,
-				renderContentTabBar("announcements", () => { /* tab navigation handled by router */ }),
+				renderContentTabBar("announcements", (tab) => { router.push(`/content/${tab}`); }),
 				renderAnnouncementTable(s.announcements, openEdit, toggleActive, handleDelete),
 				s.showPanel
 					? renderAnnouncementFormPanel(

@@ -2,6 +2,7 @@
 // create/edit SlidePanel with address fields and operating hours grid.
 
 import { defineComponent, h, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import { useSdk } from "../composables/use-sdk";
 import {
@@ -319,9 +320,11 @@ export const ContentLocationsPage = defineComponent({
 			showPanel: false,
 		});
 
+		const sdk = useSdk();
+		const router = useRouter();
+
 		async function loadLocations() {
 			try {
-				const sdk = useSdk();
 				const result = await sdk.locations.list();
 				const rawLocations = result.data;
 				state.value = {
@@ -401,7 +404,6 @@ export const ContentLocationsPage = defineComponent({
 
 			state.value = { ...state.value, isSaving: true, formError: null };
 			try {
-				const sdk = useSdk();
 				const params: CreateLocationParams = {
 					address: formData.address,
 					city: formData.city,
@@ -433,7 +435,6 @@ export const ContentLocationsPage = defineComponent({
 
 		async function handleDelete(id: string) {
 			try {
-				const sdk = useSdk();
 				await sdk.locations.delete(id);
 				await loadLocations();
 			} catch (err) {
@@ -467,7 +468,7 @@ export const ContentLocationsPage = defineComponent({
 				s.error
 					? h("div", { class: "alert alert--error", role: "alert" }, s.error)
 					: null,
-				renderContentTabBar("locations", () => { /* tab navigation handled by router */ }),
+				renderContentTabBar("locations", (tab) => { router.push(`/content/${tab}`); }),
 				renderLocationTable(s.locations, openEdit, handleDelete),
 				s.showPanel
 					? renderLocationFormPanel(

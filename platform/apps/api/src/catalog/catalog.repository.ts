@@ -52,22 +52,11 @@ function applyPagination<T>(
 
 export class CatalogRepository {
 	private categories: Category[] = [
-		{ id: "cat-1", tenantId: "dev-tenant-001", name: "Appetizers", slug: "appetizers", status: "active", displayOrder: 1, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-		{ id: "cat-2", tenantId: "dev-tenant-001", name: "Main Courses", slug: "main-courses", status: "active", displayOrder: 2, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-		{ id: "cat-3", tenantId: "dev-tenant-001", name: "Desserts", slug: "desserts", status: "active", displayOrder: 3, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-		{ id: "cat-4", tenantId: "dev-tenant-001", name: "Beverages", slug: "beverages", status: "active", displayOrder: 4, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
+		{ id: "cat-roofing", tenantId: "pilot-superior-exteriors", name: "Roofing", slug: "roofing", status: "active", displayOrder: 1, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
+		{ id: "cat-gutters", tenantId: "pilot-superior-exteriors", name: "Gutters", slug: "gutters", status: "active", displayOrder: 2, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
+		{ id: "cat-pressure-washing", tenantId: "pilot-superior-exteriors", name: "Pressure Washing", slug: "pressure-washing", status: "active", displayOrder: 3, createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
 	];
-	private itemRecords: Item[] = [
-		{ id: "item-1", tenantId: "dev-tenant-001", categoryId: "cat-1", name: "Bruschetta", slug: "bruschetta", description: "Toasted bread with fresh tomatoes, basil, and garlic", displayOrder: 1, status: "active", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-		{ id: "item-2", tenantId: "dev-tenant-001", categoryId: "cat-1", name: "Garlic Bread", slug: "garlic-bread", description: "Crispy garlic bread with herb butter", displayOrder: 2, status: "active", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-		{ id: "item-3", tenantId: "dev-tenant-001", categoryId: "cat-2", name: "Grilled Salmon", slug: "grilled-salmon", description: "Atlantic salmon with lemon dill sauce and seasonal vegetables", displayOrder: 1, status: "active", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-		{ id: "item-4", tenantId: "dev-tenant-001", categoryId: "cat-2", name: "Chicken Parmesan", slug: "chicken-parmesan", description: "Breaded chicken breast with marinara and melted mozzarella", displayOrder: 2, status: "active", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-		{ id: "item-5", tenantId: "dev-tenant-001", categoryId: "cat-2", name: "Ribeye Steak", slug: "ribeye-steak", description: "12oz USDA prime ribeye with garlic mashed potatoes", displayOrder: 3, status: "active", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-		{ id: "item-6", tenantId: "dev-tenant-001", categoryId: "cat-3", name: "Tiramisu", slug: "tiramisu", description: "Classic Italian dessert with espresso-soaked ladyfingers", displayOrder: 1, status: "active", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-		{ id: "item-7", tenantId: "dev-tenant-001", categoryId: "cat-3", name: "Chocolate Lava Cake", slug: "chocolate-lava-cake", description: "Warm chocolate cake with a molten center, served with vanilla ice cream", displayOrder: 2, status: "active", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-		{ id: "item-8", tenantId: "dev-tenant-001", categoryId: "cat-4", name: "Fresh Lemonade", slug: "fresh-lemonade", description: "House-made lemonade with fresh mint", displayOrder: 1, status: "active", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-		{ id: "item-9", tenantId: "dev-tenant-001", categoryId: "cat-4", name: "Iced Coffee", slug: "iced-coffee", description: "Cold-brewed coffee served over ice", displayOrder: 2, status: "active", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-	];
+	private itemRecords: Item[] = [];
 	private variants: ItemVariant[] = [];
 	private modifiers: ItemModifier[] = [];
 	private media: MediaReference[] = [];

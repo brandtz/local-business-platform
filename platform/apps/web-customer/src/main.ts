@@ -49,13 +49,13 @@ function isDevMode(): boolean {
 
 function createDevTenantContext(): TenantFrontendContext {
 	return {
-		tenantId: "dev-tenant-001",
-		displayName: runtimeConfig.appTitle || "Dev Storefront",
-		slug: "dev-store",
+		tenantId: "pilot-superior-exteriors",
+		displayName: runtimeConfig.appTitle || "Superior Exteriors & Maintenance",
+		slug: "superior-exteriors",
 		status: "active",
-		previewSubdomain: "dev-store",
-		templateKey: "food-drink",
-		enabledModules: ["catalog", "ordering", "bookings", "content", "operations"],
+		previewSubdomain: "superior-exteriors",
+		templateKey: "contractor",
+		enabledModules: ["services", "bookings", "content", "operations"],
 	};
 }
 

@@ -2,6 +2,7 @@
 // SearchToolbar, bulk actions, and create/edit SlidePanel.
 
 import { defineComponent, h, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import { useSdk } from "../composables/use-sdk";
 import {
@@ -351,6 +352,8 @@ function renderProductFormPanel(
 export const CatalogProductsPage = defineComponent({
 	name: "CatalogProductsPage",
 	setup() {
+		const sdk = useSdk();
+		const router = useRouter();
 		const state = ref<ProductPageState>({
 			categories: [],
 			editTarget: null,
@@ -374,7 +377,6 @@ export const CatalogProductsPage = defineComponent({
 
 		async function loadProducts() {
 			try {
-				const sdk = useSdk();
 				const [itemsResult, catsResult] = await Promise.allSettled([
 					sdk.catalog.listItems({
 						search: state.value.searchQuery || undefined,
@@ -499,7 +501,6 @@ export const CatalogProductsPage = defineComponent({
 
 			state.value = { ...state.value, isSaving: true, formError: null };
 			try {
-				const sdk = useSdk();
 				if (editTarget) {
 					await sdk.catalog.updateItem(editTarget.id, {
 						categoryId: formData.categoryId || undefined,
@@ -530,7 +531,6 @@ export const CatalogProductsPage = defineComponent({
 
 		async function handleDelete(id: string) {
 			try {
-				const sdk = useSdk();
 				await sdk.catalog.deleteItem(id);
 				await loadProducts();
 			} catch (err) {
@@ -551,7 +551,6 @@ export const CatalogProductsPage = defineComponent({
 			state.value = { ...state.value, showBulkConfirm: false };
 
 			try {
-				const sdk = useSdk();
 				const ids = Array.from(selectedIds);
 				for (const id of ids) {
 					if (bulkAction === "delete") {
@@ -594,7 +593,7 @@ export const CatalogProductsPage = defineComponent({
 				s.error
 					? h("div", { class: "alert alert--error", role: "alert" }, s.error)
 					: null,
-				renderCatalogTabBar("products", () => { /* tab navigation handled by router */ }),
+				renderCatalogTabBar("products", (tab) => { router.push(`/catalog/${tab}`); }),
 				renderSearchToolbar(
 					s.searchQuery,
 					s.filterCategory,

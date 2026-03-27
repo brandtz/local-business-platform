@@ -3,7 +3,7 @@ import { Controller, Get, Post, Patch, Param, Query, Body, HttpException, HttpSt
 import { OrderService, OrderNotFoundError, OrderTransitionError, OrderValidationError } from "./order.service";
 import { assertValidPlaceOrderRequest, assertValidTransitionOrderStatusRequest, assertValidCancelOrderRequest, validateAdminOrderListQuery, OrderApiContractError } from "./order-api-contracts";
 
-const DEV_TENANT_ID = "dev-tenant-001";
+const DEV_TENANT_ID = "pilot-superior-exteriors";
 
 @Controller("orders")
 export class OrderController {

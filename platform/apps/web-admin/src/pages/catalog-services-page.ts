@@ -2,6 +2,7 @@
 // SearchToolbar, and create/edit SlidePanel with booking config.
 
 import { defineComponent, h, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import { useSdk } from "../composables/use-sdk";
 import {
@@ -317,6 +318,8 @@ export const CatalogServicesPage = defineComponent({
 	name: "CatalogServicesPage",
 	setup() {
 
+		const sdk = useSdk();
+		const router = useRouter();
 		const state = ref<ServicePageState>({
 			editTarget: null,
 			error: null,
@@ -334,7 +337,6 @@ export const CatalogServicesPage = defineComponent({
 
 		async function loadServices() {
 			try {
-				const sdk = useSdk();
 				const result = await sdk.services.list({
 					search: state.value.searchQuery || undefined,
 					status: (state.value.filterStatus as ServiceStatus) || undefined,
@@ -432,7 +434,6 @@ export const CatalogServicesPage = defineComponent({
 
 			state.value = { ...state.value, isSaving: true, formError: null };
 			try {
-				const sdk = useSdk();
 				const payload = {
 					bufferMinutes: Number(formData.bufferMinutes) || 0,
 					description: formData.description || undefined,
@@ -466,7 +467,6 @@ export const CatalogServicesPage = defineComponent({
 
 		async function handleDelete(id: string) {
 			try {
-				const sdk = useSdk();
 				await sdk.services.delete(id);
 				await loadServices();
 			} catch (err) {
@@ -500,7 +500,7 @@ export const CatalogServicesPage = defineComponent({
 				s.error
 					? h("div", { class: "alert alert--error", role: "alert" }, s.error)
 					: null,
-				renderCatalogTabBar("services", () => { /* tab navigation handled by router */ }),
+				renderCatalogTabBar("services", (tab) => { router.push(`/catalog/${tab}`); }),
 				renderSearchToolbar(s.searchQuery, s.filterStatus, setSearch, setStatusFilter),
 				renderServiceTable(s.services, openEdit, handleDelete),
 				s.showPanel

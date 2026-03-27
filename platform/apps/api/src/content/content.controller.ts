@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Param, Query, Body, HttpCode, HttpE
 
 import type { ContentPageRecord, AnnouncementRecord } from "@platform/types";
 
-const DEV_TENANT_ID = "dev-tenant-001";
+const DEV_TENANT_ID = "pilot-superior-exteriors";
 
 // In-memory stores — no persistence layer for content yet
 const pages: ContentPageRecord[] = [];

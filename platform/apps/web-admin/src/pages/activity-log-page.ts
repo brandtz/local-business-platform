@@ -238,10 +238,11 @@ export const ActivityLogPage = defineComponent({
 
 		const displayEntries = ref<EntryDisplay[]>([]);
 
+		const sdk = useSdk();
+
 		async function loadEntries(page: number = 1) {
 			state.value = { ...state.value, isLoading: true };
 			try {
-				const sdk = useSdk();
 				const result = await sdk.audit.list({
 					page,
 					pageSize: 20,

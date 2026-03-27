@@ -175,6 +175,8 @@ export const AdminLoginPage = defineComponent({
 	setup() {
 		const router = useRouter();
 
+		const sdk = useSdk();
+
 		const state = ref<LoginFormState>({
 			email: "",
 			password: "",
@@ -203,7 +205,6 @@ export const AdminLoginPage = defineComponent({
 			state.value = { ...state.value, isSubmitting: true, error: null };
 
 			try {
-				const sdk = useSdk();
 				await sdk.auth.login({
 					email: state.value.email,
 					password: state.value.password,
@@ -228,7 +229,6 @@ export const AdminLoginPage = defineComponent({
 			}
 
 			try {
-				const sdk = useSdk();
 				await sdk.auth.forgotPassword({ email: state.value.forgotEmail });
 				state.value = { ...state.value, forgotSent: true, forgotError: null };
 			} catch (err) {

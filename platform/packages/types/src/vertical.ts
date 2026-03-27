@@ -188,7 +188,7 @@ export const verticalConfigs: Record<BusinessVertical, VerticalTemplateConfig> =
 		contractor: {
 			vertical: "contractor",
 			description:
-				"Roofing, gutters, general contracting, and home services",
+				"Roofing, gutters, pressure washing, general contracting, and home exterior services",
 			modules: {
 				bookings: true,
 				cart: false,
@@ -209,12 +209,13 @@ export const verticalConfigs: Record<BusinessVertical, VerticalTemplateConfig> =
 			starterCategories: [
 				"Roofing",
 				"Gutters",
-				"General Contracting",
+				"Pressure Washing",
 			],
 			starterServices: [
 				{ name: "Free Consultation", slug: "free-consultation", durationMinutes: 60, price: 0, isBookable: true },
 				{ name: "Roof Inspection", slug: "roof-inspection", durationMinutes: 90, price: 15000, isBookable: true },
 				{ name: "Gutter Cleaning", slug: "gutter-cleaning", durationMinutes: 120, price: 20000, isBookable: true },
+				{ name: "Pressure Washing — Buildings", slug: "pw-buildings", durationMinutes: 180, price: 25000, isBookable: true },
 			],
 			starterContentPages: ["about", "services", "gallery"],
 			defaultBusinessHours: defaultWeekdayHours,

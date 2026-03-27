@@ -198,9 +198,10 @@ export const ProfileBrandingPage = defineComponent({
 			saveSuccess: false,
 		});
 
+		const sdk = useSdk();
+
 		onMounted(async () => {
 			try {
-				const sdk = useSdk();
 				const tenant = await sdk.tenants.get("current");
 				state.value = {
 					...state.value,
@@ -256,7 +257,6 @@ export const ProfileBrandingPage = defineComponent({
 
 			state.value = { ...state.value, isSaving: true, error: null };
 			try {
-				const sdk = useSdk();
 				await sdk.tenants.update("current", {
 					displayName: state.value.profile.businessName,
 				});

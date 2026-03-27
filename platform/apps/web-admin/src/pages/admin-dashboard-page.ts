@@ -248,10 +248,10 @@ export const AdminDashboardPage = defineComponent({
 			error: null,
 		});
 
+		const sdk = useSdk();
+
 		onMounted(async () => {
 			try {
-				const sdk = useSdk();
-
 				const [dashboardData, ordersData] = await Promise.allSettled([
 					sdk.analytics.dashboard(),
 					sdk.orders.list({ tenantId: "", page: 1, pageSize: 5 }),

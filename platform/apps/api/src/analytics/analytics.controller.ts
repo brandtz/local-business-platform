@@ -3,7 +3,7 @@ import { Controller, Post, Body, HttpException, HttpStatus } from "@nestjs/commo
 import { AnalyticsService } from "./analytics.service";
 import { validateAnalyticsQueryParams, validateTopPerformersParams, AnalyticsApiContractError } from "./analytics-api-contracts";
 
-const DEV_TENANT_ID = "dev-tenant-001";
+const DEV_TENANT_ID = "pilot-superior-exteriors";
 
 @Controller("analytics")
 export class AnalyticsController {

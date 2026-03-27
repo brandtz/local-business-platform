@@ -2,6 +2,7 @@
 // full-page editor with RichTextEditor, SEO section, and draft/publish workflow.
 
 import { defineComponent, h, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import { useSdk } from "../composables/use-sdk";
 import {
@@ -268,9 +269,11 @@ export const ContentPagesPage = defineComponent({
 			showEditor: false,
 		});
 
+		const sdk = useSdk();
+		const router = useRouter();
+
 		async function loadPages() {
 			try {
-				const sdk = useSdk();
 				const result = await sdk.content.listPages();
 				const rawPages = result.data;
 				state.value = {
@@ -343,7 +346,6 @@ export const ContentPagesPage = defineComponent({
 
 			state.value = { ...state.value, isSaving: true, formError: null };
 			try {
-				const sdk = useSdk();
 				if (editTarget) {
 					const params: UpdateContentPageRequest = {
 						body: formData.body,
@@ -378,7 +380,6 @@ export const ContentPagesPage = defineComponent({
 
 		async function handleDelete(id: string) {
 			try {
-				const sdk = useSdk();
 				await sdk.content.deletePage(id);
 				await loadPages();
 			} catch (err) {
@@ -424,7 +425,7 @@ export const ContentPagesPage = defineComponent({
 				s.error
 					? h("div", { class: "alert alert--error", role: "alert" }, s.error)
 					: null,
-				renderContentTabBar("pages", () => { /* tab navigation handled by router */ }),
+				renderContentTabBar("pages", (tab) => { router.push(`/content/${tab}`); }),
 				renderPageCardGrid(s.pages, openEdit, handleDelete),
 			]);
 		};

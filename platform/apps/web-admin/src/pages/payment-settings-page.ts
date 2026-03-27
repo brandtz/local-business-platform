@@ -170,9 +170,10 @@ export const PaymentSettingsPage = defineComponent({
 			formErrors: {},
 		});
 
+		const sdk = useSdk();
+
 		onMounted(async () => {
 			try {
-				const sdk = useSdk();
 				const config = await sdk.payments.getConfig();
 				const row = buildConnectionListRow(config);
 				state.value = {
@@ -224,8 +225,6 @@ export const PaymentSettingsPage = defineComponent({
 			}
 
 			try {
-				const sdk = useSdk();
-
 				let credentials: PaymentProviderCredentials;
 				if (provider === "stripe") {
 					credentials = {

@@ -23,15 +23,21 @@ function wrapWithDevFallback(client: ApiClient): ApiClient {
 
 					return async (...args: unknown[]) => {
 						try {
-							return await (method as Function).apply(apiTarget, args);
+							return await (method as (...a: unknown[]) => unknown).apply(apiTarget, args);
 						} catch {
 							const path = `${String(prop)}.${String(methodName)}`;
 							console.warn(`[dev] ${path} failed — no API backend running, returning empty data`);
 
 							const m = String(methodName);
 							if (m === "list")   return { data: [], total: 0, orders: [] };
-							if (m === "dashboard") return { kpis: [], revenue: [], recentOrders: [] };
-							if (m === "getModules") return [];
+							if (m === "dashboard") return { kpiCards: [], revenueChart: { labels: [], datasets: [] }, trafficChart: { labels: [], datasets: [] }, lastUpdated: new Date().toISOString() };
+							if (m === "getModules") return [
+								{ key: "catalog", displayName: "Catalog", category: "commerce", description: "", requiredDependencies: [] },
+								{ key: "ordering", displayName: "Ordering", category: "commerce", description: "", requiredDependencies: [] },
+								{ key: "bookings", displayName: "Bookings", category: "scheduling", description: "", requiredDependencies: [] },
+								{ key: "content", displayName: "Content", category: "content", description: "", requiredDependencies: [] },
+								{ key: "operations", displayName: "Operations", category: "operations", description: "", requiredDependencies: [] },
+							];
 							// For singular gets / mutations, re-throw with a friendlier message
 							throw new Error(`No API backend running — ${path} is unavailable in dev mode`);
 						}
